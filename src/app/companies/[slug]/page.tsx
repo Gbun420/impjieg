@@ -22,11 +22,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: employer } = await supabase
+  const result = await supabase
     .from("employers")
     .select("name, description")
     .eq("slug", slug)
     .single();
+  const employer = result.data as { name: string; description: string | null } | null;
 
   if (!employer) {
     return { title: "Company Not Found" };

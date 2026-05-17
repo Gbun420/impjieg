@@ -1,11 +1,25 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.clover",
-  typescript: true,
+let stripeInstance: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!stripeInstance) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
+      apiVersion: "2025-01-27.clover",
+      typescript: true,
+    });
+  }
+  return stripeInstance;
+}
+
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    const client = getStripe();
+    return client[prop as keyof Stripe];
+  },
 });
 
 export const PRICES = {
-  standard: process.env.STRIPE_PRICE_STANDARD!,
-  featured: process.env.STRIPE_PRICE_FEATURED!,
+  standard: process.env.STRIPE_PRICE_STANDARD || "",
+  featured: process.env.STRIPE_PRICE_FEATURED || "",
 };
