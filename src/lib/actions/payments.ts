@@ -1,0 +1,73 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { stripe, PRICES } from "@/lib/stripe";
+
+export async function createCheckoutSession(
+  jobId: string,
+  listingType: string
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { data: employer } = await supabase
+    .from("employers")
+    .select("id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!employer) {
+    return { error: "Employer profile not found" };
+  }
+
+  const amount = listingType === "featured" ? 5900 : 2900;
+
+  const { data: payment, error: paymentError } = await supabase
+    .from("payments")
+    .insert({
+      employer_id: employer.id,
+      job_id: jobId,
+      amount,
+      currency: "eur",
+      status: "pending",
+      listing_type: listingType,
+    })
+    .select()
+    .single();
+
+  if (paymentError) {
+    return { error: paymentError.message };
+  }
+
+  const priceId =
+    listingType === "featured" ? PRICES.featured : PRICES.standard;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${process.env.NEXT_PUBLIC_URL}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL}/employer/post-job`,
+    metadata: {
+      jobId,
+      employerId: employer.id,
+      paymentId: payment.id,
+      listingType,
+    },
+  });
+
+  redirect(session.url!);
+}
