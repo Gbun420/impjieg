@@ -1,0 +1,95 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Bell, CheckCircle2 } from "lucide-react";
+import { SECTORS, JOB_TYPES, REMOTE_OPTIONS } from "@/lib/constants";
+
+export default function JobAlertsPage() {
+  const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    await new Promise((r) => setTimeout(r, 1000));
+    setIsLoading(false);
+    setSubmitted(true);
+  }
+
+  if (submitted) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 sm:px-6 lg:px-8">
+        <Card className="p-8 text-center">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+          <h1 className="mt-4 text-xl font-bold text-foreground">
+            Alert Created
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            We&apos;ll notify you when new jobs match your preferences.
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-lg px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex items-center gap-3">
+        <Bell className="h-8 w-8 text-secondary" />
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Job Alerts</h1>
+          <p className="text-muted-foreground">
+            Get notified when new jobs match your criteria
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <Input
+          label="Email Address"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          required
+        />
+        <Select
+          label="Sector"
+          name="sector"
+          options={SECTORS.map((s) => ({ value: s, label: s }))}
+          placeholder="Any sector"
+        />
+        <Select
+          label="Job Type"
+          name="jobType"
+          options={JOB_TYPES.map((t) => ({ value: t, label: t }))}
+          placeholder="Any type"
+        />
+        <Select
+          label="Remote Option"
+          name="remote"
+          options={REMOTE_OPTIONS.map((r) => ({ value: r, label: r }))}
+          placeholder="Any option"
+        />
+        <Input
+          label="Minimum Salary (EUR)"
+          name="salaryMin"
+          type="number"
+          placeholder="30000"
+        />
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="w-full"
+          isLoading={isLoading}
+        >
+          Create Alert
+        </Button>
+      </form>
+    </div>
+  );
+}
