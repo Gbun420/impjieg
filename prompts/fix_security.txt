@@ -1,0 +1,10 @@
+Create an Express middleware (src/middleware/csp.ts) that sets a
+Content-Security-Policy header.
+
+- Allow scripts from 'self' and https://cdn.jsdelivr.net.
+- Disallow eval, inline styles, and all other unsafe sources.
+- Include object-src 'none' and base-uri 'self'.
+- Export the middleware as csp and add it to the app with
+  app.use(csp) in src/server.ts.
+
+Provide the full TypeScript file content.

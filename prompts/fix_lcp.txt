@@ -1,0 +1,13 @@
+From the Lighthouse report (reports/lh.json) the LCP is > 3 s because the
+hero image /public/images/hero.jpg is 4 MB.
+
+Rewrite the markup to use a low-quality WebP placeholder with a CSS
+blur-up effect and loading="lazy".
+
+Provide:
+- A <picture> element that serves the WebP version for modern browsers,
+  falls back to the original JPEG for older browsers.
+- The low-quality placeholder should be a tiny WebP (hero-placeholder.webp).
+- CSS to apply a blur filter to the placeholder and transition to the full
+  image once it loads.
+- Update any Next.js <Image> component usage accordingly.

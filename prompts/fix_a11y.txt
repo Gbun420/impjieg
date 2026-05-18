@@ -1,5 +1,11 @@
-Add an axe-core accessibility validation step to the existing Playwright test suite.
-- After each page.goto(...) call, run checkA11y(page) from tests/helpers/a11y.ts.
-- Fail the test if any WCAG 2.1 AA violations appear.
-- Log the violations as JSON in the error message.
-- Export the helper as tests/helpers/a11y.ts.
+Add an axe-core accessibility validation step to the existing Playwright
+test suite.
+
+- After each page.goto(...) call, inject axe-core from CDN
+  (https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js).
+- Run await page.evaluate(async () => await axe.run({runOnly:{type:'tag',values:['wcag2aa']}})).
+- If any violations are returned, fail the test, log a pretty-printed
+  JSON dump, and upload that JSON as an artifact named a11y-report.json.
+- Export a helper function export async function checkA11y(page) in
+  tests/helpers/a11y.ts.
+- Import and invoke await checkA11y(page) at the end of every test file.

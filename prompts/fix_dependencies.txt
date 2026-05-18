@@ -1,0 +1,7 @@
+Parse the reports/npm-audit.json file (output of npm audit --json).
+
+Generate a single npm install command that upgrades all flagged
+packages to the minimal non-vulnerable versions while preserving the lock
+file. Include the exact version numbers to be installed.
+
+Output only the npm install command line.
