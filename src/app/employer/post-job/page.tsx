@@ -14,10 +14,12 @@ import {
   REMOTE_OPTIONS,
   PRICING,
 } from "@/lib/constants";
+import { Sparkles, Loader2 } from "lucide-react";
 
 export default function PostJobPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -26,6 +28,47 @@ export default function PostJobPage() {
     setIsLoading(false);
     if (result?.error) {
       setError(result.error);
+    }
+  }
+
+  async function generateDescription() {
+    const title = (document.querySelector('[name="title"]') as HTMLInputElement)?.value;
+    const sector = (document.querySelector('[name="sector"]') as HTMLSelectElement)?.value;
+    const jobType = (document.querySelector('[name="jobType"]') as HTMLSelectElement)?.value;
+    const seniority = (document.querySelector('[name="seniority"]') as HTMLSelectElement)?.value;
+    const location = (document.querySelector('[name="location"]') as HTMLInputElement)?.value;
+
+    if (!title) {
+      setError("Please enter a job title first");
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/ai/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, sector, jobType, seniority, location }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to generate description");
+        return;
+      }
+
+      const textarea = document.querySelector('[name="description"]') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.value = data.description;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsGenerating(false);
     }
   }
 
@@ -41,9 +84,24 @@ export default function PostJobPage() {
 
       <form action={handleSubmit} className="space-y-8">
         <Card className="p-6">
-          <h2 className="text-lg font-semibold text-foreground">
-            Job Details
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground">
+              Job Details
+            </h2>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={generateDescription}
+              isLoading={isGenerating}
+            >
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              AI Generate
+            </Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Fill in the title and click AI Generate for a professional description
+          </p>
           <div className="mt-4 space-y-4">
             <Input
               label="Job Title"
@@ -54,7 +112,7 @@ export default function PostJobPage() {
             <Textarea
               label="Description"
               name="description"
-              placeholder="Describe the role, responsibilities, and requirements..."
+              placeholder="Describe the role, responsibilities, and requirements... or use AI Generate"
               required
               className="min-h-[200px]"
             />

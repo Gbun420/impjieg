@@ -1,0 +1,70 @@
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  const { title, sector, jobType, seniority, location, description } = await request.json();
+
+  if (!title) {
+    return NextResponse.json({ error: "Job title is required" }, { status: 400 });
+  }
+
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
+  }
+
+  const prompt = `Generate a professional job description for the following role:
+
+Job Title: ${title}
+Sector: ${sector || "General"}
+Job Type: ${jobType || "Full-time"}
+Seniority: ${seniority || "Mid Level"}
+Location: ${location || "Malta"}
+${description ? `Additional context: ${description}` : ""}
+
+Format the response as HTML with the following sections:
+1. A compelling 2-3 sentence role overview
+2. Key Responsibilities (5-7 bullet points as <li> elements)
+3. Requirements & Qualifications (5-7 bullet points as <li> elements)
+4. What We Offer (3-5 bullet points as <li> elements)
+
+Wrap each section in <h3> tags for the section title and <ul>/<li> for the bullet points.
+Keep it concise, professional, and tailored to the Malta job market.
+Do not include any HTML wrapper tags (no <html>, <body>, etc).
+Only return the HTML content for the sections.`;
+
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${groqApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert HR writer specializing in creating compelling job descriptions for the Malta job market. Always format output as clean HTML with h3 headings and ul/li lists.",
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 2048,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Groq API error:", data);
+      return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
+    }
+
+    const generatedDescription = data.choices[0].message.content;
+
+    return NextResponse.json({ description: generatedDescription });
+  } catch (error) {
+    console.error("AI generation error:", error);
+    return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
+  }
+}

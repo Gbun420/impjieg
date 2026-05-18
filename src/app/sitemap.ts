@@ -1,5 +1,10 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { SECTORS, LOCATIONS } from "@/lib/constants";
+
+function labelToSlug(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
@@ -20,6 +25,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "daily" as const,
     priority: route === "" ? 1 : 0.8,
   }));
+
+  const seoSectorPages = SECTORS.map((sector) => ({
+    url: `${baseUrl}/jobs/sector/${labelToSlug(sector)}`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  }));
+
+  const seoLocationPages = SECTORS.flatMap((sector) =>
+    LOCATIONS.map((location) => ({
+      url: `${baseUrl}/jobs/sector/${labelToSlug(sector)}/location/${labelToSlug(location)}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.6,
+    }))
+  );
 
   let jobPages: MetadataRoute.Sitemap = [];
   let companyPages: MetadataRoute.Sitemap = [];
@@ -59,5 +80,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // If Supabase is not configured yet, return static pages only
   }
 
-  return [...staticPages, ...jobPages, ...companyPages];
+  return [...staticPages, ...seoSectorPages, ...seoLocationPages, ...jobPages, ...companyPages];
 }

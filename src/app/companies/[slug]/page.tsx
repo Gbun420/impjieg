@@ -11,6 +11,7 @@ import {
   Users,
   Building2,
   ArrowLeft,
+  Briefcase,
 } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
@@ -35,8 +36,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: emp.name,
-    description: emp.description || `View open roles at ${emp.name}`,
+    title: `${emp.name} - Jobs & Company Profile | Impjieg`,
+    description: emp.description || `View open roles at ${emp.name} on Impjieg Malta's job board.`,
   };
 }
 
@@ -80,75 +81,97 @@ export default async function CompanyProfilePage({
         Back to companies
       </Link>
 
-      <Card className="p-6 sm:p-8 border-primary/20">
-        <div className="flex items-start gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-muted/50">
-            {emp.logo_url ? (
-              <img
-                src={emp.logo_url}
-                alt={emp.name}
-                className="h-10 w-10 rounded-xl object-cover"
-              />
-            ) : (
-              <span className="text-2xl font-bold text-muted-foreground">
-                {emp.name.charAt(0)}
-              </span>
-            )}
+      <Card className="overflow-hidden border-primary/20">
+        {emp.cover_image_url && (
+          <div className="h-40 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20 sm:h-48">
+            <img
+              src={emp.cover_image_url}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {emp.name}
-            </h1>
-            {emp.description && (
-              <p className="mt-2 text-muted-foreground leading-relaxed">
-                {emp.description}
-              </p>
-            )}
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-              {emp.location && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  {emp.location}
+        )}
+        <div className="p-6 sm:p-8">
+          <div className="flex items-start gap-5">
+            <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${
+              emp.cover_image_url
+                ? "-mt-12 border-4 border-background bg-background shadow-lg"
+                : "bg-muted/50"
+            }`}>
+              {emp.logo_url ? (
+                <img
+                  src={emp.logo_url}
+                  alt={emp.name}
+                  className="h-10 w-10 rounded-xl object-cover"
+                />
+              ) : (
+                <span className="text-2xl font-bold text-muted-foreground">
+                  {emp.name.charAt(0)}
                 </span>
-              )}
-              {emp.company_size && (
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  {emp.company_size}
-                </span>
-              )}
-              {emp.industry && (
-                <span className="flex items-center gap-1">
-                  <Building2 className="h-4 w-4" />
-                  {emp.industry}
-                </span>
-              )}
-              {emp.website && (
-                <a
-                  href={emp.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-                >
-                  <Globe className="h-4 w-4" />
-                  Website
-                </a>
               )}
             </div>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                {emp.name}
+              </h1>
+              {emp.description && (
+                <p className="mt-2 text-muted-foreground leading-relaxed">
+                  {emp.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
+            {emp.location && (
+              <span className="flex items-center gap-1.5 rounded-lg bg-muted/30 px-3 py-1.5">
+                <MapPin className="h-4 w-4" />
+                {emp.location}
+              </span>
+            )}
+            {emp.company_size && (
+              <span className="flex items-center gap-1.5 rounded-lg bg-muted/30 px-3 py-1.5">
+                <Users className="h-4 w-4" />
+                {emp.company_size} employees
+              </span>
+            )}
+            {emp.industry && (
+              <span className="flex items-center gap-1.5 rounded-lg bg-muted/30 px-3 py-1.5">
+                <Building2 className="h-4 w-4" />
+                {emp.industry}
+              </span>
+            )}
+            {emp.website && (
+              <a
+                href={emp.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-primary hover:bg-primary/20 transition-colors"
+              >
+                <Globe className="h-4 w-4" />
+                Visit Website
+              </a>
+            )}
           </div>
         </div>
       </Card>
 
       <div className="mt-10">
-        <h2 className="mb-5 text-xl font-bold tracking-tight text-foreground">
-          Open Roles ({typedJobs.length})
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Open Roles
+          </h2>
+          <Badge variant="secondary">{typedJobs.length}</Badge>
+        </div>
         {typedJobs.length === 0 ? (
-          <p className="text-muted-foreground">
-            No open roles at this company.
-          </p>
+          <Card className="mt-5 p-8 text-center">
+            <Briefcase className="mx-auto h-8 w-8 text-muted-foreground/50" />
+            <p className="mt-2 text-muted-foreground">
+              No open roles at this company right now.
+            </p>
+          </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="mt-5 space-y-3">
             {typedJobs.map((job) => (
               <JobCard key={job.id} job={job} />
             ))}

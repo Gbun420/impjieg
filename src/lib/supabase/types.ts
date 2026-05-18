@@ -272,6 +272,6 @@ export type JobAlert = Database["public"]["Tables"]["job_alerts"]["Row"];
 export type JobWithEmployer = Job & {
   employers: Pick<
     Employer,
-    "id" | "name" | "slug" | "logo_url" | "location"
+    "id" | "name" | "slug" | "logo_url" | "location" | "website"
   >;
 };

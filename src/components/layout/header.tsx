@@ -21,12 +21,24 @@ export default function Header() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setIsLoggedIn(!!data.user);
-    });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setIsLoggedIn(!!user);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuth();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(!!session);
+      }
     });
 
     return () => {
@@ -75,7 +87,10 @@ export default function Header() {
                     Dashboard
                   </Button>
                 </Link>
-                <form action={logout}>
+                <form action={async () => {
+                  await logout();
+                  window.location.href = "/";
+                }}>
                   <Button variant="outline" size="sm">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -144,7 +159,10 @@ export default function Header() {
                       Dashboard
                     </Button>
                   </Link>
-                  <form action={logout}>
+                  <form action={async () => {
+                    await logout();
+                    window.location.href = "/";
+                  }}>
                     <Button variant="outline" size="md" className="w-full">
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out

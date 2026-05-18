@@ -5,8 +5,19 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { SECTORS } from "@/lib/constants";
 import type { Employer } from "@/lib/supabase/types";
+
+const COMPANY_SIZES = [
+  "1-10",
+  "11-50",
+  "51-200",
+  "201-500",
+  "501-1000",
+  "1000+",
+];
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +28,9 @@ export default function SettingsPage() {
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [companySize, setCompanySize] = useState("");
+  const [industry, setIndustry] = useState("");
 
   useEffect(() => {
     async function loadEmployer() {
@@ -40,6 +54,9 @@ export default function SettingsPage() {
         setWebsite(emp.website || "");
         setLocation(emp.location || "");
         setLogoUrl(emp.logo_url || "");
+        setCoverImageUrl(emp.cover_image_url || "");
+        setCompanySize(emp.company_size || "");
+        setIndustry(emp.industry || "");
       }
     }
     loadEmployer();
@@ -59,7 +76,16 @@ export default function SettingsPage() {
 
     const result = await supabase
       .from("employers")
-      .update({ name, description, website, location, logo_url: logoUrl } as any)
+      .update({
+        name,
+        description,
+        website,
+        location,
+        logo_url: logoUrl,
+        cover_image_url: coverImageUrl,
+        company_size: companySize || null,
+        industry: industry || null,
+      } as any)
       .eq("user_id", user.id);
 
     setIsLoading(false);
@@ -75,7 +101,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">Settings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Company Profile</h1>
 
       {error && (
         <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
@@ -85,9 +111,36 @@ export default function SettingsPage() {
 
       {success && (
         <div className="rounded-xl bg-success/10 p-4 text-sm text-success">
-          Settings updated successfully
+          Profile updated successfully
         </div>
       )}
+
+      <Card className="overflow-hidden">
+        {coverImageUrl && (
+          <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20">
+            <img src={coverImageUrl} alt="" className="h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="p-6">
+          <h2 className="text-lg font-semibold text-foreground">
+            Branding
+          </h2>
+          <div className="mt-4 space-y-4">
+            <Input
+              label="Cover Image URL"
+              value={coverImageUrl}
+              onChange={(e) => setCoverImageUrl(e.target.value)}
+              placeholder="https://example.com/cover.jpg"
+            />
+            <Input
+              label="Logo URL"
+              value={logoUrl}
+              onChange={(e) => setLogoUrl(e.target.value)}
+              placeholder="https://example.com/logo.png"
+            />
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-foreground">
@@ -104,8 +157,25 @@ export default function SettingsPage() {
             label="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Tell candidates about your company..."
+            placeholder="Tell candidates about your company culture, mission, and values..."
+            className="min-h-[120px]"
           />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              label="Company Size"
+              value={companySize}
+              onChange={(e) => setCompanySize(e.target.value)}
+              options={COMPANY_SIZES.map((s) => ({ value: s, label: s }))}
+              placeholder="Select size"
+            />
+            <Select
+              label="Industry"
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              options={SECTORS.map((s) => ({ value: s, label: s }))}
+              placeholder="Select industry"
+            />
+          </div>
           <Input
             label="Website"
             type="url"
@@ -118,12 +188,6 @@ export default function SettingsPage() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Sliema, Malta"
-          />
-          <Input
-            label="Logo URL"
-            value={logoUrl}
-            onChange={(e) => setLogoUrl(e.target.value)}
-            placeholder="https://example.com/logo.png"
           />
           <Button
             type="submit"

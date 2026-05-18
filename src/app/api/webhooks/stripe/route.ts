@@ -49,10 +49,14 @@ export async function POST(request: Request) {
           .eq("id", paymentId);
       }
 
-      if (listingType === "featured" && jobId) {
+      if (jobId) {
+        const updates: Record<string, unknown> = { status: "active" };
+        if (listingType === "featured") {
+          updates.is_featured = true;
+        }
         await supabase
           .from("jobs")
-          .update({ status: "active", is_featured: true })
+          .update(updates)
           .eq("id", jobId);
       }
 
@@ -67,8 +71,59 @@ export async function POST(request: Request) {
       if (paymentId) {
         await supabase
           .from("payments")
+          .update({ status: "expired" })
+          .eq("id", paymentId);
+      }
+
+      break;
+    }
+
+    case "payment_intent.payment_failed": {
+      const intent = event.data.object as any;
+      const metadata = intent.metadata || {};
+      const { paymentId, jobId } = metadata;
+
+      if (paymentId) {
+        await supabase
+          .from("payments")
           .update({ status: "failed" })
           .eq("id", paymentId);
+      }
+
+      if (jobId) {
+        await supabase
+          .from("jobs")
+          .update({ status: "draft" })
+          .eq("id", jobId);
+      }
+
+      break;
+    }
+
+    case "charge.refunded": {
+      const charge = event.data.object as any;
+      const paymentIntentId = charge.payment_intent;
+
+      if (paymentIntentId) {
+        const { data: payment } = await supabase
+          .from("payments")
+          .select("id, job_id")
+          .eq("stripe_payment_intent_id", paymentIntentId)
+          .single();
+
+        if (payment) {
+          await supabase
+            .from("payments")
+            .update({ status: "refunded" })
+            .eq("id", payment.id);
+
+          if (payment.job_id) {
+            await supabase
+              .from("jobs")
+              .update({ status: "draft" })
+              .eq("id", payment.job_id);
+          }
+        }
       }
 
       break;

@@ -42,6 +42,54 @@ export async function generateMetadata({
   };
 }
 
+function JobPostingSchema({ job }: { job: JobWithEmployer }) {
+  const schema = {
+    "@context": "https://schema.org/",
+    "@type": "JobPosting",
+    title: job.title,
+    description: job.description.replace(/<[^>]*>/g, ""),
+    datePosted: job.created_at,
+    validThrough: job.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    employmentType: job.job_type,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: job.employers?.name,
+      sameAs: job.employers?.website || undefined,
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: job.location?.split(",")[0]?.trim() || "Malta",
+        addressCountry: "MT",
+      },
+    },
+    baseSalary: job.salary_min
+      ? {
+          "@type": "MonetaryAmount",
+          currency: "EUR",
+          value: {
+            "@type": "QuantitativeValue",
+            minValue: job.salary_min,
+            maxValue: job.salary_max || undefined,
+            unitText: "YEAR",
+          },
+        }
+      : undefined,
+    applicantLocationRequirements: job.remote_type
+      ? { "@type": "Place", name: job.remote_type }
+      : undefined,
+    url: `https://impjieg.com/jobs/${job.employers?.slug}/${job.slug}`,
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 export default async function JobDetailPage({
   params,
 }: {
@@ -55,7 +103,7 @@ export default async function JobDetailPage({
     .select("*, employers(id, name, slug, logo_url, location, website)")
     .eq("slug", jobSlug)
     .eq("status", "active")
-    .single();
+    .single() as { data: JobWithEmployer | null; error: any };
 
   if (!job) {
     notFound();
@@ -229,6 +277,8 @@ export default async function JobDetailPage({
       <div className="mt-10 border-t border-border/50 pt-6 text-sm text-muted-foreground">
         Posted {formatDate(j.created_at)} &middot; {daysAgo(j.created_at)}
       </div>
+
+      <JobPostingSchema job={j} />
     </div>
   );
 }
