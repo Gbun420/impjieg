@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -14,7 +16,23 @@ const navLinks = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setIsLoggedIn(!!data.user);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -49,16 +67,35 @@ export default function Header() {
           </button>
 
           <div className="hidden md:flex items-center gap-2">
-            <Link href="/auth/login">
-              <Button variant="ghost" size="sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/employer/post-job">
-              <Button variant="primary" size="sm">
-                Post a Job
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <>
+                <Link href="/employer/dashboard">
+                  <Button variant="ghost" size="sm">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
+                <form action={logout}>
+                  <Button variant="outline" size="sm">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/employer/post-job">
+                  <Button variant="primary" size="sm">
+                    Post a Job
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -99,16 +136,35 @@ export default function Header() {
                   </>
                 )}
               </button>
-              <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                <Button variant="ghost" size="md" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/employer/post-job" onClick={() => setMobileOpen(false)}>
-                <Button variant="primary" size="md" className="w-full">
-                  Post a Job
-                </Button>
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link href="/employer/dashboard" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" size="md" className="w-full">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <form action={logout}>
+                    <Button variant="outline" size="md" className="w-full">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" size="md" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/employer/post-job" onClick={() => setMobileOpen(false)}>
+                    <Button variant="primary" size="md" className="w-full">
+                      Post a Job
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>
