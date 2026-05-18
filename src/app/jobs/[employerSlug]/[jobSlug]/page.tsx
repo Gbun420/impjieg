@@ -69,22 +69,26 @@ export default async function JobDetailPage({
   const j = job as unknown as JobWithEmployer;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
         href="/jobs"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="group mb-8 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
         Back to jobs
       </Link>
 
-      <div className="flex items-start gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+      <div className="flex items-start gap-5">
+        <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${
+          j.is_featured
+            ? "bg-gradient-to-br from-primary/20 to-secondary/20 ring-2 ring-primary/10"
+            : "bg-muted/50"
+        }`}>
           {j.employers.logo_url ? (
             <img
               src={j.employers.logo_url}
               alt={j.employers.name}
-              className="h-10 w-10 rounded object-cover"
+              className="h-10 w-10 rounded-xl object-cover"
             />
           ) : (
             <span className="text-2xl font-bold text-muted-foreground">
@@ -94,14 +98,14 @@ export default async function JobDetailPage({
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {j.title}
             </h1>
-            {j.is_featured && <Badge variant="success">Featured</Badge>}
+            {j.is_featured && <Badge variant="default">Featured</Badge>}
           </div>
           <Link
             href={`/companies/${j.employers.slug}`}
-            className="mt-1 text-lg text-muted-foreground hover:text-secondary"
+            className="mt-1 text-lg text-muted-foreground hover:text-primary transition-colors"
           >
             {j.employers.name}
           </Link>
@@ -125,15 +129,17 @@ export default async function JobDetailPage({
       </div>
 
       {(j.salary_min || j.salary_max) && (
-        <Card className="mt-6 border-secondary/30 bg-secondary/[0.03]">
+        <Card className="mt-8 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
           <div className="p-6">
             <div className="flex items-center gap-2">
-              <Banknote className="h-5 w-5 text-secondary" />
-              <span className="text-sm font-medium text-secondary">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Banknote className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-primary">
                 Verified Salary
               </span>
             </div>
-            <p className="mt-2 font-mono text-2xl font-bold text-foreground">
+            <p className="mt-3 font-mono text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               {formatSalary(j.salary_min ?? 0)}
               {j.salary_max
                 ? ` - ${formatSalary(j.salary_max)}`
@@ -146,7 +152,7 @@ export default async function JobDetailPage({
         </Card>
       )}
 
-      <div className="mt-8 space-y-8">
+      <div className="mt-10 space-y-10">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
             Job Description
@@ -183,7 +189,7 @@ export default async function JobDetailPage({
                   key={benefit}
                   className="flex items-center gap-2 text-muted-foreground"
                 >
-                  <CheckCircle2 className="h-4 w-4 text-secondary" />
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
                   {benefit}
                 </li>
               ))}
@@ -191,7 +197,7 @@ export default async function JobDetailPage({
           </div>
         )}
 
-        <Card>
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-foreground">
               Interested in this role?
@@ -199,7 +205,7 @@ export default async function JobDetailPage({
             <p className="mt-1 text-sm text-muted-foreground">
               Apply directly through the employer&apos;s preferred method.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               {j.application_url && (
                 <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
                   <Button variant="primary" size="lg">
@@ -220,7 +226,7 @@ export default async function JobDetailPage({
         </Card>
       </div>
 
-      <div className="mt-8 border-t border-border pt-6 text-sm text-muted-foreground">
+      <div className="mt-10 border-t border-border/50 pt-6 text-sm text-muted-foreground">
         Posted {formatDate(j.created_at)} &middot; {daysAgo(j.created_at)}
       </div>
     </div>

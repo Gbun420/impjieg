@@ -44,31 +44,34 @@ export default function SearchFilters() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             name="search"
             placeholder="Search jobs, companies, skills..."
-            className="pl-10"
+            className="pl-10 h-11"
             defaultValue={searchParams.get("search") || ""}
           />
         </div>
-        <Button type="submit" variant="primary" isLoading={isPending}>
-          Search
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          Filters
-        </Button>
+        <div className="flex gap-2">
+          <Button type="submit" variant="primary" isLoading={isPending} className="sm:w-auto w-full">
+            Search
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="sm:w-auto w-full"
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            Filters
+          </Button>
+        </div>
       </div>
 
       {showFilters && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 animate-fade-in">
           <Select
             name="sector"
             options={sectorOptions}
@@ -92,12 +95,12 @@ export default function SearchFilters() {
             placeholder="Location"
             defaultValue={searchParams.get("location") || ""}
           />
-          <label className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm">
+          <label className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/50 px-3 py-2.5 text-sm backdrop-blur-sm cursor-pointer hover:border-primary/30 transition-colors">
             <input
               type="checkbox"
               name="visa"
               defaultChecked={searchParams.get("visa") === "true"}
-              className="h-4 w-4 rounded border-border text-secondary focus:ring-secondary"
+              className="h-4 w-4 rounded border-border/60 text-primary focus:ring-primary/40"
             />
             Visa Friendly
           </label>

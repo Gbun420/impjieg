@@ -23,7 +23,7 @@ export default function SignupPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-foreground">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Create your account
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -32,7 +32,7 @@ export default function SignupPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-error/10 p-4 text-sm text-error">
+        <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
           {error}
         </div>
       )}
@@ -71,7 +71,7 @@ export default function SignupPage() {
         Already have an account?{" "}
         <Link
           href="/auth/login"
-          className="font-medium text-secondary hover:underline"
+          className="font-medium text-primary hover:text-primary/80 transition-colors"
         >
           Sign in
         </Link>

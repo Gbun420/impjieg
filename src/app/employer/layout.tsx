@@ -43,14 +43,14 @@ export default async function EmployerLayout({
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
-      <aside className="hidden w-64 border-r border-border bg-card lg:block">
+      <aside className="hidden w-64 border-r border-border/50 bg-muted/20 lg:block">
         <nav className="p-4">
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}

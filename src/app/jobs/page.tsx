@@ -13,9 +13,9 @@ function SearchFiltersSkeleton() {
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <Skeleton className="h-10 flex-1" />
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-11 flex-1" />
+        <Skeleton className="h-11 w-24" />
+        <Skeleton className="h-11 w-24" />
       </div>
     </div>
   );
@@ -78,7 +78,7 @@ async function JobsContent({
       {typedJobs.length === JOBS_PER_PAGE && (
         <div className="flex justify-center pt-4">
           <Link href={`/jobs?${new URLSearchParams({ ...searchParams, page: String(page + 1) }).toString()}`}>
-            <Button variant="outline">Load More</Button>
+            <Button variant="outline" size="lg">Load More</Button>
           </Link>
         </div>
       )}
@@ -94,8 +94,8 @@ export default async function JobsPage({
   const params = await searchParams;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-foreground sm:text-3xl">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 className="mb-8 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         Browse Jobs
       </h1>
       <Suspense fallback={<SearchFiltersSkeleton />}>

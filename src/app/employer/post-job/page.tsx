@@ -31,10 +31,10 @@ export default function PostJobPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="text-2xl font-bold text-foreground">Post a Job</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Post a Job</h1>
 
       {error && (
-        <div className="rounded-lg bg-error/10 p-4 text-sm text-error">
+        <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
           {error}
         </div>
       )}
@@ -133,11 +133,11 @@ export default function PostJobPage() {
               name="benefits"
               placeholder="Health insurance, Remote work, Bonus"
             />
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/50 px-3 py-2.5 text-sm backdrop-blur-sm cursor-pointer hover:border-primary/30 transition-colors">
               <input
                 type="checkbox"
                 name="visaFriendly"
-                className="h-4 w-4 rounded border-border text-secondary focus:ring-secondary"
+                className="h-4 w-4 rounded border-border/60 text-primary focus:ring-primary/40"
               />
               Visa Friendly (open to work permit sponsorship)
             </label>
@@ -169,13 +169,13 @@ export default function PostJobPage() {
             Listing Type
           </h2>
           <div className="mt-4 space-y-3">
-            <label className="flex items-start gap-3 rounded-lg border border-border p-4 has-[:checked]:border-secondary has-[:checked]:bg-secondary/[0.02]">
+            <label className="flex items-start gap-3 rounded-xl border border-border/60 p-4 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 transition-all cursor-pointer">
               <input
                 type="radio"
                 name="listingType"
                 value="standard"
                 defaultChecked
-                className="mt-1 h-4 w-4 border-border text-secondary focus:ring-secondary"
+                className="mt-1 h-4 w-4 border-border/60 text-primary focus:ring-primary/40"
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
@@ -191,19 +191,19 @@ export default function PostJobPage() {
                 </p>
               </div>
             </label>
-            <label className="flex items-start gap-3 rounded-lg border border-border p-4 has-[:checked]:border-secondary has-[:checked]:bg-secondary/[0.02]">
+            <label className="flex items-start gap-3 rounded-xl border border-border/60 p-4 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 transition-all cursor-pointer">
               <input
                 type="radio"
                 name="listingType"
                 value="featured"
-                className="mt-1 h-4 w-4 border-border text-secondary focus:ring-secondary"
+                className="mt-1 h-4 w-4 border-border/60 text-primary focus:ring-primary/40"
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-foreground">
                     {PRICING.featured.label}
                   </span>
-                  <span className="font-mono text-lg font-bold text-foreground">
+                  <span className="font-mono text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                     €{PRICING.featured.price}
                   </span>
                 </div>

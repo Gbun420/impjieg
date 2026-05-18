@@ -26,14 +26,16 @@ export default async function CompaniesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-foreground sm:text-3xl">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 className="mb-8 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         Companies
       </h1>
 
       {!employers || employers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card py-16 text-center">
-          <Building2 className="h-12 w-12 text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border/50 bg-card/50 py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
+            <Building2 className="h-8 w-8 text-muted-foreground" />
+          </div>
           <p className="mt-4 text-lg font-medium text-foreground">
             No companies yet
           </p>
@@ -45,23 +47,23 @@ export default async function CompaniesPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {employers.map((employer: any) => (
             <Link key={employer.id} href={`/companies/${employer.slug}`}>
-              <Card className="group h-full p-6 transition-all hover:shadow-md">
+              <Card className="group h-full p-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-secondary/20 transition-all">
                     {employer.logo_url ? (
                       <img
                         src={employer.logo_url}
                         alt={employer.name}
-                        className="h-8 w-8 rounded object-cover"
+                        className="h-8 w-8 rounded-lg object-cover"
                       />
                     ) : (
-                      <span className="text-lg font-bold text-muted-foreground">
+                      <span className="text-lg font-bold text-muted-foreground group-hover:text-primary transition-colors">
                         {employer.name.charAt(0)}
                       </span>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-base font-semibold text-foreground group-hover:text-secondary">
+                    <h3 className="truncate text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                       {employer.name}
                     </h3>
                     {employer.location && (

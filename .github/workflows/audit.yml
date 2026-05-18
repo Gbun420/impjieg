@@ -1,0 +1,121 @@
+name: Full Audit + Codex Auto-Fix
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  typecheck-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npx eslint . --max-warnings 0
+
+  e2e-tests:
+    needs: typecheck-lint
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+      - run: npm ci
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=junit --output=test-results
+        continue-on-error: true
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            test-results/**/*.xml
+            test-results/**/*.png
+            playwright-report/**
+
+  lighthouse:
+    needs: typecheck-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Run Lighthouse (JSON+HTML)
+        run: |
+          npx lighthouse https://impjieg.vercel.app \
+            --output json --output html \
+            --output-path ./reports/lh.json \
+            --only-categories=performance,accessibility
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            reports/lh.json
+            reports/lh.html
+
+  audit:
+    needs: typecheck-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: npm audit
+        run: npm audit --json > reports/npm-audit.json
+      - name: axe accessibility scan
+        run: npx axe-cli https://impjieg.vercel.app --format json > reports/axe.json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audit-reports
+          path: |
+            reports/npm-audit.json
+            reports/axe.json
+
+  codex-fix:
+    needs: [lighthouse, audit]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download reports
+        uses: actions/download-artifact@v4
+        with:
+          name: audit-reports
+          path: ./reports
+      - name: Download lighthouse JSON
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-report
+          path: ./reports
+      - name: Generate fixes via OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          mkdir -p generated
+          python scripts/codex_generate.py \
+            --system "./prompts/system.txt" \
+            --user "./prompts/fix_a11y.txt" \
+            --reports "./reports" \
+            > generated/codex-fix.ts
+      - name: Commit generated fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Auto-generated audit fixes (Codex)"
+          file_pattern: generated/*.ts

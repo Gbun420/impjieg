@@ -7,7 +7,6 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
-  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -24,23 +23,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-lg";
+      "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-xl active:scale-[0.98]";
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+        "bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5",
       secondary:
-        "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm",
+        "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20",
       outline:
-        "border border-border bg-background hover:bg-muted text-foreground",
-      ghost: "hover:bg-muted text-foreground",
-      danger: "bg-error text-error-foreground hover:bg-error/90 shadow-sm",
+        "border border-border bg-background/50 hover:bg-muted/50 text-foreground backdrop-blur-sm hover:border-primary/30",
+      ghost: "hover:bg-muted/50 text-foreground",
+      danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20",
     };
 
     const sizes: Record<NonNullable<ButtonProps["size"]>, string> = {
-      sm: "h-9 px-3 text-sm",
-      md: "h-10 px-4 text-sm",
-      lg: "h-12 px-6 text-base",
+      sm: "h-9 px-3.5 text-sm",
+      md: "h-10 px-5 text-sm",
+      lg: "h-12 px-7 text-base",
     };
 
     return (

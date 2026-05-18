@@ -1,0 +1,5 @@
+Add an axe-core accessibility validation step to the existing Playwright test suite.
+- After each page.goto(...) call, run checkA11y(page) from tests/helpers/a11y.ts.
+- Fail the test if any WCAG 2.1 AA violations appear.
+- Log the violations as JSON in the error message.
+- Export the helper as tests/helpers/a11y.ts.

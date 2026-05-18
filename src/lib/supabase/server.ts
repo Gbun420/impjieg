@@ -8,16 +8,28 @@ export function createClient() {
     {
       cookies: {
         async get(name: string) {
-          const cookieStore = await cookies();
-          return cookieStore.get(name)?.value;
+          try {
+            const cookieStore = await cookies();
+            return cookieStore.get(name)?.value;
+          } catch {
+            return undefined;
+          }
         },
         async set(name: string, value: string, options: any) {
-          const cookieStore = await cookies();
-          cookieStore.set({ name, value, ...options });
+          try {
+            const cookieStore = await cookies();
+            cookieStore.set({ name, value, ...options });
+          } catch {
+            // Ignore during prerendering
+          }
         },
         async remove(name: string, options: any) {
-          const cookieStore = await cookies();
-          cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+          try {
+            const cookieStore = await cookies();
+            cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+          } catch {
+            // Ignore during prerendering
+          }
         },
       },
     }

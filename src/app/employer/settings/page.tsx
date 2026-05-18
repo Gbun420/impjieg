@@ -75,16 +75,16 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Settings</h1>
 
       {error && (
-        <div className="rounded-lg bg-error/10 p-4 text-sm text-error">
+        <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="rounded-lg bg-success/10 p-4 text-sm text-success">
+        <div className="rounded-xl bg-success/10 p-4 text-sm text-success">
           Settings updated successfully
         </div>
       )}

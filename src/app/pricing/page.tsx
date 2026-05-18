@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { PRICING } from "@/lib/constants";
 
 const standardFeatures = [
@@ -23,17 +23,20 @@ const featuredFeatures = [
 
 export default function PricingPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-          Simple, Transparent Pricing
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          Simple, Transparent{" "}
+          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Pricing
+          </span>
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground">
+        <p className="mt-3 text-lg text-muted-foreground">
           Post your job and reach Malta&apos;s top talent
         </p>
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+      <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
         {/* Standard */}
         <Card className="p-8">
           <div>
@@ -43,7 +46,7 @@ export default function PricingPage() {
             <p className="mt-2 text-muted-foreground">
               {PRICING.standard.description}
             </p>
-            <div className="mt-4 flex items-baseline gap-1">
+            <div className="mt-5 flex items-baseline gap-1">
               <span className="font-mono text-4xl font-bold text-foreground">
                 €{PRICING.standard.price}
               </span>
@@ -58,7 +61,9 @@ export default function PricingPage() {
           <ul className="mt-8 space-y-3">
             {standardFeatures.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <Check className="h-3 w-3 text-primary" />
+                </div>
                 <span className="text-sm text-muted-foreground">
                   {feature}
                 </span>
@@ -68,12 +73,12 @@ export default function PricingPage() {
         </Card>
 
         {/* Featured */}
-        <Card className="relative border-secondary/50 p-8">
+        <Card className="relative border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-8">
           <Badge
-            variant="accent"
+            variant="default"
             className="absolute -top-3 left-1/2 -translate-x-1/2"
           >
-            Most Popular
+            <Sparkles className="mr-1 h-3 w-3" /> Most Popular
           </Badge>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
@@ -82,8 +87,8 @@ export default function PricingPage() {
             <p className="mt-2 text-muted-foreground">
               {PRICING.featured.description}
             </p>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="font-mono text-4xl font-bold text-foreground">
+            <div className="mt-5 flex items-baseline gap-1">
+              <span className="font-mono text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 €{PRICING.featured.price}
               </span>
               <span className="text-muted-foreground">/listing</span>
@@ -97,8 +102,10 @@ export default function PricingPage() {
           <ul className="mt-8 space-y-3">
             {featuredFeatures.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                <span className="text-sm text-muted-foreground">
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <Check className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-sm text-foreground/80">
                   {feature}
                 </span>
               </li>

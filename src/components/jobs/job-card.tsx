@@ -12,19 +12,23 @@ export default function JobCard({ job }: JobCardProps) {
   return (
     <Link
       href={`/jobs/${job.employers.slug}/${job.slug}`}
-      className={`group block rounded-xl border bg-card p-5 transition-all hover:shadow-md ${
+      className={`group block rounded-2xl border p-5 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 ${
         job.is_featured
-          ? "border-secondary/50 bg-secondary/[0.02]"
-          : "border-border"
+          ? "border-primary/30 bg-gradient-to-r from-primary/5 to-transparent"
+          : "border-border/50 bg-card/50 hover:border-primary/20"
       }`}
     >
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all ${
+          job.is_featured
+            ? "bg-gradient-to-br from-primary/20 to-secondary/20 ring-2 ring-primary/10"
+            : "bg-muted/50"
+        }`}>
           {job.employers.logo_url ? (
             <img
               src={job.employers.logo_url}
               alt={job.employers.name}
-              className="h-8 w-8 rounded object-cover"
+              className="h-8 w-8 rounded-lg object-cover"
             />
           ) : (
             <span className="text-lg font-bold text-muted-foreground">
@@ -35,11 +39,11 @@ export default function JobCard({ job }: JobCardProps) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-semibold text-foreground group-hover:text-secondary transition-colors truncate">
+            <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
               {job.title}
             </h3>
             {job.is_featured && (
-              <Badge variant="success">Featured</Badge>
+              <Badge variant="default">Featured</Badge>
             )}
           </div>
 
@@ -60,8 +64,8 @@ export default function JobCard({ job }: JobCardProps) {
               <Badge variant="accent">Visa Friendly</Badge>
             )}
             {(job.salary_min || job.salary_max) && (
-              <span className="flex items-center gap-1 font-mono text-foreground">
-                <Banknote className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-1 font-mono font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <Banknote className="h-3.5 w-3.5 text-primary" />
                 {formatSalary(job.salary_min ?? 0)}
                 {job.salary_max ? ` - ${formatSalary(job.salary_max)}` : "+"}
               </span>

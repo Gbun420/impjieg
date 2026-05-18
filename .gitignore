@@ -43,3 +43,9 @@ next-env.d.ts
 
 # worktrees
 .worktrees/
+
+# audit reports
+/reports
+/playwright-report
+/test-results
+/generated

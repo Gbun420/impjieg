@@ -49,7 +49,7 @@ export default async function EmployerDashboardPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
         <Link href="/employer/post-job">
           <Button variant="primary">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -64,11 +64,13 @@ export default async function EmployerDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">
+                <p className="mt-1 text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {stat.value}
                 </p>
               </div>
-              <stat.icon className="h-8 w-8 text-secondary/50" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <stat.icon className="h-5 w-5 text-primary" />
+              </div>
             </div>
           </Card>
         ))}
@@ -88,9 +90,9 @@ export default async function EmployerDashboardPage() {
             </Link>
           </Card>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-border">
+          <div className="overflow-x-auto rounded-2xl border border-border/50">
             <table className="w-full text-sm">
-              <thead className="border-b border-border bg-muted/50">
+              <thead className="border-b border-border/50 bg-muted/30">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">Title</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
@@ -105,7 +107,7 @@ export default async function EmployerDashboardPage() {
                 {typedJobs.slice(0, 10).map((job) => (
                   <tr
                     key={job.id}
-                    className="border-b border-border last:border-0"
+                    className="border-b border-border/30 last:border-0 hover:bg-muted/20 transition-colors"
                   >
                     <td className="px-4 py-3 font-medium">{job.title}</td>
                     <td className="px-4 py-3">

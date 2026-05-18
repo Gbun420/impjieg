@@ -33,7 +33,7 @@ export default async function EmployerJobsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">My Jobs</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">My Jobs</h1>
         <Link href="/employer/post-job">
           <Button variant="primary">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -43,7 +43,7 @@ export default async function EmployerJobsPage() {
       </div>
 
       {typedJobs.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center">
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-8 text-center">
           <p className="text-lg font-medium text-foreground">
             No jobs posted yet
           </p>
@@ -55,9 +55,9 @@ export default async function EmployerJobsPage() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border">
+        <div className="overflow-x-auto rounded-2xl border border-border/50">
           <table className="w-full text-sm">
-            <thead className="border-b border-border bg-muted/50">
+            <thead className="border-b border-border/50 bg-muted/30">
               <tr>
                 <th className="px-4 py-3 text-left font-medium">Title</th>
                 <th className="px-4 py-3 text-left font-medium">Status</th>
@@ -73,13 +73,13 @@ export default async function EmployerJobsPage() {
               {typedJobs.map((job) => (
                 <tr
                   key={job.id}
-                  className="border-b border-border last:border-0"
+                  className="border-b border-border/30 last:border-0 hover:bg-muted/20 transition-colors"
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{job.title}</span>
                       {job.is_featured && (
-                        <Badge variant="success">Featured</Badge>
+                        <Badge variant="default">Featured</Badge>
                       )}
                     </div>
                   </td>
