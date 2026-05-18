@@ -23,9 +23,11 @@ export default function JobAlertsPage() {
   if (submitted) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 sm:px-6 lg:px-8">
-        <Card className="p-8 text-center">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
-          <h1 className="mt-4 text-xl font-bold text-foreground">
+        <Card className="p-8 text-center border-primary/20">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-success/10">
+            <CheckCircle2 className="h-8 w-8 text-success" />
+          </div>
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-foreground">
             Alert Created
           </h1>
           <p className="mt-2 text-muted-foreground">
@@ -37,18 +39,20 @@ export default function JobAlertsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-lg px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
-        <Bell className="h-8 w-8 text-secondary" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+          <Bell className="h-6 w-6 text-primary" />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Job Alerts</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Job Alerts</h1>
           <p className="text-muted-foreground">
             Get notified when new jobs match your criteria
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <Input
           label="Email Address"
           name="email"

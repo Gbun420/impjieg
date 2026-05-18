@@ -71,23 +71,23 @@ export default async function CompanyProfilePage({
   const typedJobs = (jobs || []) as unknown as JobWithEmployer[];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
         href="/companies"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="group mb-8 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
         Back to companies
       </Link>
 
-      <Card className="p-6 sm:p-8">
-        <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+      <Card className="p-6 sm:p-8 border-primary/20">
+        <div className="flex items-start gap-5">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-muted/50">
             {emp.logo_url ? (
               <img
                 src={emp.logo_url}
                 alt={emp.name}
-                className="h-10 w-10 rounded object-cover"
+                className="h-10 w-10 rounded-xl object-cover"
               />
             ) : (
               <span className="text-2xl font-bold text-muted-foreground">
@@ -96,11 +96,11 @@ export default async function CompanyProfilePage({
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               {emp.name}
             </h1>
             {emp.description && (
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-2 text-muted-foreground leading-relaxed">
                 {emp.description}
               </p>
             )}
@@ -128,7 +128,7 @@ export default async function CompanyProfilePage({
                   href={emp.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-secondary hover:underline"
+                  className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
                 >
                   <Globe className="h-4 w-4" />
                   Website
@@ -139,8 +139,8 @@ export default async function CompanyProfilePage({
         </div>
       </Card>
 
-      <div className="mt-8">
-        <h2 className="mb-4 text-xl font-bold text-foreground">
+      <div className="mt-10">
+        <h2 className="mb-5 text-xl font-bold tracking-tight text-foreground">
           Open Roles ({typedJobs.length})
         </h2>
         {typedJobs.length === 0 ? (

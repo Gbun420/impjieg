@@ -2,8 +2,8 @@ import { SITE } from "@/lib/constants";
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-foreground">Terms of Service</h1>
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">Terms of Service</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Last updated: May 2026
       </p>

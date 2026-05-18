@@ -2,8 +2,10 @@ import { SITE } from "@/lib/constants";
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-foreground">About {SITE.name}</h1>
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        About {SITE.name}
+      </h1>
 
       <div className="prose prose-sm mt-6 max-w-none text-muted-foreground">
         <p>

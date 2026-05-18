@@ -30,10 +30,10 @@ export default async function ApplicationsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Applications</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Applications</h1>
 
       {typedApps.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center">
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-8 text-center">
           <p className="text-lg font-medium text-foreground">
             No applications yet
           </p>
@@ -46,7 +46,7 @@ export default async function ApplicationsPage() {
           {typedApps.map((app) => (
             <div
               key={app.id}
-              className="rounded-xl border border-border bg-card p-6"
+              className="rounded-2xl border border-border/50 bg-card/50 p-6 transition-all hover:border-primary/20 hover:shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -88,7 +88,7 @@ export default async function ApplicationsPage() {
                     href={app.candidate_cv_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-secondary hover:underline"
+                    className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
                   >
                     <FileText className="h-4 w-4" />
                     View CV
@@ -97,7 +97,7 @@ export default async function ApplicationsPage() {
               </div>
 
               {app.cover_letter && (
-                <div className="mt-4 rounded-lg bg-muted/50 p-4 text-sm text-muted-foreground">
+                <div className="mt-4 rounded-xl bg-muted/30 p-4 text-sm text-muted-foreground">
                   {app.cover_letter}
                 </div>
               )}
