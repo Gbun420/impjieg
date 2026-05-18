@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import type { Employer } from "@/lib/supabase/types";
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,12 +32,14 @@ export default function SettingsPage() {
         .eq("user_id", user.id)
         .single();
 
-      if (employer) {
-        setName(employer.name || "");
-        setDescription(employer.description || "");
-        setWebsite(employer.website || "");
-        setLocation(employer.location || "");
-        setLogoUrl(employer.logo_url || "");
+      const emp = employer as Employer | null;
+
+      if (emp) {
+        setName(emp.name || "");
+        setDescription(emp.description || "");
+        setWebsite(emp.website || "");
+        setLocation(emp.location || "");
+        setLogoUrl(emp.logo_url || "");
       }
     }
     loadEmployer();
@@ -54,12 +57,14 @@ export default function SettingsPage() {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { error: updateError } = await supabase
+    const result = await supabase
       .from("employers")
-      .update({ name, description, website, location, logo_url: logoUrl })
+      .update({ name, description, website, location, logo_url: logoUrl } as any)
       .eq("user_id", user.id);
 
     setIsLoading(false);
+
+    const updateError = (result as { error: Error | null }).error;
 
     if (updateError) {
       setError(updateError.message);

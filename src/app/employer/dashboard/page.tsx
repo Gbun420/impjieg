@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Users, Briefcase } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import type { Job } from "@/lib/supabase/types";
 
 export default async function EmployerDashboardPage() {
   const supabase = await createClient();
@@ -25,15 +26,14 @@ export default async function EmployerDashboardPage() {
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
-    .eq("employer_id", employer.id)
+    .eq("employer_id", (employer as any).id)
     .order("created_at", { ascending: false });
 
-  const activeJobs = jobs?.filter((j) => j.status === "active") || [];
-  const totalViews = jobs?.reduce((sum, j) => sum + (j.views || 0), 0) || 0;
-  const totalApplications =
-    jobs?.reduce((sum, j) => sum + (j.applications_count || 0), 0) || 0;
-  const avgViews =
-    jobs && jobs.length > 0 ? Math.round(totalViews / jobs.length) : 0;
+  const typedJobs = (jobs || []) as Job[];
+  const activeJobs = typedJobs.filter((j) => j.status === "active");
+  const totalViews = typedJobs.reduce((sum, j) => sum + (j.views || 0), 0);
+  const totalApplications = typedJobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
+  const avgViews = typedJobs.length > 0 ? Math.round(totalViews / typedJobs.length) : 0;
 
   const stats = [
     { label: "Active Jobs", value: activeJobs.length, icon: Briefcase },
@@ -78,7 +78,7 @@ export default async function EmployerDashboardPage() {
         <h2 className="mb-4 text-lg font-semibold text-foreground">
           Recent Jobs
         </h2>
-        {!jobs || jobs.length === 0 ? (
+        {!typedJobs || typedJobs.length === 0 ? (
           <Card className="p-8 text-center">
             <p className="text-muted-foreground">
               You haven&apos;t posted any jobs yet.
@@ -102,7 +102,7 @@ export default async function EmployerDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.slice(0, 10).map((job) => (
+                {typedJobs.slice(0, 10).map((job) => (
                   <tr
                     key={job.id}
                     className="border-b border-border last:border-0"

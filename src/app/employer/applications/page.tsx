@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { Mail, Phone, FileText } from "lucide-react";
+import type { Application } from "@/lib/supabase/types";
 
 export default async function ApplicationsPage() {
   const supabase = await createClient();
@@ -22,14 +23,16 @@ export default async function ApplicationsPage() {
   const { data: applications } = await supabase
     .from("applications")
     .select("*, jobs(title)")
-    .eq("employer_id", employer.id)
+    .eq("employer_id", (employer as any).id)
     .order("created_at", { ascending: false });
+
+  const typedApps = (applications || []) as (Application & { jobs: { title: string } | null })[];
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Applications</h1>
 
-      {!applications || applications.length === 0 ? (
+      {typedApps.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-8 text-center">
           <p className="text-lg font-medium text-foreground">
             No applications yet
@@ -40,7 +43,7 @@ export default async function ApplicationsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {applications.map((app) => (
+          {typedApps.map((app) => (
             <div
               key={app.id}
               className="rounded-xl border border-border bg-card p-6"

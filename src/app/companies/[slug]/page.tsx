@@ -13,7 +13,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
-import type { JobWithEmployer } from "@/lib/supabase/types";
+import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
 
 export async function generateMetadata({
   params,
@@ -22,20 +22,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
-  const result = await supabase
+  const { data: employer } = await supabase
     .from("employers")
     .select("name, description")
     .eq("slug", slug)
     .single();
-  const employer = result.data as { name: string; description: string | null } | null;
 
-  if (!employer) {
+  const emp = employer as Employer | null;
+
+  if (!emp) {
     return { title: "Company Not Found" };
   }
 
   return {
-    title: employer.name,
-    description: employer.description || `View open roles at ${employer.name}`,
+    title: emp.name,
+    description: emp.description || `View open roles at ${emp.name}`,
   };
 }
 
@@ -53,14 +54,16 @@ export default async function CompanyProfilePage({
     .eq("slug", slug)
     .single();
 
-  if (!employer) {
+  const emp = employer as Employer | null;
+
+  if (!emp) {
     notFound();
   }
 
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*, employers(id, name, slug, logo_url, location)")
-    .eq("employer_id", employer.id)
+    .eq("employer_id", emp.id)
     .eq("status", "active")
     .gte("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
@@ -80,49 +83,49 @@ export default async function CompanyProfilePage({
       <Card className="p-6 sm:p-8">
         <div className="flex items-start gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
-            {employer.logo_url ? (
+            {emp.logo_url ? (
               <img
-                src={employer.logo_url}
-                alt={employer.name}
+                src={emp.logo_url}
+                alt={emp.name}
                 className="h-10 w-10 rounded object-cover"
               />
             ) : (
               <span className="text-2xl font-bold text-muted-foreground">
-                {employer.name.charAt(0)}
+                {emp.name.charAt(0)}
               </span>
             )}
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-foreground">
-              {employer.name}
+              {emp.name}
             </h1>
-            {employer.description && (
+            {emp.description && (
               <p className="mt-2 text-muted-foreground">
-                {employer.description}
+                {emp.description}
               </p>
             )}
             <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-              {employer.location && (
+              {emp.location && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  {employer.location}
+                  {emp.location}
                 </span>
               )}
-              {employer.company_size && (
+              {emp.company_size && (
                 <span className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  {employer.company_size}
+                  {emp.company_size}
                 </span>
               )}
-              {employer.industry && (
+              {emp.industry && (
                 <span className="flex items-center gap-1">
                   <Building2 className="h-4 w-4" />
-                  {employer.industry}
+                  {emp.industry}
                 </span>
               )}
-              {employer.website && (
+              {emp.website && (
                 <a
-                  href={employer.website}
+                  href={emp.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-secondary hover:underline"
