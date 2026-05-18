@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Copy, Zap, Trash2 } from "lucide-react";
+import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Copy, Zap, Trash2, BarChart3 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Job } from "@/lib/supabase/types";
 import { duplicateJob, boostJob, deleteJob } from "@/lib/actions/applications";
@@ -42,12 +42,20 @@ export default async function EmployerJobsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">My Jobs</h1>
-        <Link href="/employer/post-job">
-          <Button variant="primary">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Post a Job
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/employer/bulk-upload">
+            <Button variant="outline" size="sm">
+              <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
+              Bulk Upload
+            </Button>
+          </Link>
+          <Link href="/employer/post-job">
+            <Button variant="primary">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Post a Job
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -159,6 +167,11 @@ export default async function EmployerJobsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <Link href={`/employer/jobs/${job.id}/analytics`}>
+                      <Button variant="ghost" size="sm" title="View analytics">
+                        <BarChart3 className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
                     {job.status === "active" && !job.is_featured && (
                       <form action={async () => {
                         "use server";

@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { SECTORS } from "@/lib/constants";
+import { updateNotificationSettings } from "@/lib/actions/notifications";
+import { Shield, ShieldCheck, ShieldX } from "lucide-react";
 import type { Employer } from "@/lib/supabase/types";
 
 const COMPANY_SIZES = [
@@ -31,6 +33,10 @@ export default function SettingsPage() {
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [companySize, setCompanySize] = useState("");
   const [industry, setIndustry] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [whatsappNotifications, setWhatsappNotifications] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     async function loadEmployer() {
@@ -57,6 +63,10 @@ export default function SettingsPage() {
         setCoverImageUrl(emp.cover_image_url || "");
         setCompanySize(emp.company_size || "");
         setIndustry(emp.industry || "");
+        setEmailNotifications((emp as any).email_notifications ?? true);
+        setWhatsappNotifications((emp as any).whatsapp_notifications ?? false);
+        setWhatsappNumber((emp as any).whatsapp_number || "");
+        setIsVerified((emp as any).is_verified ?? false);
       }
     }
     loadEmployer();
@@ -195,6 +205,101 @@ export default function SettingsPage() {
             isLoading={isLoading}
           >
             Save Changes
+          </Button>
+        </form>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold text-foreground">
+          Verification
+        </h2>
+        <div className="mt-4">
+          {isVerified ? (
+            <div className="flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-4">
+              <ShieldCheck className="h-6 w-6 text-success" />
+              <div>
+                <p className="font-medium text-success">Verified Employer</p>
+                <p className="text-xs text-muted-foreground">
+                  Your company has been verified. A badge appears on your profile and job listings.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border/50 p-4">
+              <div className="flex items-center gap-3">
+                <ShieldX className="h-6 w-6 text-muted-foreground" />
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">Not Verified</p>
+                  <p className="text-xs text-muted-foreground">
+                    Verified employers get a trust badge, higher visibility, and 3x more applications.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground">
+                <p className="font-medium text-foreground">To get verified:</p>
+                <ul className="mt-1 space-y-1">
+                  <li>• Complete your company profile (description, website, logo)</li>
+                  <li>• Post at least 1 job listing</li>
+                  <li>• Contact us at <span className="text-primary">hello@impjieg.com</span></li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold text-foreground">
+          Notifications
+        </h2>
+        <form action={async (formData) => {
+          const result = await updateNotificationSettings(formData);
+          if (result.success) {
+            setSuccess(true);
+          }
+        }} className="mt-4 space-y-4">
+          <label className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/50 px-4 py-3 cursor-pointer hover:border-primary/30 transition-colors">
+            <input
+              type="checkbox"
+              name="emailNotifications"
+              defaultChecked={emailNotifications}
+              className="h-4 w-4 rounded border-border/60 text-primary focus:ring-primary/40"
+            />
+            <div>
+              <p className="text-sm font-medium text-foreground">Email Notifications</p>
+              <p className="text-xs text-muted-foreground">Get notified when candidates apply</p>
+            </div>
+          </label>
+
+          <label className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/50 px-4 py-3 cursor-pointer hover:border-primary/30 transition-colors">
+            <input
+              type="checkbox"
+              name="whatsappNotifications"
+              defaultChecked={whatsappNotifications}
+              onChange={(e) => setWhatsappNotifications(e.target.checked)}
+              className="h-4 w-4 rounded border-border/60 text-primary focus:ring-primary/40"
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">WhatsApp Notifications</p>
+              <p className="text-xs text-muted-foreground">Instant alerts via WhatsApp</p>
+            </div>
+          </label>
+
+          {whatsappNotifications && (
+            <Input
+              label="WhatsApp Number"
+              name="whatsappNumber"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="+356 7900 0000"
+            />
+          )}
+
+          <Button
+            type="submit"
+            variant="primary"
+          >
+            Save Notification Settings
           </Button>
         </form>
       </Card>

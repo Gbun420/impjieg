@@ -123,3 +123,11 @@ body {
 .stagger-3 { animation-delay: 0.3s; }
 .stagger-4 { animation-delay: 0.4s; }
 .stagger-5 { animation-delay: 0.5s; }
+
+@media print {
+  [data-print-hide] { display: none !important; }
+  body { background: white !important; color: black !important; }
+  * { border-color: #e5e7eb !important; }
+  a { color: inherit !important; }
+  .bg-gradient-to-r, .bg-gradient-to-br { background: none !important; }
+}

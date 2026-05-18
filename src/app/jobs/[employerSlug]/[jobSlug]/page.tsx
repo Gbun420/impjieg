@@ -14,9 +14,12 @@ import {
   ArrowLeft,
   CheckCircle2,
   Eye,
+  Share2,
 } from "lucide-react";
 import { formatSalary, formatDate, daysAgo } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
+import ApplyForm from "@/components/jobs/apply-form";
+import { ShareJobButton } from "@/components/jobs/share-job";
 
 export async function generateMetadata({
   params,
@@ -150,6 +153,7 @@ export default async function JobDetailPage({
               {j.title}
             </h1>
             {j.is_featured && <Badge variant="default">Featured</Badge>}
+            <ShareJobButton title={j.title} />
           </div>
           <Link
             href={`/companies/${j.employers.slug}`}
@@ -251,24 +255,30 @@ export default async function JobDetailPage({
               Interested in this role?
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Apply directly through the employer&apos;s preferred method.
+              Apply directly through Impjieg or use the employer&apos;s preferred method.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {j.application_url && (
-                <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
-                  <Button variant="primary" size="lg">
-                    <Globe className="mr-2 h-4 w-4" />
-                    Apply Now
-                  </Button>
-                </Link>
-              )}
-              {j.application_email && (
-                <Link href={`mailto:${j.application_email}`}>
-                  <Button variant="outline" size="lg">
-                    Email Application
-                  </Button>
-                </Link>
-              )}
+            <div className="mt-5 space-y-4">
+              <ApplyForm jobId={j.id} employerId={j.employer_id} jobTitle={j.title} />
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <span className="text-xs">or</span>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {j.application_url && (
+                  <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="lg">
+                      <Globe className="mr-2 h-4 w-4" />
+                      Apply on Company Site
+                    </Button>
+                  </Link>
+                )}
+                {j.application_email && (
+                  <Link href={`mailto:${j.application_email}`}>
+                    <Button variant="outline" size="lg">
+                      Email Application
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </Card>

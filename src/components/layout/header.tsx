@@ -10,8 +10,10 @@ import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
   { label: "Browse Jobs", href: "/jobs" },
-  { label: "Pricing", href: "/pricing" },
   { label: "Companies", href: "/companies" },
+  { label: "Blog", href: "/blog" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Saved", href: "/saved-jobs" },
 ];
 
 export default function Header() {

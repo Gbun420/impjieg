@@ -1,0 +1,53 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+
+export async function updateNotificationSettings(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const emailNotifications = formData.get("emailNotifications") === "on";
+  const whatsappNotifications = formData.get("whatsappNotifications") === "on";
+  const whatsappNumber = formData.get("whatsappNumber") as string;
+
+  const { error } = await supabase
+    .from("employers")
+    .update({
+      email_notifications: emailNotifications,
+      whatsapp_notifications: whatsappNotifications,
+      whatsapp_number: whatsappNumber || null,
+    } as any)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/employer/settings");
+  return { success: true };
+}
+
+export async function sendWhatsAppNotification(phoneNumber: string, message: string) {
+  // In production, integrate with Twilio WhatsApp API or WhatsApp Business API
+  // For now, this is a placeholder that logs the notification
+  console.log(`WhatsApp notification to ${phoneNumber}:`, message);
+
+  // Example Twilio implementation:
+  // const twilio = require('twilio');
+  // const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  // await client.messages.create({
+  //   from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+  //   to: `whatsapp:+356${phoneNumber}`,
+  //   body: message,
+  // });
+
+  return { success: true };
+}

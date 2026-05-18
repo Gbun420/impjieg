@@ -12,6 +12,7 @@ import {
   Building2,
   ArrowLeft,
   Briefcase,
+  ShieldCheck,
 } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
@@ -114,6 +115,9 @@ export default async function CompanyProfilePage({
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 {emp.name}
               </h1>
+              {(emp as any).is_verified && (
+                <ShieldCheck className="h-5 w-5 text-success" />
+              )}
               {emp.description && (
                 <p className="mt-2 text-muted-foreground leading-relaxed">
                   {emp.description}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Banknote } from "lucide-react";
+import { MapPin, Clock, Banknote, ShieldCheck } from "lucide-react";
 import { daysAgo, formatSalary } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
@@ -47,8 +47,11 @@ export default function JobCard({ job }: JobCardProps) {
             )}
           </div>
 
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
             {job.employers.name}
+            {(job.employers as any).is_verified && (
+              <ShieldCheck className="h-3.5 w-3.5 text-success" />
+            )}
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
