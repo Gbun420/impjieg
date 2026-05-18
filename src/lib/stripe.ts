@@ -5,7 +5,7 @@ let stripeInstance: Stripe | null = null;
 export function getStripe(): Stripe {
   if (!stripeInstance) {
     stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
-      apiVersion: "2025-01-27.clover",
+      apiVersion: "2026-04-22.dahlia",
       typescript: true,
     });
   }

@@ -37,7 +37,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${job.title} at ${job.employers?.name}`,
+    title: `${job.title} at ${job.employers?.[0]?.name}`,
     description: job.description.substring(0, 160),
   };
 }
