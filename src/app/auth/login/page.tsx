@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,35 +41,78 @@ function LoginForm() {
         </p>
       </div>
 
+      {message === "signed-up" && (
+        <div className="flex items-start gap-3 rounded-xl bg-success/10 p-4 text-sm text-success">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Account created successfully</p>
+            <p className="mt-1 text-success/80">
+              You can now sign in with your credentials.
+            </p>
+          </div>
+        </div>
+      )}
+
       {message === "check-email" && (
-        <div className="rounded-xl bg-success/10 p-4 text-sm text-success">
-          Account created. Check your email for a confirmation link.
+        <div className="flex items-start gap-3 rounded-xl bg-success/10 p-4 text-sm text-success">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Check your email</p>
+            <p className="mt-1 text-success/80">
+              Click the confirmation link we sent to activate your account.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {message === "reset-sent" && (
+        <div className="flex items-start gap-3 rounded-xl bg-success/10 p-4 text-sm text-success">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Reset email sent</p>
+            <p className="mt-1 text-success/80">
+              Check your inbox for the password reset link.
+            </p>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
-          {error}
+        <div className="flex items-start gap-3 rounded-xl bg-error/10 p-4 text-sm text-error">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>{error}</p>
         </div>
       )}
 
       <form action={handleSubmit} className="space-y-4">
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="you@company.com"
-          required
-          autoComplete="email"
-        />
-        <Input
-          label="Password"
-          name="password"
-          type="password"
-          placeholder="Enter your password"
-          required
-          autoComplete="current-password"
-        />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Email</label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              name="email"
+              type="email"
+              placeholder="you@company.com"
+              required
+              autoComplete="email"
+              className="pl-10"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Password</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+              className="pl-10"
+            />
+          </div>
+        </div>
         <div className="flex justify-end">
           <Link
             href="/auth/reset-password"
