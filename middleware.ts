@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data: https://frontend-cdn.perplexity.ai",
+    "font-src 'self' data: https://frontend-cdn.perplexity.ai https://vercel.live",
     "connect-src 'self' https://*.supabase.co https://*.vercel.app",
     "media-src 'self'",
     "object-src 'none'",

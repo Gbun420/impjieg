@@ -25,6 +25,7 @@ export async function signup(formData: FormData) {
     password: data.password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/callback`,
+      data: { companyName: data.companyName },
     },
   });
 
@@ -32,19 +33,7 @@ export async function signup(formData: FormData) {
     return { error: authError.message };
   }
 
-  if (authData.user) {
-    const slug = slugify(data.companyName);
-    const { error: profileError } = await supabase.rpc("create_employer_profile", {
-      p_user_id: authData.user.id,
-      p_name: data.companyName,
-      p_slug: `${slug}-${Math.random().toString(36).substring(2, 6)}`,
-    });
-
-    if (profileError) {
-      return { error: profileError.message };
-    }
-  }
-
+  // Employer profile will be created lazily on first dashboard access
   return { success: true, needsConfirmation: !authData.user?.email_confirmed_at };
 }
 
