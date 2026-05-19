@@ -92,6 +92,7 @@ export const viewport = {
 
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import CookieConsentBanner from "@/components/cookie-consent-banner";
 
 export default function RootLayout({
   children,
@@ -109,6 +110,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <CookieConsentBanner />
         </ThemeProvider>
       </body>
     </html>

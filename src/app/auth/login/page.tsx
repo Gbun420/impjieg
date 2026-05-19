@@ -5,21 +5,27 @@ import { login } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const message = searchParams.get("message");
+  const redirectUrl = searchParams.get("redirect");
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
     const result = await login(formData);
     setIsLoading(false);
+
     if (result?.error) {
       setError(result.error);
+    } else if (result?.success) {
+      router.push(redirectUrl || "/employer/dashboard");
+      router.refresh();
     }
   }
 
@@ -36,7 +42,7 @@ function LoginForm() {
 
       {message === "check-email" && (
         <div className="rounded-xl bg-success/10 p-4 text-sm text-success">
-          Check your email for a confirmation link.
+          Account created. Check your email for a confirmation link.
         </div>
       )}
 
@@ -63,7 +69,21 @@ function LoginForm() {
           required
           autoComplete="current-password"
         />
-        <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isLoading}>
+        <div className="flex justify-end">
+          <Link
+            href="/auth/reset-password"
+            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="w-full"
+          isLoading={isLoading}
+        >
           Sign In
         </Button>
       </form>
@@ -83,7 +103,15 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="space-y-6"><div className="text-center"><h1 className="text-2xl font-bold text-foreground">Welcome back</h1></div></div>}>
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
+          </div>
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

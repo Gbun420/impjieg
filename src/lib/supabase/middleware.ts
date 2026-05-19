@@ -28,12 +28,21 @@ export async function updateSession(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
+  // Protect employer routes
   if (pathname.startsWith("/employer") && !user) {
     url.pathname = "/auth/login";
     url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }
 
+  // Protect saved-jobs route
+  if (pathname === "/saved-jobs" && !user) {
+    url.pathname = "/auth/login";
+    url.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect authenticated users away from auth pages
   if (
     (pathname === "/auth/login" || pathname === "/auth/signup") &&
     user

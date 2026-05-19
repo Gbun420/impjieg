@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -19,34 +20,64 @@ const navLinks = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
 
     const checkAuth = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         setIsLoggedIn(!!user);
       } catch {
         setIsLoggedIn(false);
+      } finally {
+        setIsChecking(false);
       }
     };
 
     checkAuth();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
         setIsLoggedIn(false);
-      } else {
-        setIsLoggedIn(!!session);
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        setIsLoggedIn(!!session?.user);
+      } else if (event === "INITIAL_SESSION") {
+        setIsLoggedIn(!!session?.user);
       }
     });
 
     return () => {
-      listener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
+
+  async function handleLogout() {
+    await logout();
+    setIsLoggedIn(false);
+    router.push("/");
+    router.refresh();
+  }
+
+  if (isChecking) {
+    return (
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/logo.svg" alt="Impjieg" className="h-7 dark:invert" />
+          </Link>
+          <div className="h-9 w-20 rounded-xl bg-muted/50 animate-pulse" />
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -89,27 +120,18 @@ export default function Header() {
                     Dashboard
                   </Button>
                 </Link>
-                <form action={async () => {
-                  await logout();
-                  window.location.href = "/";
-                }}>
-                  <Button variant="outline" size="sm">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </Button>
-                </form>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
               </>
             ) : (
               <>
                 <Link href="/auth/login">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
+                  <Button variant="ghost" size="sm">Sign In</Button>
                 </Link>
                 <Link href="/employer/post-job">
-                  <Button variant="primary" size="sm">
-                    Post a Job
-                  </Button>
+                  <Button variant="primary" size="sm">Post a Job</Button>
                 </Link>
               </>
             )}
@@ -120,7 +142,11 @@ export default function Header() {
             className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors"
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
@@ -140,7 +166,10 @@ export default function Header() {
             ))}
             <div className="pt-3 border-t border-border/50 space-y-2">
               <button
-                onClick={() => { toggleTheme(); setMobileOpen(false); }}
+                onClick={() => {
+                  toggleTheme();
+                  setMobileOpen(false);
+                }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
               >
                 {theme === "dark" ? (
@@ -155,30 +184,42 @@ export default function Header() {
               </button>
               {isLoggedIn ? (
                 <>
-                  <Link href="/employer/dashboard" onClick={() => setMobileOpen(false)}>
+                  <Link
+                    href="/employer/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                  >
                     <Button variant="ghost" size="md" className="w-full">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </Button>
                   </Link>
-                  <form action={async () => {
-                    await logout();
-                    window.location.href = "/";
-                  }}>
-                    <Button variant="outline" size="md" className="w-full">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </Button>
-                  </form>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    className="w-full"
+                    onClick={async () => {
+                      await handleLogout();
+                      setMobileOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
                 </>
               ) : (
                 <>
-                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setMobileOpen(false)}
+                  >
                     <Button variant="ghost" size="md" className="w-full">
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/employer/post-job" onClick={() => setMobileOpen(false)}>
+                  <Link
+                    href="/employer/post-job"
+                    onClick={() => setMobileOpen(false)}
+                  >
                     <Button variant="primary" size="md" className="w-full">
                       Post a Job
                     </Button>

@@ -19,6 +19,8 @@ const companyLinks = [
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
+  { label: "Cookies", href: "/cookies" },
+  { label: "DPA", href: "/dpa" },
 ];
 
 export default function Footer() {
