@@ -107,11 +107,6 @@ create policy "Users can update own profile"
   on candidate_profiles for update
   using (auth.uid() = user_id);
 
--- Public read for profile data (for employer viewing)
-create policy "Anyone can view candidate profiles"
-  on candidate_profiles for select
-  using (true);
-
 -- CV policies
 create policy "Users can view own CVs"
   on candidate_cvs for select

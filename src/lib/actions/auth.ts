@@ -4,6 +4,20 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
 import { signupWithAutoConfirm } from "./auth-signup";
+import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
+import type { Database, Employer } from "@/lib/supabase/types";
+
+type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
+type EmployersMutationTable = {
+  insert(values: EmployerInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: Employer | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function signup(formData: FormData) {
   const supabase = await createClient();
@@ -40,6 +54,10 @@ export async function signup(formData: FormData) {
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -63,7 +81,25 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  return { success: true };
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: employer } = user
+    ? await serviceSupabase
+        .from("employers")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle()
+    : { data: null };
+
+  return {
+    success: true,
+    redirectTo: resolvePostLoginDestination({
+      redirectUrl: null,
+      hasEmployerProfile: Boolean(employer),
+    }),
+  };
 }
 
 export async function logout() {
@@ -120,19 +156,27 @@ export async function ensureEmployerProfile() {
   // Create profile lazily (auth.users is committed by now)
   const companyName = user.user_metadata?.companyName || "New Employer";
   const slug = slugify(companyName);
+  const employersTable = serviceSupabase.from(
+    "employers"
+  ) as unknown as EmployersMutationTable;
 
-  const { data: newProfile, error: profileError } = await serviceSupabase
-    .from("employers")
-    .insert({
-      user_id: user.id,
-      name: companyName,
-      slug: `${slug}-${Math.random().toString(36).substring(2, 6)}`,
-    })
+  const { data: newProfile, error: profileError } = await employersTable
+    .insert([
+      {
+        user_id: user.id,
+        name: companyName,
+        slug: `${slug}-${Math.random().toString(36).substring(2, 6)}`,
+      },
+    ])
     .select()
     .single();
 
   if (profileError) {
     return { error: profileError.message, profile: null };
+  }
+
+  if (!newProfile) {
+    return { error: "Failed to create employer profile", profile: null };
   }
 
   return { error: null, profile: newProfile };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 export type CookieCategory = "necessary" | "analytics" | "marketing" | "preferences";
 
@@ -35,18 +35,13 @@ function getStoredConsent(): CookieConsent | null {
 }
 
 export function useCookieConsent() {
-  const [consent, setConsent] = useState<CookieConsent>(defaultConsent);
-  const [hasConsented, setHasConsented] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = getStoredConsent();
-    if (stored) {
-      setConsent(stored);
-      setHasConsented(true);
-    }
-  }, []);
+  const [consent, setConsent] = useState<CookieConsent>(
+    () => getStoredConsent() ?? defaultConsent
+  );
+  const [hasConsented, setHasConsented] = useState(
+    () => getStoredConsent() !== null
+  );
+  const mounted = typeof window !== "undefined";
 
   const saveConsent = useCallback((newConsent: CookieConsent) => {
     setConsent(newConsent);

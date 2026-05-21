@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import { requireInternalAdminToken } from "../../_lib/internal-route-guard";
 
 export async function POST(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   const { applicationId, candidateName, jobTitle, employerPhone } = await request.json();
 
   if (!applicationId || !candidateName || !jobTitle || !employerPhone) {

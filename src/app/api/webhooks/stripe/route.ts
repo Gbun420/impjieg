@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import type Stripe from "stripe";
 
 function getSupabaseAdmin() {
   return createClient(
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as any;
+      const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
       const { paymentId, jobId, listingType } = metadata;
 
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
     }
 
     case "checkout.session.expired": {
-      const session = event.data.object as any;
+      const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
       const { paymentId } = metadata;
 
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
     }
 
     case "payment_intent.payment_failed": {
-      const intent = event.data.object as any;
+      const intent = event.data.object as Stripe.PaymentIntent;
       const metadata = intent.metadata || {};
       const { paymentId, jobId } = metadata;
 
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
     }
 
     case "charge.refunded": {
-      const charge = event.data.object as any;
+      const charge = event.data.object as Stripe.Charge;
       const paymentIntentId = charge.payment_intent;
 
       if (paymentIntentId) {

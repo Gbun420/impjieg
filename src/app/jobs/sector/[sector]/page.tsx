@@ -58,7 +58,7 @@ export default async function SectorPage({
 
   const supabase = await createClient();
 
-  let query = supabase
+  const query = supabase
     .from("jobs")
     .select("*, employers(id, name, slug, logo_url, location)")
     .eq("status", "active")

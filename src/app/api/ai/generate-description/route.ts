@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const { title, sector, jobType, seniority, location, description } = await request.json();
+  const { title, sector, jobType, seniority, location, description, skills, benefits } = await request.json();
 
   if (!title) {
     return NextResponse.json({ error: "Job title is required" }, { status: 400 });
@@ -19,6 +19,8 @@ Sector: ${sector || "General"}
 Job Type: ${jobType || "Full-time"}
 Seniority: ${seniority || "Mid Level"}
 Location: ${location || "Malta"}
+${skills ? `Key Skills: ${skills}` : ""}
+${benefits ? `Benefits: ${benefits}` : ""}
 ${description ? `Additional context: ${description}` : ""}
 
 Format the response as HTML with the following sections:
@@ -30,7 +32,9 @@ Format the response as HTML with the following sections:
 Wrap each section in <h3> tags for the section title and <ul>/<li> for the bullet points.
 Keep it concise, professional, and tailored to the Malta job market.
 Do not include any HTML wrapper tags (no <html>, <body>, etc).
-Only return the HTML content for the sections.`;
+Only return the HTML content for the sections.
+
+IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focus on skills and competencies, not personal characteristics.`;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -44,7 +48,7 @@ Only return the HTML content for the sections.`;
         messages: [
           {
             role: "system",
-            content: "You are an expert HR writer specializing in creating compelling job descriptions for the Malta job market. Always format output as clean HTML with h3 headings and ul/li lists.",
+            content: "You are an expert HR writer specializing in creating inclusive, bias-free job descriptions for the Malta job market. Always use gender-neutral language, avoid age-related terms, and focus on skills and competencies. Format output as clean HTML with h3 headings and ul/li lists.",
           },
           { role: "user", content: prompt },
         ],

@@ -115,7 +115,7 @@ export default async function CompanyProfilePage({
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 {emp.name}
               </h1>
-              {(emp as any).is_verified && (
+              {emp.is_verified && (
                 <ShieldCheck className="h-5 w-5 text-success" />
               )}
               {emp.description && (

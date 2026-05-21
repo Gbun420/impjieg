@@ -10,7 +10,16 @@ import { Card } from "@/components/ui/card";
 import { SECTORS } from "@/lib/constants";
 import { updateNotificationSettings } from "@/lib/actions/notifications";
 import { Shield, ShieldCheck, ShieldX } from "lucide-react";
-import type { Employer } from "@/lib/supabase/types";
+import type { Database, Employer } from "@/lib/supabase/types";
+
+type EmployerUpdate = Database["public"]["Tables"]["employers"]["Update"];
+type EmployerMutationTable = {
+  update(
+    values: EmployerUpdate
+  ): {
+    eq(column: "user_id", value: string): Promise<{ error: Error | null }>;
+  };
+};
 
 const COMPANY_SIZES = [
   "1-10",
@@ -63,10 +72,10 @@ export default function SettingsPage() {
         setCoverImageUrl(emp.cover_image_url || "");
         setCompanySize(emp.company_size || "");
         setIndustry(emp.industry || "");
-        setEmailNotifications((emp as any).email_notifications ?? true);
-        setWhatsappNotifications((emp as any).whatsapp_notifications ?? false);
-        setWhatsappNumber((emp as any).whatsapp_number || "");
-        setIsVerified((emp as any).is_verified ?? false);
+        setEmailNotifications(emp.email_notifications ?? true);
+        setWhatsappNotifications(emp.whatsapp_notifications ?? false);
+        setWhatsappNumber(emp.whatsapp_number || "");
+        setIsVerified(emp.is_verified ?? false);
       }
     }
     loadEmployer();
@@ -84,8 +93,11 @@ export default function SettingsPage() {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const result = await supabase
-      .from("employers")
+    const employersTable = supabase.from(
+      "employers"
+    ) as unknown as EmployerMutationTable;
+
+    const result = await employersTable
       .update({
         name,
         description,
@@ -95,7 +107,7 @@ export default function SettingsPage() {
         cover_image_url: coverImageUrl,
         company_size: companySize || null,
         industry: industry || null,
-      } as any)
+      } as EmployerUpdate)
       .eq("user_id", user.id);
 
     setIsLoading(false);

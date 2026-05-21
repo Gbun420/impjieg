@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireInternalAdminToken } from "../_lib/internal-route-guard";
 
 const TRIGGER_SQL = `
 -- Auto-create employer profile when a new user signs up
@@ -34,7 +35,12 @@ create trigger on_auth_user_created
   execute function public.handle_new_user();
 `;
 
-export async function GET() {
+export async function GET(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   return NextResponse.json({
     status: "ready",
     message: "Visit this URL with POST method to apply the database trigger",
@@ -42,7 +48,12 @@ export async function GET() {
   });
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   try {
     // Try the Supabase SQL API endpoint
     const response = await fetch(
@@ -78,12 +89,13 @@ export async function POST() {
       status: "success",
       message: "Database trigger applied successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({
       status: "manual_required",
       message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
       sql: TRIGGER_SQL,
-      error: error.message,
+      error: message,
     });
   }
 }

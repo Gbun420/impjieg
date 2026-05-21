@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import { requireInternalAdminToken } from "../_lib/internal-route-guard";
 
-export async function POST() {
+export async function POST(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   try {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -43,15 +49,21 @@ export async function POST() {
         ],
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { status: "error", message: error.message },
+      { status: "error", message },
       { status: 500 }
     );
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   return NextResponse.json({
     status: "ready",
     message: "POST to update Supabase auth redirect URLs to production",

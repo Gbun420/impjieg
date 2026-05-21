@@ -5,8 +5,8 @@ type SignupInput = {
 };
 
 type SignupResult =
-  | { success: true; needsConfirmation: false }
-  | { error: string };
+  | { success: true; needsConfirmation: false; error?: undefined }
+  | { error: string; success?: undefined; needsConfirmation?: undefined };
 
 type UserClient = {
   auth: {

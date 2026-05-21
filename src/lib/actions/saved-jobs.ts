@@ -2,6 +2,17 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { Database } from "@/lib/supabase/types";
+
+type SavedJobInsert = Database["public"]["Tables"]["saved_jobs"]["Insert"];
+type SavedJobsMutationTable = {
+  insert(values: SavedJobInsert[]): Promise<{
+    error: {
+      code?: string;
+      message: string;
+    } | null;
+  }>;
+};
 
 export async function saveJob(jobId: string) {
   const supabase = await createClient();
@@ -14,9 +25,9 @@ export async function saveJob(jobId: string) {
     return { error: "Please sign in to save jobs" };
   }
 
-  const { error } = await supabase
-    .from("saved_jobs")
-    .insert({ user_id: user.id, job_id: jobId });
+  const savedJobsTable = supabase.from("saved_jobs") as unknown as SavedJobsMutationTable;
+
+  const { error } = await savedJobsTable.insert([{ user_id: user.id, job_id: jobId }]);
 
   if (error) {
     if (error.code === "23505") {

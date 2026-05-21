@@ -21,7 +21,28 @@ import {
   Save,
   Loader2,
   CheckCircle2,
+  Sparkles,
+  Upload,
+  AlertCircle,
 } from "lucide-react";
+
+type CandidateProfileForm = {
+  full_name: string;
+  headline: string;
+  bio: string;
+  phone: string;
+  location: string;
+  website: string;
+  linkedin_url: string;
+  skills: string[];
+  experience_years: number;
+  desired_salary_min: number;
+  desired_salary_max: number;
+  job_types: string[];
+  sectors: string[];
+  remote_preference: string;
+  is_open_to_work: boolean;
+};
 
 const SECTORS = [
   "iGaming", "Technology", "Finance & Banking", "Healthcare",
@@ -39,8 +60,8 @@ export default function CandidateProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
-  const [formData, setFormData] = useState({
+  const [profile, setProfile] = useState<CandidateProfileForm | null>(null);
+  const [formData, setFormData] = useState<CandidateProfileForm>({
     full_name: "",
     headline: "",
     bio: "",
@@ -58,39 +79,101 @@ export default function CandidateProfilePage() {
     is_open_to_work: true,
   });
   const [skillInput, setSkillInput] = useState("");
+  const [resumeText, setResumeText] = useState("");
+  const [isParsing, setIsParsing] = useState(false);
+  const [parseError, setParseError] = useState<string | null>(null);
+  const [parseSuccess, setParseSuccess] = useState(false);
 
   useEffect(() => {
-    fetchProfile();
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/candidate/profile");
+        const data = await res.json();
+        if (!cancelled && data.profile) {
+          setProfile(data.profile);
+          setFormData({
+            full_name: data.profile.full_name || "",
+            headline: data.profile.headline || "",
+            bio: data.profile.bio || "",
+            phone: data.profile.phone || "",
+            location: data.profile.location || "",
+            website: data.profile.website || "",
+            linkedin_url: data.profile.linkedin_url || "",
+            skills: data.profile.skills || [],
+            experience_years: data.profile.experience_years || 0,
+            desired_salary_min: data.profile.desired_salary_min || 0,
+            desired_salary_max: data.profile.desired_salary_max || 0,
+            job_types: data.profile.job_types || [],
+            sectors: data.profile.sectors || [],
+            remote_preference: data.profile.remote_preference || "",
+            is_open_to_work: data.profile.is_open_to_work ?? true,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  async function fetchProfile() {
+  async function parseResume() {
+    if (!resumeText.trim() || resumeText.trim().length < 50) {
+      setParseError("Please paste at least 50 characters of resume text");
+      return;
+    }
+
+    setIsParsing(true);
+    setParseError(null);
+    setParseSuccess(false);
+
     try {
-      const res = await fetch("/api/candidate/profile");
+      const res = await fetch("/api/ai/parse-resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText }),
+      });
+
       const data = await res.json();
-      if (data.profile) {
-        setProfile(data.profile);
-        setFormData({
-          full_name: data.profile.full_name || "",
-          headline: data.profile.headline || "",
-          bio: data.profile.bio || "",
-          phone: data.profile.phone || "",
-          location: data.profile.location || "",
-          website: data.profile.website || "",
-          linkedin_url: data.profile.linkedin_url || "",
-          skills: data.profile.skills || [],
-          experience_years: data.profile.experience_years || 0,
-          desired_salary_min: data.profile.desired_salary_min || 0,
-          desired_salary_max: data.profile.desired_salary_max || 0,
-          job_types: data.profile.job_types || [],
-          sectors: data.profile.sectors || [],
-          remote_preference: data.profile.remote_preference || "",
-          is_open_to_work: data.profile.is_open_to_work ?? true,
-        });
+
+      if (!res.ok) {
+        setParseError(data.error || "Failed to parse resume");
+        return;
       }
-    } catch (error) {
-      console.error("Failed to fetch profile:", error);
+
+      const parsed = data.parsed;
+
+      // Auto-fill profile fields from parsed resume
+      setFormData((prev) => ({
+        ...prev,
+        full_name: parsed.fullName || prev.full_name,
+        headline: parsed.headline || prev.headline,
+        bio: parsed.bio || prev.bio,
+        phone: parsed.phone || prev.phone,
+        location: parsed.location || prev.location,
+        skills: parsed.skills?.length > 0 ? [...new Set([...prev.skills, ...parsed.skills])] : prev.skills,
+        experience_years: parsed.experienceYears || prev.experience_years,
+        sectors: parsed.sectors?.length > 0 ? [...new Set([...prev.sectors, ...parsed.sectors])] : prev.sectors,
+        job_types: parsed.jobTypes?.length > 0 ? [...new Set([...prev.job_types, ...parsed.jobTypes])] : prev.job_types,
+      }));
+
+      setParseSuccess(true);
+      setResumeText("");
+      setTimeout(() => setParseSuccess(false), 5000);
+    } catch {
+      setParseError("Something went wrong. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsParsing(false);
     }
   }
 
@@ -414,6 +497,45 @@ export default function CandidateProfilePage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* AI Resume Parser */}
+          <Card className="p-5">
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              AI Resume Parser
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Paste your resume text to auto-fill your profile
+            </p>
+            <textarea
+              value={resumeText}
+              onChange={(e) => setResumeText(e.target.value)}
+              placeholder="Paste your resume/CV text here..."
+              className="mt-3 w-full min-h-[120px] rounded-lg border border-border bg-transparent px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+            />
+            <Button
+              variant="primary"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={parseResume}
+              isLoading={isParsing}
+            >
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+              Parse &amp; Fill Profile
+            </Button>
+            {parseError && (
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-error">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                {parseError}
+              </div>
+            )}
+            {parseSuccess && (
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-success">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                Profile updated! Review and save.
+              </div>
+            )}
+          </Card>
+
           <Card className="p-5">
             <h3 className="font-semibold text-foreground">Profile Tips</h3>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">

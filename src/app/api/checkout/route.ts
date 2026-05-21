@@ -1,10 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { PRICING } from "@/lib/constants";
+import type { Database, Employer, Payment } from "@/lib/supabase/types";
+
+type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"];
+type PaymentsMutationTable = {
+  insert(
+    values: PaymentInsert[]
+  ): {
+    select(): {
+      single(): Promise<{
+        data: Payment | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function POST(request: Request) {
   const supabase = await createClient();
+  const serviceSupabase = createServiceClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const {
     data: { user },
@@ -14,11 +34,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id, name")
     .eq("user_id", user.id)
     .single();
+
+  const employer = employerData as Pick<Employer, "id" | "name"> | null;
 
   if (!employer) {
     return NextResponse.json({ error: "Employer profile not found" }, { status: 404 });
@@ -36,16 +58,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid listing type" }, { status: 400 });
   }
 
-  const { data: payment } = await supabase
-    .from("payments")
-    .insert({
-      employer_id: employer.id,
-      job_id: jobId,
-      amount: pricing.price,
-      currency: "eur",
-      status: "pending",
-      listing_type: listingType,
-    })
+  const paymentsTable = serviceSupabase.from(
+    "payments"
+  ) as unknown as PaymentsMutationTable;
+
+  const { data: payment } = await paymentsTable
+    .insert([
+      {
+        employer_id: employer.id,
+        job_id: jobId,
+        amount: pricing.price,
+        currency: "eur",
+        status: "pending",
+        listing_type: listingType,
+      },
+    ])
     .select()
     .single();
 

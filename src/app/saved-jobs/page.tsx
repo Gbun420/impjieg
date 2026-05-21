@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Briefcase, Clock, Banknote, BookmarkCheck, ArrowRight } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
 import { unsaveJob } from "@/lib/actions/saved-jobs";
+import type { JobWithEmployer } from "@/lib/supabase/types";
+
+type SavedJobWithRelations = {
+  id: string;
+  jobs: JobWithEmployer;
+};
 
 export default async function SavedJobsPage() {
   const supabase = await createClient();
@@ -25,7 +31,7 @@ export default async function SavedJobsPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const jobs = (savedJobs || []) as any[];
+  const jobs = (savedJobs || []) as SavedJobWithRelations[];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">

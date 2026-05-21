@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
+import type { Employer } from "@/lib/supabase/types";
+
+type SitemapJobRef = { slug: string; employers: { slug: string } | null };
 
 function labelToSlug(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
@@ -57,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .limit(1000);
 
     if (jobs) {
-      jobPages = jobs.map((job: any) => ({
+      jobPages = (jobs as SitemapJobRef[]).map((job) => ({
         url: `${baseUrl}/jobs/${job.employers?.slug}/${job.slug}`,
         lastModified: new Date(),
         changeFrequency: "daily" as const,
@@ -71,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .limit(500);
 
     if (companies) {
-      companyPages = companies.map((company: any) => ({
+      companyPages = (companies as Pick<Employer, "slug">[]).map((company) => ({
         url: `${baseUrl}/companies/${company.slug}`,
         lastModified: new Date(),
         changeFrequency: "weekly" as const,

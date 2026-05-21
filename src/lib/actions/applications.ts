@@ -2,6 +2,38 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { Application, Database, Employer, Job } from "@/lib/supabase/types";
+
+type EmployerRef = Pick<Employer, "id">;
+type ApplicationUpdate = Database["public"]["Tables"]["applications"]["Update"];
+type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
+type JobUpdate = Database["public"]["Tables"]["jobs"]["Update"];
+type ApplicationsMutationTable = {
+  update(values: ApplicationUpdate): {
+    eq(column: "id", value: string): {
+      eq(column: "employer_id", value: string): Promise<{
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
+type JobsMutationTable = {
+  insert(values: JobInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: Job | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+  update(values: JobUpdate): {
+    eq(column: "id", value: string): {
+      eq(column: "employer_id", value: string): Promise<{
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function updateApplicationStatus(applicationId: string, status: string) {
   const supabase = await createClient();
@@ -14,18 +46,22 @@ export async function updateApplicationStatus(applicationId: string, status: str
     return { error: "Not authenticated" };
   }
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as EmployerRef | null;
 
   if (!employer) {
     return { error: "Employer profile not found" };
   }
 
-  const { error } = await supabase
-    .from("applications")
+  const applicationsTable = supabase.from(
+    "applications"
+  ) as unknown as ApplicationsMutationTable;
+
+  const { error } = await applicationsTable
     .update({ status })
     .eq("id", applicationId)
     .eq("employer_id", employer.id);
@@ -50,11 +86,15 @@ export async function sendCandidateEmail(applicationId: string, subject: string,
     return { error: "Not authenticated" };
   }
 
-  const { data: application } = await supabase
+  const { data: applicationData } = await supabase
     .from("applications")
     .select("candidate_email, candidate_name")
     .eq("id", applicationId)
     .single();
+  const application = applicationData as Pick<
+    Application,
+    "candidate_email" | "candidate_name"
+  > | null;
 
   if (!application) {
     return { error: "Application not found" };
@@ -78,22 +118,24 @@ export async function duplicateJob(jobId: string) {
     return { error: "Not authenticated" };
   }
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as EmployerRef | null;
 
   if (!employer) {
     return { error: "Employer profile not found" };
   }
 
-  const { data: job } = await supabase
+  const { data: jobData } = await supabase
     .from("jobs")
     .select("*")
     .eq("id", jobId)
     .eq("employer_id", employer.id)
     .single();
+  const job = jobData as Job | null;
 
   if (!job) {
     return { error: "Job not found" };
@@ -104,34 +146,41 @@ export async function duplicateJob(jobId: string) {
 
   const newSlug = `${job.slug.split("-").slice(0, -1).join("-")}-${Math.random().toString(36).substring(2, 6)}`;
 
-  const { data: newJob, error } = await supabase
-    .from("jobs")
-    .insert({
-      employer_id: employer.id,
-      title: job.title,
-      slug: newSlug,
-      description: job.description,
-      location: job.location,
-      sector: job.sector,
-      job_type: job.job_type,
-      seniority: job.seniority,
-      remote_type: job.remote_type,
-      salary_min: job.salary_min,
-      salary_max: job.salary_max,
-      skills: job.skills,
-      benefits: job.benefits,
-      visa_friendly: job.visa_friendly,
-      is_featured: false,
-      status: "draft",
-      expires_at: expiresAt.toISOString(),
-      application_email: job.application_email,
-      application_url: job.application_url,
-    })
+  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
+
+  const { data: newJob, error } = await jobsTable
+    .insert([
+      {
+        employer_id: employer.id,
+        title: job.title,
+        slug: newSlug,
+        description: job.description,
+        location: job.location,
+        sector: job.sector,
+        job_type: job.job_type,
+        seniority: job.seniority,
+        remote_type: job.remote_type,
+        salary_min: job.salary_min,
+        salary_max: job.salary_max,
+        skills: job.skills,
+        benefits: job.benefits,
+        visa_friendly: job.visa_friendly,
+        is_featured: false,
+        status: "draft",
+        expires_at: expiresAt.toISOString(),
+        application_email: job.application_email,
+        application_url: job.application_url,
+      },
+    ])
     .select()
     .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!newJob) {
+    return { error: "Failed to duplicate job" };
   }
 
   revalidatePath("/employer/jobs");
@@ -150,18 +199,20 @@ export async function boostJob(jobId: string) {
     return { error: "Not authenticated" };
   }
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as EmployerRef | null;
 
   if (!employer) {
     return { error: "Employer profile not found" };
   }
 
-  const { error } = await supabase
-    .from("jobs")
+  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
+
+  const { error } = await jobsTable
     .update({ is_featured: true, status: "active" })
     .eq("id", jobId)
     .eq("employer_id", employer.id);
@@ -186,19 +237,21 @@ export async function deleteJob(jobId: string) {
     return { error: "Not authenticated" };
   }
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as EmployerRef | null;
 
   if (!employer) {
     return { error: "Employer profile not found" };
   }
 
-  const { error } = await supabase
-    .from("jobs")
-    .update({ status: "deleted" })
+  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
+
+  const { error } = await jobsTable
+    .update({ status: "closed" })
     .eq("id", jobId)
     .eq("employer_id", employer.id);
 

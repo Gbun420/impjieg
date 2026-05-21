@@ -22,6 +22,10 @@ export interface Database {
           location: string | null;
           company_size: string | null;
           industry: string | null;
+          is_verified: boolean | null;
+          email_notifications: boolean | null;
+          whatsapp_notifications: boolean | null;
+          whatsapp_number: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -37,6 +41,10 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          is_verified?: boolean | null;
+          email_notifications?: boolean | null;
+          whatsapp_notifications?: boolean | null;
+          whatsapp_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -52,6 +60,10 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          is_verified?: boolean | null;
+          email_notifications?: boolean | null;
+          whatsapp_notifications?: boolean | null;
+          whatsapp_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -259,6 +271,196 @@ export interface Database {
           updated_at?: string;
         };
       };
+      saved_jobs: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string;
+          created_at?: string | null;
+        };
+      };
+      candidate_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          full_name: string | null;
+          headline: string | null;
+          bio: string | null;
+          phone: string | null;
+          location: string | null;
+          website: string | null;
+          linkedin_url: string | null;
+          skills: string[];
+          experience_years: number | null;
+          desired_salary_min: number | null;
+          desired_salary_max: number | null;
+          job_types: string[];
+          sectors: string[];
+          remote_preference: string | null;
+          is_open_to_work: boolean | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          full_name?: string | null;
+          headline?: string | null;
+          bio?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          website?: string | null;
+          linkedin_url?: string | null;
+          skills?: string[];
+          experience_years?: number | null;
+          desired_salary_min?: number | null;
+          desired_salary_max?: number | null;
+          job_types?: string[];
+          sectors?: string[];
+          remote_preference?: string | null;
+          is_open_to_work?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          full_name?: string | null;
+          headline?: string | null;
+          bio?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          website?: string | null;
+          linkedin_url?: string | null;
+          skills?: string[];
+          experience_years?: number | null;
+          desired_salary_min?: number | null;
+          desired_salary_max?: number | null;
+          job_types?: string[];
+          sectors?: string[];
+          remote_preference?: string | null;
+          is_open_to_work?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      candidate_cvs: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          file_url: string;
+          file_type: string | null;
+          is_primary: boolean | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          file_url: string;
+          file_type?: string | null;
+          is_primary?: boolean | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          file_url?: string;
+          file_type?: string | null;
+          is_primary?: boolean | null;
+          created_at?: string;
+        };
+      };
+      candidate_applications: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string;
+          application_id: string | null;
+          status: string;
+          notes: string | null;
+          applied_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id: string;
+          application_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          applied_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string;
+          application_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          applied_at?: string;
+          updated_at?: string;
+        };
+      };
+      candidate_alerts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string | null;
+          sectors: string[];
+          job_types: string[];
+          locations: string[];
+          salary_min: number | null;
+          remote_type: string | null;
+          frequency: string | null;
+          is_active: boolean | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name?: string | null;
+          sectors?: string[];
+          job_types?: string[];
+          locations?: string[];
+          salary_min?: number | null;
+          remote_type?: string | null;
+          frequency?: string | null;
+          is_active?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string | null;
+          sectors?: string[];
+          job_types?: string[];
+          locations?: string[];
+          salary_min?: number | null;
+          remote_type?: string | null;
+          frequency?: string | null;
+          is_active?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
@@ -268,10 +470,15 @@ export type Job = Database["public"]["Tables"]["jobs"]["Row"];
 export type Application = Database["public"]["Tables"]["applications"]["Row"];
 export type Payment = Database["public"]["Tables"]["payments"]["Row"];
 export type JobAlert = Database["public"]["Tables"]["job_alerts"]["Row"];
+export type SavedJob = Database["public"]["Tables"]["saved_jobs"]["Row"];
+export type CandidateProfile = Database["public"]["Tables"]["candidate_profiles"]["Row"];
+export type CandidateCv = Database["public"]["Tables"]["candidate_cvs"]["Row"];
+export type CandidateApplication = Database["public"]["Tables"]["candidate_applications"]["Row"];
+export type CandidateAlert = Database["public"]["Tables"]["candidate_alerts"]["Row"];
 
 export type JobWithEmployer = Job & {
   employers: Pick<
     Employer,
-    "id" | "name" | "slug" | "logo_url" | "location" | "website"
+    "id" | "name" | "slug" | "logo_url" | "location" | "website" | "is_verified"
   >;
 };

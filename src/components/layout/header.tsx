@@ -10,11 +10,9 @@ import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, User } from "lucide-react"
 import { useRouter } from "next/navigation";
 
 const navLinks = [
-  { label: "Browse Jobs", href: "/jobs" },
+  { label: "Jobs", href: "/jobs" },
   { label: "Companies", href: "/companies" },
-  { label: "Blog", href: "/blog" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Saved", href: "/saved-jobs" },
 ];
 
 export default function Header() {
@@ -88,40 +86,40 @@ export default function Header() {
 
   if (isChecking) {
     return (
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Impjieg" className="h-7 dark:invert" />
+            <img src="/logo.svg" alt="Impjieg" className="h-6 dark:invert" />
           </Link>
-          <div className="h-9 w-20 rounded-xl bg-muted/50 animate-pulse" />
+          <div className="h-8 w-20 rounded-lg bg-muted animate-pulse" />
         </div>
       </header>
     );
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="Impjieg" className="h-7 dark:invert" />
+          <img src="/logo.svg" alt="Impjieg" className="h-6 dark:invert" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={toggleTheme}
-            className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors"
+            className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
@@ -137,15 +135,15 @@ export default function Header() {
                 <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
                   <Button variant="ghost" size="sm">
                     {isEmployer ? (
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
                     ) : (
-                      <User className="mr-2 h-4 w-4" />
+                      <User className="mr-1.5 h-3.5 w-3.5" />
                     )}
                     {isEmployer ? "Dashboard" : "My Jobs"}
                   </Button>
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-1.5 h-3.5 w-3.5" />
                   Sign Out
                 </Button>
               </>
@@ -163,7 +161,7 @@ export default function Header() {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors"
+            className="md:hidden h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
             aria-label="Toggle menu"
           >
             {mobileOpen ? (
@@ -176,25 +174,25 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background animate-fade-in">
-          <nav className="mx-auto max-w-7xl px-4 py-4 space-y-1">
+        <div className="md:hidden border-t border-border bg-background animate-fade-in">
+          <nav className="mx-auto max-w-6xl px-4 py-3 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+                className="block rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 border-t border-border/50 space-y-2">
+            <div className="pt-2 mt-2 border-t border-border space-y-1">
               <button
                 onClick={() => {
                   toggleTheme();
                   setMobileOpen(false);
                 }}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted/50 transition-colors"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
               >
                 {theme === "dark" ? (
                   <>
@@ -212,7 +210,7 @@ export default function Header() {
                     href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Button variant="ghost" size="md" className="w-full">
+                    <Button variant="ghost" size="md" className="w-full justify-start">
                       {isEmployer ? (
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                       ) : (
@@ -224,7 +222,7 @@ export default function Header() {
                   <Button
                     variant="outline"
                     size="md"
-                    className="w-full"
+                    className="w-full justify-start"
                     onClick={async () => {
                       await handleLogout();
                       setMobileOpen(false);
@@ -240,7 +238,7 @@ export default function Header() {
                     href="/auth/login"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Button variant="ghost" size="md" className="w-full">
+                    <Button variant="ghost" size="md" className="w-full justify-start">
                       Sign In
                     </Button>
                   </Link>
@@ -248,7 +246,7 @@ export default function Header() {
                     href="/employer/post-job"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Button variant="primary" size="md" className="w-full">
+                    <Button variant="primary" size="md" className="w-full justify-start">
                       Post a Job
                     </Button>
                   </Link>

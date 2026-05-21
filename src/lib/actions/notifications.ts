@@ -2,6 +2,21 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { Database } from "@/lib/supabase/types";
+
+type EmployerNotificationUpdate = Pick<
+  Database["public"]["Tables"]["employers"]["Update"],
+  "email_notifications" | "whatsapp_notifications" | "whatsapp_number"
+>;
+type EmployerNotificationsTable = {
+  update(
+    values: EmployerNotificationUpdate
+  ): {
+    eq(column: "user_id", value: string): Promise<{
+      error: { message: string } | null;
+    }>;
+  };
+};
 
 export async function updateNotificationSettings(formData: FormData) {
   const supabase = await createClient();
@@ -18,13 +33,16 @@ export async function updateNotificationSettings(formData: FormData) {
   const whatsappNotifications = formData.get("whatsappNotifications") === "on";
   const whatsappNumber = formData.get("whatsappNumber") as string;
 
-  const { error } = await supabase
-    .from("employers")
+  const employersTable = supabase.from(
+    "employers"
+  ) as unknown as EmployerNotificationsTable;
+
+  const { error } = await employersTable
     .update({
       email_notifications: emailNotifications,
       whatsapp_notifications: whatsappNotifications,
       whatsapp_number: whatsappNumber || null,
-    } as any)
+    } as EmployerNotificationUpdate)
     .eq("user_id", user.id);
 
   if (error) {

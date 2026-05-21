@@ -19,8 +19,22 @@ import {
   Trash2,
 } from "lucide-react";
 import { daysAgo } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
+import type { CandidateApplication } from "@/lib/supabase/types";
 
-const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
+type CandidateApplicationWithJob = CandidateApplication & {
+  jobs: {
+    title: string;
+    slug: string;
+    location: string;
+    job_type: string;
+    salary_min: number | null;
+    salary_max: number | null;
+    employers: { name: string; slug: string; logo_url: string | null } | null;
+  } | null;
+};
+
+const statusConfig: Record<string, { color: string; icon: LucideIcon; label: string }> = {
   applied: { color: "bg-blue-500", icon: FileText, label: "Applied" },
   viewed: { color: "bg-gray-500", icon: Eye, label: "Viewed" },
   shortlisted: { color: "bg-purple-500", icon: Star, label: "Shortlisted" },
@@ -47,7 +61,7 @@ export default async function CandidateApplicationsPage() {
     .eq("user_id", user.id)
     .order("applied_at", { ascending: false });
 
-  const typedApps = (applications || []) as any[];
+  const typedApps = (applications || []) as CandidateApplicationWithJob[];
 
   return (
     <div className="space-y-6">
@@ -106,7 +120,7 @@ export default async function CandidateApplicationsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {typedApps.map((app: any) => {
+          {typedApps.map((app) => {
             const config = statusConfig[app.status] || statusConfig.applied;
             const Icon = config.icon;
             return (

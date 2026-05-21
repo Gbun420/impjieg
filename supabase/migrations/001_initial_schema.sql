@@ -211,15 +211,18 @@ create policy "Employers can view own payments"
     )
   );
 
-create policy "System can insert payments"
-  on payments for insert with check (true);
+create policy "Service role can insert payments"
+  on payments for insert with check (auth.role() = 'service_role');
 
-create policy "System can update payments"
-  on payments for update using (true);
+create policy "Service role can update payments"
+  on payments for update using (auth.role() = 'service_role');
 
 -- Job alerts policies
 create policy "Anyone can create job alerts"
   on job_alerts for insert with check (true);
 
-create policy "System can read job alerts"
-  on job_alerts for select using (true);
+create policy "Service role can read job alerts"
+  on job_alerts for select using (auth.role() = 'service_role');
+
+create policy "Service role can update job alerts"
+  on job_alerts for update using (auth.role() = 'service_role');

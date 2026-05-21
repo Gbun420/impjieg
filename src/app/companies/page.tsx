@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, MapPin } from "lucide-react";
+import type { Employer } from "@/lib/supabase/types";
+
+type EmployerWithJobRef = Employer & { jobs: { id: string }[] };
 
 export default async function CompaniesPage() {
   const supabase = await createClient();
@@ -17,7 +20,7 @@ export default async function CompaniesPage() {
 
   const employerCounts = new Map<string, number>();
   if (employers) {
-    employers.forEach((emp: any) => {
+    (employers as EmployerWithJobRef[]).forEach((emp) => {
       if (!employerCounts.has(emp.id)) {
         employerCounts.set(emp.id, 0);
       }
@@ -45,7 +48,7 @@ export default async function CompaniesPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {employers.map((employer: any) => (
+          {(employers as EmployerWithJobRef[]).map((employer) => (
             <Link key={employer.id} href={`/companies/${employer.slug}`}>
               <Card className="group h-full p-6">
                 <div className="flex items-start gap-4">

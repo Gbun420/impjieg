@@ -3,6 +3,36 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { buildEmployerNotificationEmail } from "./apply-helpers";
+import type {
+  Application,
+  CandidateApplication,
+  Database,
+  Employer,
+  Job,
+} from "@/lib/supabase/types";
+
+type ApplicationInsert = Database["public"]["Tables"]["applications"]["Insert"];
+type CandidateApplicationInsert =
+  Database["public"]["Tables"]["candidate_applications"]["Insert"];
+type ApplicationMutationTable = {
+  insert(values: ApplicationInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: Application | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
+type CandidateApplicationTable = {
+  insert(values: CandidateApplicationInsert[]): Promise<unknown>;
+};
+type JobsMutationTable = {
+  update(values: Database["public"]["Tables"]["jobs"]["Update"]): {
+    eq(column: "id", value: string): Promise<unknown>;
+  };
+};
 
 export async function submitApplication(formData: FormData) {
   const supabase = await createClient();
@@ -19,23 +49,32 @@ export async function submitApplication(formData: FormData) {
     return { error: "Please fill in all required fields" };
   }
 
-  const { data: application, error } = await supabase
-    .from("applications")
-    .insert({
-      job_id: jobId,
-      employer_id: employerId,
-      candidate_name: candidateName,
-      candidate_email: candidateEmail,
-      candidate_phone: candidatePhone || null,
-      candidate_cv_url: cvUrl || null,
-      cover_letter: coverLetter || null,
-      status: "new",
-    })
+  const applicationsTable = supabase.from(
+    "applications"
+  ) as unknown as ApplicationMutationTable;
+
+  const { data: application, error } = await applicationsTable
+    .insert([
+      {
+        job_id: jobId,
+        employer_id: employerId,
+        candidate_name: candidateName,
+        candidate_email: candidateEmail,
+        candidate_phone: candidatePhone || null,
+        candidate_cv_url: cvUrl || null,
+        cover_letter: coverLetter || null,
+        status: "new",
+      },
+    ])
     .select()
     .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!application) {
+    return { error: "Failed to create application" };
   }
 
   // Track application for logged-in candidates
@@ -49,12 +88,18 @@ export async function submitApplication(formData: FormData) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    await serviceSupabase.from("candidate_applications").insert({
-      user_id: user.id,
-      job_id: jobId,
-      application_id: application.id,
-      status: "applied",
-    });
+    const candidateApplicationsTable = serviceSupabase.from(
+      "candidate_applications"
+    ) as unknown as CandidateApplicationTable;
+
+    await candidateApplicationsTable.insert([
+      {
+        user_id: user.id,
+        job_id: jobId,
+        application_id: application.id,
+        status: "applied",
+      },
+    ]);
   }
 
   // Increment job applications count
@@ -64,32 +109,65 @@ export async function submitApplication(formData: FormData) {
     .eq("id", jobId)
     .single();
 
-  await supabase
-    .from("jobs")
-    .update({ applications_count: (currentJob as any)?.applications_count + 1 || 1 })
+  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
+
+  await jobsTable
+    .update({
+      applications_count:
+        ((currentJob as { applications_count?: number } | null)
+          ?.applications_count ?? 0) + 1,
+    })
     .eq("id", jobId);
 
   // Get employer info for notification
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
-    .select("name, whatsapp_notifications, whatsapp_number, email_notifications")
+    .select("user_id, name, whatsapp_notifications, whatsapp_number, email_notifications")
     .eq("id", employerId)
     .single();
+  const employer = employerData as Pick<
+    Employer,
+    "user_id" | "name" | "whatsapp_notifications" | "whatsapp_number" | "email_notifications"
+  > | null;
 
   // Get job title for notification
-  const { data: job } = await supabase
+  const { data: jobData } = await supabase
     .from("jobs")
     .select("title")
     .eq("id", jobId)
     .single();
+  const job = jobData as Pick<Job, "title"> | null;
 
-  const jobTitleStr = (job as any)?.title || "a position";
+  const jobTitleStr = job?.title || "a position";
+
+  let employerEmail: string | null = null;
+  if (employer?.user_id) {
+    const serviceSupabase = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const {
+      data: { user: employerUser },
+    } = await serviceSupabase.auth.admin.getUserById(employer.user_id);
+    employerEmail = employerUser?.email ?? null;
+  }
 
   // Send email notification to employer
-  if (employer && (employer as any).email_notifications !== false) {
+  if (employer && employer.email_notifications !== false && employerEmail) {
     try {
       const resendApiKey = process.env.RESEND_API_KEY;
       if (resendApiKey) {
+        const emailPayload = buildEmployerNotificationEmail({
+          employerEmail,
+          candidateEmail,
+          candidateName,
+          candidatePhone,
+          coverLetter,
+          cvUrl,
+          jobTitle: jobTitleStr,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_URL}/employer/applications`,
+        });
+
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -98,20 +176,7 @@ export async function submitApplication(formData: FormData) {
           },
           body: JSON.stringify({
             from: "Impjieg <notifications@impjieg.com>",
-            to: [candidateEmail],
-            bcc: [(employer as any).email || "hello@impjieg.com"],
-            subject: `New Application: ${candidateName} applied for ${jobTitleStr}`,
-            html: `
-              <h2>New Application Received</h2>
-              <p><strong>Candidate:</strong> ${candidateName}</p>
-              <p><strong>Email:</strong> ${candidateEmail}</p>
-              ${candidatePhone ? `<p><strong>Phone:</strong> ${candidatePhone}</p>` : ""}
-              <p><strong>Job:</strong> ${jobTitleStr}</p>
-              ${coverLetter ? `<h3>Cover Letter</h3><p>${coverLetter.replace(/\n/g, "<br>")}</p>` : ""}
-              ${cvUrl ? `<p><a href="${cvUrl}">View CV</a></p>` : ""}
-              <hr>
-              <p><a href="${process.env.NEXT_PUBLIC_URL}/employer/applications">View in Dashboard</a></p>
-            `,
+            ...emailPayload,
           }),
         });
       }
@@ -121,16 +186,22 @@ export async function submitApplication(formData: FormData) {
   }
 
   // Send WhatsApp notification if enabled
-  if (employer && (employer as any).whatsapp_notifications && (employer as any).whatsapp_number) {
+  if (employer && employer.whatsapp_notifications && employer.whatsapp_number) {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/api/notifications/whatsapp`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-internal-admin-token":
+            process.env.INTERNAL_ADMIN_TOKEN ||
+            process.env.SUPABASE_SERVICE_ROLE_KEY ||
+            "",
+        },
         body: JSON.stringify({
           applicationId: application.id,
           candidateName,
           jobTitle: jobTitleStr,
-          employerPhone: (employer as any).whatsapp_number,
+          employerPhone: employer.whatsapp_number,
         }),
       });
     } catch {

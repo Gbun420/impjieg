@@ -1,8 +1,9 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import type { Database } from "./types";
 
 export function createClient() {
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -15,7 +16,7 @@ export function createClient() {
             return undefined;
           }
         },
-        async set(name: string, value: string, options: any) {
+        async set(name: string, value: string, options: CookieOptions) {
           try {
             const cookieStore = await cookies();
             cookieStore.set({ name, value, ...options });
@@ -23,7 +24,7 @@ export function createClient() {
             // Ignore during prerendering
           }
         },
-        async remove(name: string, options: any) {
+        async remove(name: string, options: CookieOptions) {
           try {
             const cookieStore = await cookies();
             cookieStore.set({ name, value: "", ...options, maxAge: 0 });

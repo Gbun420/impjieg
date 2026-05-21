@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Briefcase, Clock, Banknote, ArrowRight } from "lucide-react";
-import { formatSalary, formatDate, daysAgo } from "@/lib/utils";
+import { formatSalary, formatDate, daysAgo, addDaysIso } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
 
@@ -55,7 +55,7 @@ function JobPostingSchema({ job }: { job: JobWithEmployer }) {
     title: job.title,
     description: job.description.replace(/<[^>]*>/g, ""),
     datePosted: job.created_at,
-    validThrough: job.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    validThrough: job.expires_at || addDaysIso(30),
     employmentType: job.job_type,
     hiringOrganization: {
       "@type": "Organization",
@@ -112,7 +112,7 @@ export default async function SectorLocationPage({
 
   const supabase = await createClient();
 
-  let query = supabase
+  const query = supabase
     .from("jobs")
     .select("*, employers(id, name, slug, logo_url, location)")
     .eq("status", "active")

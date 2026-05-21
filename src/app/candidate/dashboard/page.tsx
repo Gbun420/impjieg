@@ -21,6 +21,18 @@ import {
   Star,
 } from "lucide-react";
 import { daysAgo, formatSalary } from "@/lib/utils";
+import { applyCandidateJobFilters } from "../candidate-queries";
+import type {
+  CandidateAlert,
+  CandidateApplication,
+  CandidateCv,
+  CandidateProfile,
+  JobWithEmployer,
+} from "@/lib/supabase/types";
+
+type CandidateApplicationWithJob = CandidateApplication & {
+  jobs: { title: string; location: string; employers: { name: string } | null } | null;
+};
 
 export default async function CandidateDashboardPage() {
   const supabase = await createClient();
@@ -34,11 +46,12 @@ export default async function CandidateDashboardPage() {
   }
 
   // Get candidate profile
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from("candidate_profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
+  const profile = profileData as CandidateProfile | null;
 
   // Get saved jobs count
   const { count: savedCount } = await supabase
@@ -54,20 +67,22 @@ export default async function CandidateDashboardPage() {
     .order("applied_at", { ascending: false });
 
   // Get job alerts
-  const { data: alerts } = await supabase
+  const { data: alertsData } = await supabase
     .from("candidate_alerts")
     .select("*")
     .eq("user_id", user.id)
     .eq("is_active", true);
+  const alerts = (alertsData || []) as CandidateAlert[];
 
   // Get CVs
-  const { data: cvs } = await supabase
+  const { data: cvsData } = await supabase
     .from("candidate_cvs")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+  const cvs = (cvsData || []) as CandidateCv[];
 
-  const typedApps = (applications || []) as any[];
+  const typedApps = (applications || []) as CandidateApplicationWithJob[];
   const statusCounts = {
     applied: typedApps.filter((a) => a.status === "applied").length,
     viewed: typedApps.filter((a) => a.status === "viewed").length,
@@ -88,15 +103,17 @@ export default async function CandidateDashboardPage() {
   const recentApps = typedApps.slice(0, 5);
 
   // Get recommended jobs based on profile
-  let recommendedJobs: any[] = [];
+  let recommendedJobs: JobWithEmployer[] = [];
   if (profile?.sectors && profile.sectors.length > 0) {
-    const { data: jobs } = await supabase
+    const { data: jobs } = await applyCandidateJobFilters(
+      supabase
       .from("jobs")
       .select("*, employers(name, slug, logo_url)")
       .eq("status", "active")
-      .overlaps("sector", profile.sectors)
       .order("created_at", { ascending: false })
-      .limit(5);
+      .limit(5),
+      profile
+    );
     recommendedJobs = jobs || [];
   }
 
@@ -272,7 +289,7 @@ export default async function CandidateDashboardPage() {
               </Card>
             ) : (
               <div className="mt-4 space-y-3">
-                {recentApps.map((app: any) => (
+                {recentApps.map((app) => (
                   <Card key={app.id} className="p-4 transition-all hover:shadow-sm">
                     <div className="flex items-start justify-between">
                       <div className="min-w-0 flex-1">
@@ -345,7 +362,7 @@ export default async function CandidateDashboardPage() {
               </Card>
             ) : (
               <div className="mt-4 space-y-3">
-                {recommendedJobs.map((job: any) => (
+                {recommendedJobs.map((job) => (
                   <Card key={job.id} className="p-4 transition-all hover:shadow-sm">
                     <Link href={`/jobs/${job.employers?.slug}/${job.slug}`}>
                       <div className="flex items-start gap-3">
@@ -419,7 +436,7 @@ export default async function CandidateDashboardPage() {
                 </Link>
               </div>
               <div className="mt-3 space-y-2">
-                {alerts.slice(0, 3).map((alert: any) => (
+                {(alerts as CandidateAlert[]).slice(0, 3).map((alert) => (
                   <div key={alert.id} className="flex items-center gap-2 text-sm">
                     <Bell className="h-3.5 w-3.5 text-primary" />
                     <span className="truncate text-muted-foreground">

@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Copy, Zap, Trash2, BarChart3 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
-import type { Job } from "@/lib/supabase/types";
+import { formatDate, daysUntil } from "@/lib/utils";
+import type { Employer, Job } from "@/lib/supabase/types";
 import { duplicateJob, boostJob, deleteJob } from "@/lib/actions/applications";
 
 export default async function EmployerJobsPage() {
@@ -16,18 +16,19 @@ export default async function EmployerJobsPage() {
 
   if (!user) return null;
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as Pick<Employer, "id"> | null;
 
   if (!employer) return null;
 
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
-    .eq("employer_id", (employer as any).id)
+    .eq("employer_id", (employer as Employer).id)
     .order("created_at", { ascending: false });
 
   const typedJobs = (jobs || []) as Job[];
@@ -121,7 +122,7 @@ export default async function EmployerJobsPage() {
         <div className="space-y-3">
           {typedJobs.map((job) => {
             const daysLeft = job.expires_at
-              ? Math.max(0, Math.ceil((new Date(job.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+              ? daysUntil(job.expires_at)
               : 0;
             const appRate = job.views > 0 ? ((job.applications_count / job.views) * 100).toFixed(1) : "0";
 

@@ -1,5 +1,35 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/types";
+
+type CandidateProfileInsert = Database["public"]["Tables"]["candidate_profiles"]["Insert"];
+type CandidateProfileUpdate = Database["public"]["Tables"]["candidate_profiles"]["Update"];
+type CandidateProfileRecord = Database["public"]["Tables"]["candidate_profiles"]["Row"];
+
+type CandidateProfilesMutationTable = {
+  update(
+    values: CandidateProfileUpdate
+  ): {
+    eq(column: "user_id", value: string): {
+      select(): {
+        single(): Promise<{
+          data: CandidateProfileRecord | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
+  };
+  insert(
+    values: CandidateProfileInsert[]
+  ): {
+    select(): {
+      single(): Promise<{
+        data: CandidateProfileRecord | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function GET() {
   const supabase = await createClient();
@@ -32,7 +62,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = (await request.json()) as CandidateProfileUpdate;
 
   const { data: existing } = await supabase
     .from("candidate_profiles")
@@ -42,22 +72,30 @@ export async function POST(request: Request) {
 
   let result;
   if (existing) {
-    result = await supabase
-      .from("candidate_profiles")
+    const candidateProfilesTable = supabase.from(
+      "candidate_profiles"
+    ) as unknown as CandidateProfilesMutationTable;
+
+    result = await candidateProfilesTable
       .update({
-        ...body,
+        ...(body as CandidateProfileUpdate),
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id)
       .select()
       .single();
   } else {
-    result = await supabase
-      .from("candidate_profiles")
-      .insert({
-        user_id: user.id,
-        ...body,
-      })
+    const candidateProfilesTable = supabase.from(
+      "candidate_profiles"
+    ) as unknown as CandidateProfilesMutationTable;
+
+    result = await candidateProfilesTable
+      .insert([
+        {
+          user_id: user.id,
+          ...(body as Omit<CandidateProfileInsert, "user_id">),
+        } satisfies CandidateProfileInsert,
+      ])
       .select()
       .single();
   }

@@ -14,8 +14,27 @@ import {
   Bookmark,
   Building2,
   Zap,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  AlertCircle,
+  Target,
 } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
+import { applyCandidateJobFilters } from "../candidate-queries";
+import type { CandidateApplication, CandidateProfile, JobWithEmployer } from "@/lib/supabase/types";
+
+type SavedJobRef = { job_id: string };
+type AppliedJobRef = Pick<CandidateApplication, "job_id">;
+type MatchAnalysis = {
+  score: number;
+  matchLevel: string;
+  strengths: string[];
+  gaps: string[];
+  skillMatch: { matching: string[]; missing: string[]; bonus: string[] };
+  recommendation: string;
+};
+type ScoredJob = JobWithEmployer & { matchScore: number; matchLevel: string; matchStrengths: string[]; matchGaps: string[] };
 
 export default async function RecommendationsPage() {
   const supabase = await createClient();
@@ -29,25 +48,26 @@ export default async function RecommendationsPage() {
   }
 
   // Get candidate profile for matching
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from("candidate_profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
+  const profile = profileData as CandidateProfile | null;
 
   // Get saved job IDs to exclude
   const { data: savedJobs } = await supabase
     .from("saved_jobs")
     .select("job_id")
     .eq("user_id", user.id);
-  const savedJobIds = (savedJobs || []).map((s: any) => s.job_id);
+  const savedJobIds = (savedJobs || [] as SavedJobRef[]).map((s) => s.job_id);
 
   // Get applied job IDs to exclude
   const { data: appliedJobs } = await supabase
     .from("candidate_applications")
     .select("job_id")
     .eq("user_id", user.id);
-  const appliedJobIds = (appliedJobs || []).map((a: any) => a.job_id);
+  const appliedJobIds = (appliedJobs || [] as AppliedJobRef[]).map((a) => a.job_id);
   const excludedIds = [...savedJobIds, ...appliedJobIds];
 
   // Build query based on profile
@@ -58,48 +78,62 @@ export default async function RecommendationsPage() {
     .order("created_at", { ascending: false })
     .limit(20);
 
-  if (profile?.sectors && profile.sectors.length > 0) {
-    query = query.overlaps("sector", profile.sectors);
-  }
-
-  if (profile?.job_types && profile.job_types.length > 0) {
-    query = query.overlaps("job_type", profile.job_types);
-  }
-
-  if (profile?.remote_preference && profile.remote_preference !== "No preference") {
-    query = query.eq("remote_type", profile.remote_preference);
-  }
-
-  if (profile?.desired_salary_min) {
-    query = query.gte("salary_max", profile.desired_salary_min);
-  }
+  query = applyCandidateJobFilters(query, profile);
 
   const { data: jobs } = await query;
 
   // Filter out excluded jobs
-  const filteredJobs = (jobs || []).filter(
-    (j: any) => !excludedIds.includes(j.id)
+  const filteredJobs = ((jobs || []) as JobWithEmployer[]).filter(
+    (j) => !excludedIds.includes(j.id)
   );
 
   // Score jobs based on profile match
-  const scoredJobs = filteredJobs.map((job: any) => {
+  const scoredJobs: ScoredJob[] = filteredJobs.map((job) => {
     let score = 0;
+    const strengths: string[] = [];
+    const gaps: string[] = [];
+
     if (profile) {
-      if (profile.sectors?.includes(job.sector)) score += 30;
-      if (profile.job_types?.includes(job.job_type)) score += 20;
-      if (profile.remote_preference === job.remote_type) score += 15;
+      if (profile.sectors?.includes(job.sector)) {
+        score += 30;
+        strengths.push(`Matches your ${job.sector} preference`);
+      }
+      if (profile.job_types?.includes(job.job_type)) {
+        score += 20;
+        strengths.push(`${job.job_type} role`);
+      }
+      if (profile.remote_preference === job.remote_type) {
+        score += 15;
+        strengths.push(`${job.remote_type} matches your preference`);
+      }
       if (profile.skills?.length > 0 && job.skills?.length > 0) {
         const matchingSkills = profile.skills.filter((s: string) =>
           job.skills.some((js: string) => js.toLowerCase().includes(s.toLowerCase()))
         );
+        const missingSkills = job.skills.filter((js: string) =>
+          !profile.skills.some((s: string) => js.toLowerCase().includes(s.toLowerCase()))
+        );
         score += matchingSkills.length * 5;
+        if (matchingSkills.length > 0) strengths.push(`${matchingSkills.length} matching skills`);
+        if (missingSkills.length > 0 && missingSkills.length <= 3) {
+          gaps.push(`Missing: ${missingSkills.slice(0, 2).join(", ")}`);
+        }
       }
       if (profile.desired_salary_min && job.salary_min) {
-        if (job.salary_min >= profile.desired_salary_min) score += 10;
+        if (job.salary_min >= profile.desired_salary_min) {
+          score += 10;
+          strengths.push("Meets salary expectations");
+        } else {
+          gaps.push("Below desired salary range");
+        }
       }
       if (job.is_featured) score += 5;
     }
-    return { ...job, matchScore: Math.min(score, 100) };
+
+    const finalScore = Math.min(score, 100);
+    const matchLevel = finalScore >= 80 ? "Excellent" : finalScore >= 60 ? "Good" : finalScore >= 40 ? "Fair" : "Low";
+
+    return { ...job, matchScore: finalScore, matchLevel, matchStrengths: strengths, matchGaps: gaps };
   });
 
   // Sort by match score
@@ -158,7 +192,7 @@ export default async function RecommendationsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {scoredJobs.map((job: any) => (
+          {scoredJobs.map((job) => (
             <Card
               key={job.id}
               className={`group p-5 transition-all hover:shadow-md ${
@@ -241,13 +275,59 @@ export default async function RecommendationsPage() {
                         )}
                       </div>
                     )}
+                    {/* Match analysis */}
+                    {(job.matchStrengths.length > 0 || job.matchGaps.length > 0) && (
+                      <div className="mt-3 pt-3 border-t border-border/50 grid gap-2 sm:grid-cols-2">
+                        {job.matchStrengths.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-1 text-xs font-medium text-success mb-1">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Why it matches
+                            </div>
+                            <ul className="space-y-0.5">
+                              {job.matchStrengths.slice(0, 3).map((s, i) => (
+                                <li key={i} className="text-xs text-muted-foreground">{s}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {job.matchGaps.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-1 text-xs font-medium text-warning mb-1">
+                              <AlertCircle className="h-3 w-3" />
+                              Gaps to consider
+                            </div>
+                            <ul className="space-y-0.5">
+                              {job.matchGaps.slice(0, 2).map((g, i) => (
+                                <li key={i} className="text-xs text-muted-foreground">{g}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                      <span className="text-sm font-bold text-primary">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                      job.matchScore >= 80 ? "bg-success/10" :
+                      job.matchScore >= 60 ? "bg-primary/10" :
+                      job.matchScore >= 40 ? "bg-warning/10" : "bg-muted"
+                    }`}>
+                      <span className={`text-sm font-bold ${
+                        job.matchScore >= 80 ? "text-success" :
+                        job.matchScore >= 60 ? "text-primary" :
+                        job.matchScore >= 40 ? "text-warning" : "text-muted-foreground"
+                      }`}>
                         {job.matchScore}%
                       </span>
                     </div>
+                    <Badge variant={
+                      job.matchScore >= 80 ? "success" :
+                      job.matchScore >= 60 ? "default" :
+                      job.matchScore >= 40 ? "warning" : "secondary"
+                    } className="text-[10px]">
+                      {job.matchLevel}
+                    </Badge>
                   </div>
                 </div>
               </Link>

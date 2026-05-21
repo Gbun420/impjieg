@@ -14,12 +14,19 @@ import {
   REMOTE_OPTIONS,
   PRICING,
 } from "@/lib/constants";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 export default function PostJobPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCheckingBias, setIsCheckingBias] = useState(false);
+  const [biasResult, setBiasResult] = useState<{
+    isClean: boolean;
+    issues: Array<{ type: string; text: string; severity: string; explanation: string; suggestion: string }>;
+    overallScore: number;
+    summary: string;
+  } | null>(null);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -72,6 +79,45 @@ export default function PostJobPage() {
     }
   }
 
+  async function checkBias() {
+    const title = (document.querySelector('[name="title"]') as HTMLInputElement)?.value;
+    const description = (document.querySelector('[name="description"]') as HTMLTextAreaElement)?.value;
+    const skills = (document.querySelector('[name="skills"]') as HTMLInputElement)?.value;
+    const benefits = (document.querySelector('[name="benefits"]') as HTMLInputElement)?.value;
+
+    const textToCheck = `${title}\n\n${description}\n\nSkills: ${skills}\n\nBenefits: ${benefits}`;
+
+    if (!description || description.trim().length < 20) {
+      setError("Please add a job description first");
+      return;
+    }
+
+    setIsCheckingBias(true);
+    setError(null);
+    setBiasResult(null);
+
+    try {
+      const res = await fetch("/api/ai/bias-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: textToCheck }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to check for bias");
+        return;
+      }
+
+      setBiasResult(data.analysis);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsCheckingBias(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Post a Job</h1>
@@ -116,6 +162,75 @@ export default function PostJobPage() {
               required
               className="min-h-[200px]"
             />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={generateDescription}
+                isLoading={isGenerating}
+              >
+                <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                AI Generate
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={checkBias}
+                isLoading={isCheckingBias}
+              >
+                <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                Check Bias
+              </Button>
+            </div>
+            {biasResult && (
+              <div className={`rounded-lg border p-4 ${
+                biasResult.isClean
+                  ? "border-success/20 bg-success/5"
+                  : biasResult.overallScore >= 70
+                  ? "border-warning/20 bg-warning/5"
+                  : "border-error/20 bg-error/5"
+              }`}>
+                <div className="flex items-center gap-2">
+                  {biasResult.isClean ? (
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                  )}
+                  <span className="text-sm font-medium text-foreground">
+                    Inclusivity Score: {biasResult.overallScore}/100
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{biasResult.summary}</p>
+                {biasResult.issues.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {biasResult.issues.map((issue, i) => (
+                      <div key={i} className="rounded-md border border-border/50 bg-background p-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                            issue.severity === "high"
+                              ? "bg-error/10 text-error"
+                              : issue.severity === "medium"
+                              ? "bg-warning/10 text-warning"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {issue.severity}
+                          </span>
+                          <span className="text-xs font-medium text-foreground">{issue.type}</span>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          &ldquo;{issue.text}&rdquo; — {issue.explanation}
+                        </p>
+                        <p className="mt-1 text-xs text-success">
+                          Try: &ldquo;{issue.suggestion}&rdquo;
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <Select
                 label="Sector"

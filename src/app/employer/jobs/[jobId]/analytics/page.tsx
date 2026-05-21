@@ -5,8 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Eye, Users, TrendingUp, Clock, Calendar, MapPin, Briefcase, FileText } from "lucide-react";
-import { formatDate, daysAgo, formatSalary } from "@/lib/utils";
-import type { Job, Application } from "@/lib/supabase/types";
+import { formatDate, daysAgo, formatSalary, daysSince, daysUntil } from "@/lib/utils";
+import type { Job, Application, Employer } from "@/lib/supabase/types";
 
 export default async function JobAnalyticsPage({
   params,
@@ -22,11 +22,12 @@ export default async function JobAnalyticsPage({
 
   if (!user) return null;
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as Pick<Employer, "id"> | null;
 
   if (!employer) return null;
 
@@ -34,7 +35,7 @@ export default async function JobAnalyticsPage({
     .from("jobs")
     .select("*")
     .eq("id", jobId)
-    .eq("employer_id", (employer as any).id)
+    .eq("employer_id", (employer as Employer).id)
     .single();
 
   if (!job) notFound();
@@ -50,10 +51,8 @@ export default async function JobAnalyticsPage({
   const apps = (applications || []) as Application[];
 
   const appRate = j.views > 0 ? ((j.applications_count / j.views) * 100).toFixed(1) : "0";
-  const daysSincePosted = Math.max(1, Math.ceil((Date.now() - new Date(j.created_at).getTime()) / (1000 * 60 * 60 * 24)));
-  const daysLeft = j.expires_at
-    ? Math.max(0, Math.ceil((new Date(j.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : 0;
+  const daysSincePosted = daysSince(j.created_at);
+  const daysLeft = j.expires_at ? daysUntil(j.expires_at) : 0;
   const avgApplicationsPerDay = (j.applications_count / daysSincePosted).toFixed(1);
 
   const statusBreakdown = apps.reduce((acc, app) => {

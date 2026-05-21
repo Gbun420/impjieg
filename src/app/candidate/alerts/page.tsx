@@ -18,6 +18,18 @@ import {
   Briefcase,
   Banknote,
 } from "lucide-react";
+import type { CandidateAlert } from "@/lib/supabase/types";
+
+type CandidateAlertForm = {
+  name: string;
+  sectors: string[];
+  job_types: string[];
+  locations: string[];
+  salary_min: number;
+  remote_type: string;
+  frequency: string;
+  is_active: boolean;
+};
 
 const SECTORS = [
   "iGaming", "Technology", "Finance & Banking", "Healthcare",
@@ -37,10 +49,10 @@ const FREQUENCIES = [
 export default function CandidateAlertsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<CandidateAlert[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CandidateAlertForm>({
     name: "",
     sectors: [] as string[],
     job_types: [] as string[],
@@ -129,7 +141,7 @@ export default function CandidateAlertsPage() {
     setLocationInput("");
   }
 
-  function startEdit(alert: any) {
+  function startEdit(alert: CandidateAlert) {
     setFormData({
       name: alert.name || "",
       sectors: alert.sectors || [],
@@ -379,10 +391,10 @@ export default function CandidateAlertsPage() {
                         {alert.locations.join(", ")}
                       </span>
                     )}
-                    {alert.salary_min > 0 && (
+                    {(alert.salary_min ?? 0) > 0 && (
                       <span className="flex items-center gap-1">
                         <Banknote className="h-3.5 w-3.5" />
-                        €{alert.salary_min.toLocaleString()}+
+                        €{(alert.salary_min ?? 0).toLocaleString()}+
                       </span>
                     )}
                     {alert.remote_type && (
@@ -394,9 +406,9 @@ export default function CandidateAlertsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="sm" onClick={() => handleToggle(alert.id, alert.is_active)}>
-                    {alert.is_active ? "Pause" : "Resume"}
-                  </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleToggle(alert.id, alert.is_active ?? false)}>
+                        {alert.is_active ? "Pause" : "Resume"}
+                      </Button>
                   <Button variant="ghost" size="sm" onClick={() => startEdit(alert)}>
                     <Edit className="h-4 w-4" />
                   </Button>

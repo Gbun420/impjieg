@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 import SearchFilters from "@/components/jobs/search-filters";
-import JobList from "@/components/jobs/job-list";
+import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
@@ -11,11 +11,11 @@ const JOBS_PER_PAGE = 20;
 
 function SearchFiltersSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex gap-2">
-        <Skeleton className="h-11 flex-1" />
-        <Skeleton className="h-11 w-24" />
-        <Skeleton className="h-11 w-24" />
+        <Skeleton className="h-10 flex-1" />
+        <Skeleton className="h-10 w-20" />
+        <Skeleton className="h-10 w-20" />
       </div>
     </div>
   );
@@ -64,7 +64,7 @@ async function JobsContent({
   const { data: jobs, error } = await query.range(from, to);
 
   if (error || !jobs) {
-    return <p>Error loading jobs.</p>;
+    return <p className="text-sm text-muted-foreground">Error loading jobs.</p>;
   }
 
   const typedJobs = jobs as unknown as JobWithEmployer[];
@@ -74,14 +74,34 @@ async function JobsContent({
       <Suspense fallback={<SearchFiltersSkeleton />}>
         <SearchFilters />
       </Suspense>
-      <JobList jobs={typedJobs} />
-      {typedJobs.length === JOBS_PER_PAGE && (
-        <div className="flex justify-center pt-4">
-          <Link href={`/jobs?${new URLSearchParams({ ...searchParams, page: String(page + 1) }).toString()}`}>
-            <Button variant="outline" size="lg">Load More</Button>
-          </Link>
-        </div>
-      )}
+      <div className="mt-6">
+        {typedJobs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No jobs found matching your criteria.</p>
+            <Link href="/jobs" className="mt-3 inline-flex text-sm text-primary hover:text-primary-hover transition-colors">
+              Clear filters
+            </Link>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground mb-4">
+              {typedJobs.length} job{typedJobs.length !== 1 ? "s" : ""} found
+            </p>
+            <div className="space-y-3">
+              {typedJobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+            {typedJobs.length === JOBS_PER_PAGE && (
+              <div className="flex justify-center pt-6">
+                <Link href={`/jobs?${new URLSearchParams({ ...searchParams, page: String(page + 1) }).toString()}`}>
+                  <Button variant="outline" size="lg">Load More</Button>
+                </Link>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 }
@@ -94,8 +114,8 @@ export default async function JobsPage({
   const params = await searchParams;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-6">
         Browse Jobs
       </h1>
       <Suspense fallback={<SearchFiltersSkeleton />}>

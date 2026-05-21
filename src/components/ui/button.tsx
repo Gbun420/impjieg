@@ -23,23 +23,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-xl active:scale-[0.98]";
+      "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-lg active:scale-[0.98]";
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5",
+        "bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md",
       secondary:
         "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20",
       outline:
-        "border border-border bg-background/50 hover:bg-muted/50 text-foreground backdrop-blur-sm hover:border-primary/30",
-      ghost: "hover:bg-muted/50 text-foreground",
+        "border border-border bg-transparent hover:bg-muted text-foreground hover:border-border-hover",
+      ghost: "hover:bg-muted text-foreground",
       danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20",
     };
 
     const sizes: Record<NonNullable<ButtonProps["size"]>, string> = {
-      sm: "h-9 px-3.5 text-sm",
-      md: "h-10 px-5 text-sm",
-      lg: "h-12 px-7 text-base",
+      sm: "h-8 px-3 text-sm",
+      md: "h-10 px-4 text-sm",
+      lg: "h-12 px-6 text-base",
     };
 
     return (

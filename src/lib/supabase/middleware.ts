@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  const supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -46,15 +46,6 @@ export async function updateSession(request: NextRequest) {
   if (pathname === "/saved-jobs" && !user) {
     url.pathname = "/auth/login";
     url.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(url);
-  }
-
-  // Redirect authenticated users away from auth pages
-  if (
-    (pathname === "/auth/login" || pathname === "/auth/signup") &&
-    user
-  ) {
-    url.pathname = "/employer/dashboard";
     return NextResponse.redirect(url);
   }
 

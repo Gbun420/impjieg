@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireInternalAdminToken } from "../_lib/internal-route-guard";
 
 const MIGRATION_SQL = `
 -- Candidate profiles for job seekers
@@ -76,7 +77,12 @@ create table if not exists candidate_alerts (
 create index if not exists idx_candidate_alerts_user on candidate_alerts(user_id);
 `;
 
-export async function GET() {
+export async function GET(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   return NextResponse.json({
     status: "ready",
     message: "POST to apply the candidate portal database migration",
@@ -84,7 +90,12 @@ export async function GET() {
   });
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const forbidden = requireInternalAdminToken(request);
+  if (forbidden) {
+    return forbidden;
+  }
+
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/`,
@@ -120,12 +131,13 @@ export async function POST() {
         "3. Paste the SQL and click 'Run'",
       ],
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({
       status: "manual_required",
       message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
       sql: MIGRATION_SQL,
-      error: error.message,
+      error: message,
     });
   }
 }

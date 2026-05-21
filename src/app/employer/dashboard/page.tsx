@@ -5,8 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ArrowRight, Zap } from "lucide-react";
-import { formatDate, daysAgo } from "@/lib/utils";
-import type { Job } from "@/lib/supabase/types";
+import { formatDate, daysAgo, daysUntil } from "@/lib/utils";
+import type { Application, Employer, Job } from "@/lib/supabase/types";
 
 export default async function EmployerDashboardPage() {
   const supabase = await createClient();
@@ -32,18 +32,18 @@ export default async function EmployerDashboardPage() {
     );
   }
 
-  const employer = profile as any;
+  const employer = profile as Employer;
 
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
-    .eq("employer_id", (employer as any).id)
+    .eq("employer_id", employer.id)
     .order("created_at", { ascending: false });
 
   const { data: applications } = await supabase
     .from("applications")
     .select("*, jobs(title)")
-    .eq("employer_id", (employer as any).id)
+    .eq("employer_id", employer.id)
     .order("created_at", { ascending: false })
     .limit(5);
 
@@ -52,7 +52,9 @@ export default async function EmployerDashboardPage() {
   const totalViews = typedJobs.reduce((sum, j) => sum + (j.views || 0), 0);
   const totalApplications = typedJobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
   const avgApplicationRate = totalViews > 0 ? ((totalApplications / totalViews) * 100).toFixed(1) : "0";
-  const recentApps = (applications || []) as (any[]);
+  const recentApps = (applications || []) as Array<
+    Application & { jobs: { title: string } | null }
+  >;
 
   const topJobs = [...typedJobs]
     .sort((a, b) => (b.views || 0) - (a.views || 0))
@@ -148,7 +150,7 @@ export default async function EmployerDashboardPage() {
               {topJobs.map((job) => {
                 const appRate = job.views > 0 ? ((job.applications_count / job.views) * 100).toFixed(1) : "0";
                 const daysLeft = job.expires_at
-                  ? Math.max(0, Math.ceil((new Date(job.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+                  ? daysUntil(job.expires_at)
                   : 0;
 
                 return (
@@ -201,7 +203,7 @@ export default async function EmployerDashboardPage() {
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
-              {recentApps.map((app: any) => (
+              {recentApps.map((app) => (
                 <Card key={app.id} className="p-4 transition-all hover:shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">

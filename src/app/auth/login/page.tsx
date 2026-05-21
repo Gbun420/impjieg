@@ -25,7 +25,7 @@ function LoginForm() {
     if (result?.error) {
       setError(result.error);
     } else if (result?.success) {
-      router.push(redirectUrl || "/employer/dashboard");
+      router.push(redirectUrl || result.redirectTo || "/candidate/dashboard");
       router.refresh();
     }
   }
