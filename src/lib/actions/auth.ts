@@ -3,9 +3,14 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
+import { signupWithAutoConfirm } from "./auth-signup";
 
 export async function signup(formData: FormData) {
   const supabase = await createClient();
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const data = {
     email: formData.get("email") as string,
@@ -26,23 +31,11 @@ export async function signup(formData: FormData) {
     return { error: "Please enter a valid email address" };
   }
 
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.password,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/callback`,
-      data: { companyName: data.companyName },
-    },
+  return signupWithAutoConfirm({
+    adminClient: serviceSupabase,
+    userClient: supabase,
+    input: data,
   });
-
-  if (authError) {
-    if (authError.message.includes("already registered")) {
-      return { error: "An account with this email already exists. Please sign in." };
-    }
-    return { error: authError.message };
-  }
-
-  return { success: true, needsConfirmation: !authData.user?.email_confirmed_at };
 }
 
 export async function login(formData: FormData) {
