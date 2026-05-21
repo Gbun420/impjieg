@@ -234,7 +234,7 @@ export default async function JobReportPage({
       {/* Footer */}
       <div className="border-t border-border/30 pt-6 text-center text-xs text-muted-foreground">
         <p>Impjieg Hiring Report • {employer.name} • Generated on {generatedAt}</p>
-        <p className="mt-1">impjieg.com</p>
+        <p className="mt-1">impjieg.vercel.app</p>
       </div>
     </div>
   );

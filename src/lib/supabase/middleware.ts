@@ -35,6 +35,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Protect candidate routes
+  if (pathname.startsWith("/candidate") && !user) {
+    url.pathname = "/auth/login";
+    url.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(url);
+  }
+
   // Protect saved-jobs route
   if (pathname === "/saved-jobs" && !user) {
     url.pathname = "/auth/login";

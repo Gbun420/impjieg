@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/employer/", "/auth/"],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.com"}/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/sitemap.xml`,
   };
 }

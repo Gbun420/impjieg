@@ -69,8 +69,8 @@ export async function POST(request: Request) {
       },
     ],
     mode: "payment",
-    success_url: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.com"}/employer/checkout/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.com"}/employer/post-job`,
+    success_url: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/checkout/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/post-job`,
     metadata: {
       paymentId: payment.id,
       jobId,

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_MT",
-    url: "https://impjieg.com",
+    url: "https://impjieg.vercel.app",
     siteName: "Impjieg",
     title: "Impjieg — Malta's Job Board",
     description:
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.com"
+    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"
   ),
 };
 

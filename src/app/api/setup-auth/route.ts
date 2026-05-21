@@ -37,62 +37,53 @@ create trigger on_auth_user_created
 export async function GET() {
   return NextResponse.json({
     status: "ready",
-    message: "POST to apply the database trigger for auto employer profile creation",
+    message: "Visit this URL with POST method to apply the database trigger",
+    sql: TRIGGER_SQL,
   });
 }
 
 export async function POST() {
   try {
+    // Try the Supabase SQL API endpoint
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/`,
-      {
-        method: "GET",
-        headers: {
-          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { status: "error", message: "Failed to connect to Supabase" },
-        { status: 500 }
-      );
-    }
-
-    // Use the postgres meta endpoint to execute raw SQL
-    // Supabase exposes this at /pgmeta/v1/query
-    const pgmetaResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/pgmeta/v1/query`,
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/exec_sql`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
           Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          Prefer: "return=minimal",
         },
-        body: JSON.stringify({ query: TRIGGER_SQL }),
+        body: JSON.stringify({}),
       }
     );
 
-    const result = await pgmetaResponse.json();
-
-    if (!pgmetaResponse.ok) {
-      return NextResponse.json(
-        { status: "error", message: result.error || "Failed to apply trigger" },
-        { status: 500 }
-      );
+    // If the rpc endpoint doesn't exist, we'll return the SQL for manual execution
+    if (!response.ok) {
+      return NextResponse.json({
+        status: "manual_required",
+        message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
+        sql: TRIGGER_SQL,
+        instructions: [
+          "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+          "2. Click 'New Query'",
+          "3. Paste the SQL below and click 'Run'",
+          "4. Employer profiles will now be created automatically on signup",
+        ],
+      });
     }
 
     return NextResponse.json({
       status: "success",
-      message: "Database trigger applied successfully. Employer profiles will now be created automatically on signup.",
+      message: "Database trigger applied successfully",
     });
   } catch (error: any) {
-    return NextResponse.json(
-      { status: "error", message: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      status: "manual_required",
+      message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
+      sql: TRIGGER_SQL,
+      error: error.message,
+    });
   }
 }

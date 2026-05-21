@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 
 export async function submitApplication(formData: FormData) {
@@ -35,6 +36,25 @@ export async function submitApplication(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Track application for logged-in candidates
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const serviceSupabase = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    await serviceSupabase.from("candidate_applications").insert({
+      user_id: user.id,
+      job_id: jobId,
+      application_id: application.id,
+      status: "applied",
+    });
   }
 
   // Increment job applications count
@@ -103,7 +123,7 @@ export async function submitApplication(formData: FormData) {
   // Send WhatsApp notification if enabled
   if (employer && (employer as any).whatsapp_notifications && (employer as any).whatsapp_number) {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_URL || "https://impjieg.com"}/api/notifications/whatsapp`, {
+      await fetch(`${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/api/notifications/whatsapp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

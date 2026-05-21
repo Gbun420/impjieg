@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
-import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const navLinks = [
@@ -20,6 +20,7 @@ const navLinks = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isEmployer, setIsEmployer] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
@@ -33,8 +34,18 @@ export default function Header() {
           data: { user },
         } = await supabase.auth.getUser();
         setIsLoggedIn(!!user);
+
+        if (user) {
+          const { data: employer } = await supabase
+            .from("employers")
+            .select("id")
+            .eq("user_id", user.id)
+            .single();
+          setIsEmployer(!!employer);
+        }
       } catch {
         setIsLoggedIn(false);
+        setIsEmployer(false);
       } finally {
         setIsChecking(false);
       }
@@ -47,8 +58,17 @@ export default function Header() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
         setIsLoggedIn(false);
+        setIsEmployer(false);
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         setIsLoggedIn(!!session?.user);
+        if (session?.user) {
+          supabase
+            .from("employers")
+            .select("id")
+            .eq("user_id", session.user.id)
+            .single()
+            .then(({ data }) => setIsEmployer(!!data));
+        }
       } else if (event === "INITIAL_SESSION") {
         setIsLoggedIn(!!session?.user);
       }
@@ -114,10 +134,14 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
               <>
-                <Link href="/employer/dashboard">
+                <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
                   <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
+                    {isEmployer ? (
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                    ) : (
+                      <User className="mr-2 h-4 w-4" />
+                    )}
+                    {isEmployer ? "Dashboard" : "My Jobs"}
                   </Button>
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -185,12 +209,16 @@ export default function Header() {
               {isLoggedIn ? (
                 <>
                   <Link
-                    href="/employer/dashboard"
+                    href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="ghost" size="md" className="w-full">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
+                      {isEmployer ? (
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                      ) : (
+                        <User className="mr-2 h-4 w-4" />
+                      )}
+                      {isEmployer ? "Dashboard" : "My Jobs"}
                     </Button>
                   </Link>
                   <Button

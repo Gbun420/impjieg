@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const message = `🔔 New Application on Impjieg\n\n${candidateName} has applied for: ${jobTitle}\n\nLog in to your dashboard to review: https://impjieg.com/employer/applications`;
+  const message = `🔔 New Application on Impjieg\n\n${candidateName} has applied for: ${jobTitle}\n\nLog in to your dashboard to review: https://impjieg.vercel.app/employer/applications`;
 
   // Twilio WhatsApp API integration
   // Requires: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER

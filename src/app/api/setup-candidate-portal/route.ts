@@ -1,0 +1,131 @@
+import { NextResponse } from "next/server";
+
+const MIGRATION_SQL = `
+-- Candidate profiles for job seekers
+create table if not exists candidate_profiles (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete cascade not null unique,
+  full_name text,
+  headline text,
+  bio text,
+  phone text,
+  location text,
+  website text,
+  linkedin_url text,
+  skills text[] default '{}',
+  experience_years integer,
+  desired_salary_min integer,
+  desired_salary_max integer,
+  job_types text[] default '{}',
+  sectors text[] default '{}',
+  remote_preference text,
+  is_open_to_work boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_candidate_profiles_user on candidate_profiles(user_id);
+create index if not exists idx_candidate_profiles_skills on candidate_profiles using gin(skills);
+create index if not exists idx_candidate_profiles_sectors on candidate_profiles using gin(sectors);
+
+-- CV versions for candidates
+create table if not exists candidate_cvs (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  name text not null,
+  file_url text not null,
+  file_type text,
+  is_primary boolean default false,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_candidate_cvs_user on candidate_cvs(user_id);
+
+-- Application tracking for candidates (personal ATS)
+create table if not exists candidate_applications (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  job_id uuid references jobs(id) on delete cascade not null,
+  application_id uuid references applications(id) on delete set null,
+  status text default 'applied' check (status in ('applied', 'viewed', 'shortlisted', 'interview', 'offered', 'rejected', 'withdrawn')),
+  notes text,
+  applied_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_candidate_applications_user on candidate_applications(user_id);
+create index if not exists idx_candidate_applications_job on candidate_applications(job_id);
+create index if not exists idx_candidate_applications_status on candidate_applications(status);
+
+-- Job alert preferences for candidates
+create table if not exists candidate_alerts (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  name text default 'My Job Alert',
+  sectors text[] default '{}',
+  job_types text[] default '{}',
+  locations text[] default '{}',
+  salary_min integer,
+  remote_type text,
+  frequency text default 'daily' check (frequency in ('daily', 'weekly', 'instant')),
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_candidate_alerts_user on candidate_alerts(user_id);
+`;
+
+export async function GET() {
+  return NextResponse.json({
+    status: "ready",
+    message: "POST to apply the candidate portal database migration",
+    sql: MIGRATION_SQL,
+  });
+}
+
+export async function POST() {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/`,
+      {
+        method: "GET",
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      return NextResponse.json({
+        status: "manual_required",
+        message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
+        sql: MIGRATION_SQL,
+        instructions: [
+          "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+          "2. Click 'New Query'",
+          "3. Paste the SQL and click 'Run'",
+        ],
+      });
+    }
+
+    return NextResponse.json({
+      status: "manual_required",
+      message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
+      sql: MIGRATION_SQL,
+      instructions: [
+        "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+        "2. Click 'New Query'",
+        "3. Paste the SQL and click 'Run'",
+      ],
+    });
+  } catch (error: any) {
+    return NextResponse.json({
+      status: "manual_required",
+      message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
+      sql: MIGRATION_SQL,
+      error: error.message,
+    });
+  }
+}

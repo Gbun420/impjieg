@@ -82,7 +82,7 @@ function JobPostingSchema({ job }: { job: JobWithEmployer }) {
     applicantLocationRequirements: job.remote_type
       ? { "@type": "Place", name: job.remote_type }
       : undefined,
-    url: `https://impjieg.com/jobs/${job.employers?.slug}/${job.slug}`,
+    url: `https://impjieg.vercel.app/jobs/${job.employers?.slug}/${job.slug}`,
   };
 
   return (

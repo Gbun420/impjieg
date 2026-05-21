@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { ensureEmployerProfile } from "@/lib/actions/auth";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,13 +16,23 @@ export default async function EmployerDashboardPage() {
 
   if (!user) return null;
 
-  const { data: employer } = await supabase
-    .from("employers")
-    .select("id, name")
-    .eq("user_id", user.id)
-    .single();
+  // Ensure employer profile exists (lazy creation)
+  const { profile, error: profileError } = await ensureEmployerProfile();
 
-  if (!employer) return null;
+  if (profileError || !profile) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Unable to load your employer profile.</p>
+          <Link href="/auth/login" className="mt-4 inline-block">
+            <Button variant="outline">Sign In Again</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const employer = profile as any;
 
   const { data: jobs } = await supabase
     .from("jobs")

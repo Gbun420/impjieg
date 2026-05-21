@@ -8,7 +8,7 @@ function labelToSlug(label: string): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.com";
+    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app";
 
   const staticPages = [
     "",
