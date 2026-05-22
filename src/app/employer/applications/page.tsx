@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import ApplicationPipeline from "@/components/jobs/application-pipeline";
 import type { Application, Employer } from "@/lib/supabase/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function ApplicationsPage() {
   const supabase = await createClient();
   const {
