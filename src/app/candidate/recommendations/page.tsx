@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
 
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
@@ -13,14 +14,8 @@ import {
   Briefcase,
   Banknote,
   Clock,
-  Bookmark,
-  Building2,
-  Zap,
-  ChevronDown,
-  ChevronUp,
   CheckCircle2,
   AlertCircle,
-  Target,
 } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
 import { applyCandidateJobFilters } from "../candidate-queries";
@@ -28,14 +23,6 @@ import type { CandidateApplication, CandidateProfile, JobWithEmployer } from "@/
 
 type SavedJobRef = { job_id: string };
 type AppliedJobRef = Pick<CandidateApplication, "job_id">;
-type MatchAnalysis = {
-  score: number;
-  matchLevel: string;
-  strengths: string[];
-  gaps: string[];
-  skillMatch: { matching: string[]; missing: string[]; bonus: string[] };
-  recommendation: string;
-};
 type ScoredJob = JobWithEmployer & { matchScore: number; matchLevel: string; matchStrengths: string[]; matchGaps: string[] };
 
 export default async function RecommendationsPage() {
@@ -91,51 +78,30 @@ export default async function RecommendationsPage() {
 
   // Score jobs based on profile match
   const scoredJobs: ScoredJob[] = filteredJobs.map((job) => {
-    let score = 0;
-    const strengths: string[] = [];
-    const gaps: string[] = [];
-
-    if (profile) {
-      if (profile.sectors?.includes(job.sector)) {
-        score += 30;
-        strengths.push(`Matches your ${job.sector} preference`);
-      }
-      if (profile.job_types?.includes(job.job_type)) {
-        score += 20;
-        strengths.push(`${job.job_type} role`);
-      }
-      if (profile.remote_preference === job.remote_type) {
-        score += 15;
-        strengths.push(`${job.remote_type} matches your preference`);
-      }
-      if (profile.skills?.length > 0 && job.skills?.length > 0) {
-        const matchingSkills = profile.skills.filter((s: string) =>
-          job.skills.some((js: string) => js.toLowerCase().includes(s.toLowerCase()))
-        );
-        const missingSkills = job.skills.filter((js: string) =>
-          !profile.skills.some((s: string) => js.toLowerCase().includes(s.toLowerCase()))
-        );
-        score += matchingSkills.length * 5;
-        if (matchingSkills.length > 0) strengths.push(`${matchingSkills.length} matching skills`);
-        if (missingSkills.length > 0 && missingSkills.length <= 3) {
-          gaps.push(`Missing: ${missingSkills.slice(0, 2).join(", ")}`);
-        }
-      }
-      if (profile.desired_salary_min && job.salary_min) {
-        if (job.salary_min >= profile.desired_salary_min) {
-          score += 10;
-          strengths.push("Meets salary expectations");
-        } else {
-          gaps.push("Below desired salary range");
-        }
-      }
-      if (job.is_featured) score += 5;
+    if (!profile) {
+      return { ...job, matchScore: 0, matchLevel: "Low", matchStrengths: [], matchGaps: [] };
     }
 
-    const finalScore = Math.min(score, 100);
-    const matchLevel = finalScore >= 80 ? "Excellent" : finalScore >= 60 ? "Good" : finalScore >= 40 ? "Fair" : "Low";
+    const match = scoreCandidateJobMatch({
+      candidate: profile,
+      job: {
+        sector: job.sector,
+        job_type: job.job_type,
+        remote_type: job.remote_type,
+        salary_min: job.salary_min,
+        skills: job.skills || [],
+        seniority: job.seniority,
+        is_featured: job.is_featured,
+      },
+    });
 
-    return { ...job, matchScore: finalScore, matchLevel, matchStrengths: strengths, matchGaps: gaps };
+    return {
+      ...job,
+      matchScore: match.score,
+      matchLevel: match.matchLevel,
+      matchStrengths: match.strengths,
+      matchGaps: match.gaps,
+    };
   });
 
   // Sort by match score

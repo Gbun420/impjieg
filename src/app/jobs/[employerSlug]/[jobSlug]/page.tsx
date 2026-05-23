@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
 import {
   MapPin,
   Briefcase,
@@ -13,10 +14,12 @@ import {
   ArrowLeft,
   CheckCircle2,
   Eye,
+  Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import { formatSalary, formatDate, daysAgo, addDaysIso } from "@/lib/utils";
 import { isJobPubliclyLive } from "@/lib/job-visibility";
-import type { Database, JobWithEmployer } from "@/lib/supabase/types";
+import type { CandidateProfile, Database, JobWithEmployer } from "@/lib/supabase/types";
 import ApplyForm from "@/components/jobs/apply-form";
 import { ShareJobButton } from "@/components/jobs/share-job";
 
@@ -132,6 +135,39 @@ export default async function JobDetailPage({
     .eq("id", job.id);
 
   const j = job as unknown as JobWithEmployer;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let candidateMatch: ReturnType<typeof scoreCandidateJobMatch> | null = null;
+
+  if (user) {
+    const { data: profileData } = await supabase
+      .from("candidate_profiles")
+      .select("skills, sectors, job_types, remote_preference, desired_salary_min, experience_years")
+      .eq("user_id", user.id)
+      .single();
+
+    const profile = profileData as Pick<
+      CandidateProfile,
+      "skills" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min" | "experience_years"
+    > | null;
+
+    if (profile) {
+      candidateMatch = scoreCandidateJobMatch({
+        candidate: profile,
+        job: {
+          sector: j.sector,
+          job_type: j.job_type,
+          remote_type: j.remote_type,
+          salary_min: j.salary_min,
+          skills: j.skills || [],
+          seniority: j.seniority,
+          is_featured: j.is_featured,
+        },
+      });
+    }
+  }
+
   const salaryText = (j.salary_min || j.salary_max)
     ? `${formatSalary(j.salary_min ?? 0)}${j.salary_max ? ` - ${formatSalary(j.salary_max)}` : "+"}`
     : null;
@@ -225,6 +261,64 @@ export default async function JobDetailPage({
                     /year
                   </span>
                 </p>
+              </div>
+            </Card>
+          )}
+
+          {candidateMatch && (
+            <Card className="border-border/60 bg-card/60">
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <h2 className="text-base font-semibold text-foreground">Your profile match</h2>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Based on your saved candidate profile
+                    </p>
+                  </div>
+                  <Badge
+                    variant={
+                      candidateMatch.matchLevel === "Excellent"
+                        ? "success"
+                        : candidateMatch.matchLevel === "Good"
+                          ? "default"
+                          : candidateMatch.matchLevel === "Fair"
+                            ? "warning"
+                            : "secondary"
+                    }
+                  >
+                    {candidateMatch.score}% {candidateMatch.matchLevel}
+                  </Badge>
+                </div>
+
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <div className="flex items-center gap-1 text-xs font-medium text-success">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Strengths
+                    </div>
+                    <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                      {candidateMatch.strengths.slice(0, 3).map((item) => (
+                        <li key={item}>• {item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {candidateMatch.gaps.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-1 text-xs font-medium text-warning">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        Gaps to consider
+                      </div>
+                      <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                        {candidateMatch.gaps.slice(0, 3).map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
           )}
