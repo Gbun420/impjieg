@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/job-alerts/send",
+      "schedule": "0 7 * * *"
+    }
+  ],
   "redirects": [
     {
       "source": "/auth/signin",

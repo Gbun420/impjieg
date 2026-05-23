@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { deriveCompanyInsights } from "@/lib/company-insights";
+import { formatDate, formatSalary, daysAgo } from "@/lib/utils";
 import {
   MapPin,
   Globe,
@@ -13,6 +14,9 @@ import {
   ArrowLeft,
   Briefcase,
   ShieldCheck,
+  Banknote,
+  Sparkles,
+  Clock3,
 } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
@@ -71,6 +75,10 @@ export default async function CompanyProfilePage({
     .order("created_at", { ascending: false });
 
   const typedJobs = (jobs || []) as unknown as JobWithEmployer[];
+  const insights = deriveCompanyInsights(typedJobs);
+  const salaryCoverage = insights.activeRoles > 0
+    ? Math.round((insights.salaryTransparentRoles / insights.activeRoles) * 100)
+    : 0;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -156,6 +164,105 @@ export default async function CompanyProfilePage({
                 Visit Website
               </a>
             )}
+          </div>
+        </div>
+      </Card>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Open roles</p>
+          <p className="mt-1 text-2xl font-bold text-foreground">{insights.activeRoles}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Currently hiring on Impjieg</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Salary transparency</p>
+          <p className="mt-1 text-2xl font-bold text-foreground">{salaryCoverage}%</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {insights.salaryTransparentRoles} of {insights.activeRoles} roles show salary ranges
+          </p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Featured hiring</p>
+          <p className="mt-1 text-2xl font-bold text-foreground">{insights.featuredRoles}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Roles currently boosted for visibility</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Latest posting</p>
+          <p className="mt-1 text-base font-semibold text-foreground">
+            {insights.latestPostingDate ? formatDate(insights.latestPostingDate) : "No active jobs"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {insights.latestPostingDate ? `${daysAgo(insights.latestPostingDate)} ago` : "No current hiring activity"}
+          </p>
+        </Card>
+      </div>
+
+      {(insights.topSectors.length > 0 || insights.averageSalaryMin || insights.averageSalaryMax) && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <Card className="p-6">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h2 className="text-base font-semibold text-foreground">Hiring snapshot</h2>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {insights.topSectors.map((sector) => (
+                <Badge key={sector} variant="secondary">
+                  {sector}
+                </Badge>
+              ))}
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Most active sectors from this employer&apos;s current openings.
+            </p>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center gap-2">
+              <Banknote className="h-4 w-4 text-primary" />
+              <h2 className="text-base font-semibold text-foreground">Published pay ranges</h2>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Typical advertised range across transparent roles:
+            </p>
+            <p className="mt-2 text-lg font-semibold text-foreground">
+              {insights.averageSalaryMin
+                ? `${formatSalary(insights.averageSalaryMin)}${insights.averageSalaryMax ? ` - ${formatSalary(insights.averageSalaryMax)}` : "+"}`
+                : "Not enough salary data yet"}
+            </p>
+          </Card>
+        </div>
+      )}
+
+      <Card className="mt-6 p-6">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+            {emp.is_verified ? (
+              <ShieldCheck className="h-5 w-5 text-success" />
+            ) : (
+              <Clock3 className="h-5 w-5 text-primary" />
+            )}
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground">
+              Candidate trust signals
+            </h2>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>
+                {emp.is_verified
+                  ? "Verified employer badge is active on this company and its listings."
+                  : "Employer identity is not yet verified on Impjieg."}
+              </li>
+              <li>
+                {salaryCoverage > 0
+                  ? `${salaryCoverage}% of active roles publish salary information.`
+                  : "No active roles currently publish salary information."}
+              </li>
+              <li>
+                {insights.latestPostingDate
+                  ? `The most recent active role was posted ${daysAgo(insights.latestPostingDate)} ago.`
+                  : "No current open roles are listed on Impjieg."}
+              </li>
+            </ul>
           </div>
         </div>
       </Card>

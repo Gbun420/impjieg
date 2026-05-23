@@ -11,12 +11,37 @@ import { SECTORS, JOB_TYPES, REMOTE_OPTIONS } from "@/lib/constants";
 export default function JobAlertsPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
+
+    const form = new FormData(e.currentTarget);
+
+    const response = await fetch("/api/job-alerts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.get("email"),
+        sector: form.get("sector"),
+        jobType: form.get("jobType"),
+        remote: form.get("remote"),
+        salaryMin: form.get("salaryMin"),
+      }),
+    });
+
     setIsLoading(false);
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setError(payload?.error || "Failed to create alert");
+      return;
+    }
+
     setSubmitted(true);
   }
 
@@ -53,6 +78,11 @@ export default function JobAlertsPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {error && (
+          <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
+            {error}
+          </div>
+        )}
         <Input
           label="Email Address"
           name="email"

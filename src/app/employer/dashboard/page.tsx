@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { ensureEmployerProfile } from "@/lib/actions/auth";
+import { deriveApplicationInsights } from "@/lib/application-insights";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ArrowRight, Zap } from "lucide-react";
-import { formatDate, daysAgo, daysUntil } from "@/lib/utils";
+import { daysAgo, daysUntil } from "@/lib/utils";
 import type { Application, Employer, Job } from "@/lib/supabase/types";
 
 export default async function EmployerDashboardPage() {
@@ -46,8 +47,7 @@ export default async function EmployerDashboardPage() {
     .from("applications")
     .select("*, jobs(title)")
     .eq("employer_id", employer.id)
-    .order("created_at", { ascending: false })
-    .limit(5);
+    .order("created_at", { ascending: false });
 
   const typedJobs = (jobs || []) as Job[];
   const activeJobs = typedJobs.filter((j) => j.status === "active");
@@ -57,6 +57,7 @@ export default async function EmployerDashboardPage() {
   const recentApps = (applications || []) as Array<
     Application & { jobs: { title: string } | null }
   >;
+  const appInsights = deriveApplicationInsights(recentApps);
 
   const topJobs = [...typedJobs]
     .sort((a, b) => (b.views || 0) - (a.views || 0))
@@ -118,13 +119,49 @@ export default async function EmployerDashboardPage() {
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Apply Rate</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{avgApplicationRate}%</p>
+              <p className="text-sm text-muted-foreground">Review Backlog</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{appInsights.staleNewApplications}</p>
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
               <TrendingUp className="h-5 w-5 text-amber-500" />
             </div>
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            New applications older than 72 hours
+          </p>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Average first action</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">
+                {appInsights.averageFirstActionHours !== null ? `${appInsights.averageFirstActionHours}h` : "N/A"}
+              </p>
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10">
+              <Clock className="h-5 w-5 text-cyan-500" />
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Average time from application to first status change
+          </p>
+        </Card>
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Apply Rate</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{avgApplicationRate}%</p>
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
+              <TrendingUp className="h-5 w-5 text-emerald-500" />
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Applications divided by job detail views
+          </p>
         </Card>
       </div>
 
@@ -199,13 +236,13 @@ export default async function EmployerDashboardPage() {
             </Link>
           </div>
 
-          {recentApps.length === 0 ? (
+          {recentApps.slice(0, 5).length === 0 ? (
             <Card className="mt-4 p-8 text-center">
               <p className="text-muted-foreground">No applications yet.</p>
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
-              {recentApps.map((app) => (
+              {recentApps.slice(0, 5).map((app) => (
                 <Card key={app.id} className="p-4 transition-all hover:shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">

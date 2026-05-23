@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from "react";
 import { updateApplicationStatus, sendCandidateEmail } from "@/lib/actions/applications";
+import { deriveApplicationInsights } from "@/lib/application-insights";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { Mail, Phone, FileText, MoreVertical, Send, X } from "lucide-react";
+import { Mail, Phone, FileText, Send, X } from "lucide-react";
 import type { Application } from "@/lib/supabase/types";
 
 const COLUMNS = [
@@ -299,6 +299,7 @@ export default function ApplicationsPage({
   applications: AppWithJob[];
 }) {
   const [apps, setApps] = useState(applications);
+  const insights = deriveApplicationInsights(apps);
 
   const handleDrop = async (appId: string, newStatus: string) => {
     const result = await updateApplicationStatus(appId, newStatus);
@@ -322,6 +323,10 @@ export default function ApplicationsPage({
         </div>
         <div className="flex gap-2 text-sm text-muted-foreground">
           <span>Total: {apps.length}</span>
+          <span>Stale new: {insights.staleNewApplications}</span>
+          <span>
+            Avg first action: {insights.averageFirstActionHours !== null ? `${insights.averageFirstActionHours}h` : "N/A"}
+          </span>
         </div>
       </div>
 
