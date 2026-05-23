@@ -160,47 +160,53 @@ export interface Database {
           updated_at?: string;
         };
       };
-      applications: {
-        Row: {
-          id: string;
-          job_id: string;
-          employer_id: string;
-          candidate_name: string;
-          candidate_email: string;
-          candidate_phone: string | null;
-          candidate_cv_url: string | null;
-          cover_letter: string | null;
-          status: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          job_id: string;
-          employer_id: string;
-          candidate_name: string;
-          candidate_email: string;
-          candidate_phone?: string | null;
-          candidate_cv_url?: string | null;
-          cover_letter?: string | null;
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          job_id?: string;
-          employer_id?: string;
-          candidate_name?: string;
-          candidate_email?: string;
-          candidate_phone?: string | null;
-          candidate_cv_url?: string | null;
-          cover_letter?: string | null;
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
+       applications: {
+         Row: {
+           id: string;
+           job_id: string;
+           employer_id: string;
+           candidate_name: string;
+           candidate_email: string;
+           candidate_phone: string | null;
+           candidate_cv_url: string | null;
+           cover_letter: string | null;
+           status: string;
+           recruiter_notes: string | null;
+           scorecard_data: Json | null;
+           created_at: string;
+           updated_at: string;
+         };
+         Insert: {
+           id?: string;
+           job_id: string;
+           employer_id: string;
+           candidate_name: string;
+           candidate_email: string;
+           candidate_phone?: string | null;
+           candidate_cv_url?: string | null;
+           cover_letter?: string | null;
+           status?: string;
+           recruiter_notes?: string | null;
+           scorecard_data?: Json | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+         Update: {
+           id?: string;
+           job_id?: string;
+           employer_id?: string;
+           candidate_name?: string;
+           candidate_email?: string;
+           candidate_phone?: string | null;
+           candidate_cv_url?: string | null;
+           cover_letter?: string | null;
+           status?: string;
+           recruiter_notes?: string | null;
+           scorecard_data?: Json | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+       };
       payments: {
         Row: {
           id: string;

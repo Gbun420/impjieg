@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import ApplicationPipeline from "@/components/jobs/application-pipeline";
 import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
-import type { Application, CandidateProfile, Database, Employer } from "@/lib/supabase/types";
+import type { Application, CandidateProfile, Database, Employer, Json } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -33,11 +33,11 @@ export default async function ApplicationsPage() {
 
   if (!employer) return null;
 
-  const { data: applications } = await supabase
-    .from("applications")
-    .select("*, jobs(title, skills, sector, job_type, remote_type, seniority)")
-    .eq("employer_id", (employer as Employer).id)
-    .order("created_at", { ascending: false });
+   const { data: applications } = await supabase
+     .from("applications")
+     .select("*, jobs(title, skills, sector, job_type, remote_type, seniority), recruiter_notes, scorecard_data")
+     .eq("employer_id", (employer as Employer).id)
+     .order("created_at", { ascending: false });
 
   const typedApps = (applications || []) as (Application & {
     jobs: {
@@ -50,11 +50,13 @@ export default async function ApplicationsPage() {
     } | null;
   })[];
 
-  let enrichedApps = typedApps.map((app) => ({
-    ...app,
-    candidateProfile: null as CandidateProfileRef | null,
-    matchSummary: null as ReturnType<typeof scoreCandidateJobMatch> | null,
-  }));
+   let enrichedApps = typedApps.map((app) => ({
+     ...app,
+     candidateProfile: null as CandidateProfileRef | null,
+     matchSummary: null as ReturnType<typeof scoreCandidateJobMatch> | null,
+     recruiterNotes: null as string | null,
+     scorecardData: null as Json | null,
+   }));
 
   const applicationIds = typedApps.map((app) => app.id);
 
@@ -107,11 +109,13 @@ export default async function ApplicationsPage() {
               })
             : null;
 
-        return {
-          ...app,
-          candidateProfile,
-          matchSummary,
-        };
+         return {
+           ...app,
+           candidateProfile,
+           matchSummary,
+           recruiterNotes: null,
+           scorecardData: null,
+         };
       });
     }
   }

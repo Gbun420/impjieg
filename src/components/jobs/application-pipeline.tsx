@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
 import { Mail, Phone, FileText, Send, X, Search, AlertTriangle } from "lucide-react";
-import type { Application, CandidateProfile } from "@/lib/supabase/types";
+import type { Application, CandidateProfile, Json } from "@/lib/supabase/types";
 
 const COLUMNS = [
   { id: "new", label: "New", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
@@ -60,6 +60,8 @@ type AppWithJob = Application & {
     strengths: string[];
     gaps: string[];
   } | null;
+  recruiterNotes?: string | null;
+  scorecardData?: Json | null;
 };
 
 function EmailModal({
@@ -246,6 +248,20 @@ function ApplicationCard({ app }: { app: AppWithJob }) {
                 {app.matchSummary.strengths.slice(0, 2).join(" · ")}
               </p>
             )}
+          </div>
+        )}
+
+        {app.recruiterNotes && (
+          <div className="mt-2 rounded-lg bg-muted/40 p-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] font-medium text-muted-foreground">Recruiter Notes</span>
+              <Badge variant="secondary" className="text-[10px]">
+                Has Notes
+              </Badge>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
+              {app.recruiterNotes}
+            </p>
           </div>
         )}
 
