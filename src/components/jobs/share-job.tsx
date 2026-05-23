@@ -43,6 +43,13 @@ export function ShareJobButton({ title }: { title: string }) {
       url: `mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(`I found this job opportunity and thought you might be interested:\n\n${url}`)}`,
       color: "hover:bg-red-500/10 hover:text-red-500",
     },
+    {
+      name: "Copy Link",
+      icon: Copy,
+      url: "#",
+      onClick: handleCopy,
+      color: "hover:bg-gray-500/10 hover:text-gray-500",
+    },
   ];
 
   if (typeof navigator !== "undefined" && navigator.share) {
