@@ -1,6 +1,7 @@
 'use client';
 
 import { type JobWithEmployer } from '@/lib/supabase/types';
+import { scoreCandidateJobMatch } from '@/lib/candidate-job-match';
 
 export type AIJobMatchAnalysis = {
   score: number;
@@ -20,11 +21,11 @@ export async function analyzeJobMatchWithAI(
   candidateProfile: {
     skills: string[];
     sectors: string[];
-    jobTypes: string[];
-    remotePreference: string | null;
-    experienceYears: number | null;
-    desiredSalaryMin: number | null;
-    fullName?: string | null;
+    job_types: string[];
+    remote_preference: string | null;
+    experience_years: number | null;
+    desired_salary_min: number | null;
+    full_name?: string | null;
     headline?: string | null;
   }
 ): Promise<AIJobMatchAnalysis> {
@@ -42,16 +43,16 @@ export async function analyzeJobMatchWithAI(
         jobType: job.job_type,
         jobRemoteType: job.remote_type,
         candidateProfile: {
-          fullName: candidateProfile.fullName,
+          full_name: candidateProfile.full_name,
           headline: candidateProfile.headline,
           skills: candidateProfile.skills,
           sectors: candidateProfile.sectors,
-          jobTypes: candidateProfile.jobTypes,
-          remotePreference: candidateProfile.remotePreference,
-          experienceYears: candidateProfile.experienceYears,
-          desiredSalaryMin: candidateProfile.desiredSalaryMin,
+          job_types: candidateProfile.job_types,
+          remote_preference: candidateProfile.remote_preference,
+          experience_years: candidateProfile.experience_years,
+          desired_salary_min: candidateProfile.desired_salary_min,
           bio: '', // Not needed for matching
-          linkedinUrl: '', // Not needed for matching
+          linkedin_url: '', // Not needed for matching
         }
       }),
     });
@@ -65,15 +66,14 @@ export async function analyzeJobMatchWithAI(
   } catch (error) {
     console.error('AI matching error, falling back to heuristic:', error);
     // Fallback to heuristic matching if AI fails
-    const { scoreCandidateJobMatch } from '@/lib/candidate-job-match';
-    return scoreCandidateJobMatch({
+    const heuristicResult = scoreCandidateJobMatch({
       candidate: {
         skills: candidateProfile.skills,
         sectors: candidateProfile.sectors,
-        jobTypes: candidateProfile.jobTypes,
-        remotePreference: candidateProfile.remotePreference,
-        desiredSalaryMin: candidateProfile.desiredSalaryMin,
-        experienceYears: candidateProfile.experienceYears,
+        job_types: candidateProfile.job_types,
+        remote_preference: candidateProfile.remote_preference,
+        desired_salary_min: candidateProfile.desired_salary_min,
+        experience_years: candidateProfile.experience_years,
       },
       job: {
         sector: job.sector,
@@ -84,6 +84,23 @@ export async function analyzeJobMatchWithAI(
         seniority: job.seniority,
         is_featured: job.is_featured,
       }
-    }) as unknown as AIJobMatchAnalysis;
+    });
+    
+    // Convert heuristic result to AI-compatible format
+    return {
+      ...heuristicResult,
+      skillMatch: {
+        matching: [],
+        missing: [],
+        bonus: []
+      },
+      recommendation: heuristicResult.score >= 80 
+        ? "Strong match - consider moving forward with interview"
+        : heuristicResult.score >= 60 
+          ? "Good match - worth further discussion"
+          : heuristicResult.score >= 40 
+            ? "Potential fit - review for skill development opportunities"
+            : "Limited overlap - may require significant training",
+    };
   }
 }

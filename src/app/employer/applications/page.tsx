@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import ApplicationPipeline from "@/components/jobs/application-pipeline";
 import { analyzeJobMatchWithAI, type AIJobMatchAnalysis } from "@/lib/ai-match.service";
-import type { Application, CandidateProfile, Database, Employer, Json } from "@/lib/supabase/types";
+import type { Application, CandidateProfile, Database, Employer, Json, JobWithEmployer } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +53,7 @@ export default async function ApplicationsPage() {
    let enrichedApps = typedApps.map((app) => ({
      ...app,
      candidateProfile: null as CandidateProfileRef | null,
-     matchSummary: null as ReturnType<typeof scoreCandidateJobMatch> | null,
+     matchSummary: null as AIJobMatchAnalysis | null,
      recruiterNotes: null as string | null,
      scorecardData: null as Json | null,
    }));
@@ -96,15 +96,64 @@ export default async function ApplicationsPage() {
 
           let matchSummary: AIJobMatchAnalysis | null = null;
           if (candidateProfile && app.jobs) {
-            matchSummary = await analyzeJobMatchWithAI(app.jobs, {
-              skills: candidateProfile.skills,
-              sectors: candidateProfile.sectors,
-              jobTypes: candidateProfile.job_types,
-              remotePreference: candidateProfile.remote_preference,
-              experienceYears: candidateProfile.experience_years,
-              desiredSalaryMin: candidateProfile.desired_salary_min,
-              fullName: candidateProfile.full_name,
-              headline: candidateProfile.headline,
+            // Construct minimal JobWithEmployer object for AI matching
+            const jobForAI: JobWithEmployer = {
+              id: '',
+              employer_id: '',
+              title: app.jobs.title || '',
+              slug: '',
+              description: '',
+              location: '',
+              sector: app.jobs.sector,
+              job_type: app.jobs.job_type,
+              seniority: app.jobs.seniority,
+              remote_type: app.jobs.remote_type,
+              salary_min: null,
+              salary_max: null,
+              skills: app.jobs.skills || [],
+              benefits: [],
+              visa_friendly: false,
+              is_featured: false,
+              status: 'active',
+              expires_at: null,
+              application_email: null,
+              application_url: null,
+              views: 0,
+              applications_count: 0,
+              created_at: '',
+              updated_at: '',
+              employers: {
+                id: '',
+                name: '',
+                slug: '',
+                logo_url: null,
+                location: '',
+                website: null,
+                is_verified: false
+              }
+            };
+
+            // Fetch full profile data for AI matching (includes full_name and headline)
+            const { data: fullProfileData } = await serviceSupabase
+              .from("candidate_profiles")
+              .select("full_name, headline, skills, sectors, job_types, remote_preference, experience_years, desired_salary_min")
+              .eq("user_id", candidateProfile.user_id)
+              .single();
+            
+            const fullProfile = fullProfileData as Pick<
+              CandidateProfile,
+              "full_name" | "headline" | "skills" | "sectors" | "job_types" | "remote_preference" | "experience_years" | "desired_salary_min"
+            > | null;
+            
+            matchSummary = await analyzeJobMatchWithAI(jobForAI, {
+              skills: fullProfile?.skills || [],
+              sectors: fullProfile?.sectors || [],
+              job_types: fullProfile?.job_types || [],
+              remote_preference: fullProfile?.remote_preference || null,
+              experience_years: fullProfile?.experience_years || null,
+              desired_salary_min: fullProfile?.desired_salary_min || null,
+              full_name: fullProfile?.full_name || null,
+              headline: fullProfile?.headline || null,
             });
           }
 

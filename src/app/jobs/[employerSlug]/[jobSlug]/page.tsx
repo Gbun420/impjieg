@@ -147,23 +147,23 @@ export default async function JobDetailPage({
        .eq("user_id", user.id)
        .single();
 
-     const profile = profileData as Pick<
-       CandidateProfile,
-       "skills" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min" | "experience_years"
-     > | null;
+      const profile = profileData as Pick<
+        CandidateProfile,
+        "skills" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min" | "experience_years" | "full_name" | "headline"
+      > | null;
 
-     if (profile) {
-       candidateMatch = await analyzeJobMatchWithAI(j, {
-         skills: profile.skills,
-         sectors: profile.sectors,
-         jobTypes: profile.job_types,
-         remotePreference: profile.remote_preference,
-         experienceYears: profile.experience_years,
-         desiredSalaryMin: profile.desired_salary_min,
-         fullName: profile.full_name,
-         headline: profile.headline,
-       });
-     }
+      if (profile) {
+        candidateMatch = await analyzeJobMatchWithAI(j, {
+          skills: profile.skills,
+          sectors: profile.sectors,
+          job_types: profile.job_types,
+          remote_preference: profile.remote_preference,
+          experience_years: profile.experience_years,
+          desired_salary_min: profile.desired_salary_min,
+          full_name: profile.full_name,
+          headline: profile.headline,
+        });
+      }
    }
 
   const salaryText = (j.salary_min || j.salary_max)

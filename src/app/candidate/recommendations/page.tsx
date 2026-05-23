@@ -86,11 +86,11 @@ export default async function RecommendationsPage() {
         const match = await analyzeJobMatchWithAI(job, {
           skills: profile.skills,
           sectors: profile.sectors,
-          jobTypes: profile.job_types,
-          remotePreference: profile.remote_preference,
-          experienceYears: profile.experience_years,
-          desiredSalaryMin: profile.desired_salary_min,
-          fullName: profile.full_name,
+          job_types: profile.job_types,
+          remote_preference: profile.remote_preference,
+          experience_years: profile.experience_years,
+          desired_salary_min: profile.desired_salary_min,
+          full_name: profile.full_name,
           headline: profile.headline,
         });
 

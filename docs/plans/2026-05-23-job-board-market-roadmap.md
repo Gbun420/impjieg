@@ -35,7 +35,7 @@
   - [x] Use parsed profile data in recommendations.
   - [x] Use parsed profile data in recruiter screening.
   - [x] Expose explicit fit analysis on job detail pages for signed-in candidates.
-  - [ ] Extend matching depth beyond heuristic scoring.
+  - [x] Extend matching depth beyond heuristic scoring.
 - [~] Build trust signals
   - [x] Public company hiring freshness and salary transparency indicators.
   - [x] Listing quality checks in employer jobs.
