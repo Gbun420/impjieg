@@ -26,6 +26,7 @@
 - [ ] Deepen recruiter workflow
   - [x] Add response-SLA and backlog visibility.
   - [x] Add better candidate filtering.
+  - [x] Add profile-based candidate screening cues.
   - [ ] Add notes, scorecards, and collaborator support.
 
 ## Next 30 Days

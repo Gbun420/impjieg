@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
 import { Mail, Phone, FileText, Send, X, Search, AlertTriangle } from "lucide-react";
-import type { Application } from "@/lib/supabase/types";
+import type { Application, CandidateProfile } from "@/lib/supabase/types";
 
 const COLUMNS = [
   { id: "new", label: "New", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
@@ -48,7 +48,19 @@ const EMAIL_TEMPLATES = [
   },
 ];
 
-type AppWithJob = Application & { jobs: { title: string } | null };
+type AppWithJob = Application & {
+  jobs: { title: string } | null;
+  candidateProfile?: Pick<
+    CandidateProfile,
+    "headline" | "skills" | "experience_years"
+  > | null;
+  matchSummary?: {
+    score: number;
+    matchLevel: string;
+    strengths: string[];
+    gaps: string[];
+  } | null;
+};
 
 function EmailModal({
   application,
@@ -202,6 +214,39 @@ function ApplicationCard({ app }: { app: AppWithJob }) {
           <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
             {app.cover_letter}
           </p>
+        )}
+
+        {app.candidateProfile?.headline && (
+          <p className="mt-2 text-xs text-foreground/80">
+            {app.candidateProfile.headline}
+          </p>
+        )}
+
+        {app.matchSummary && (
+          <div className="mt-2 rounded-lg bg-muted/40 p-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] font-medium text-muted-foreground">Profile fit</span>
+              <Badge
+                variant={
+                  app.matchSummary.matchLevel === "Excellent"
+                    ? "success"
+                    : app.matchSummary.matchLevel === "Good"
+                      ? "default"
+                      : app.matchSummary.matchLevel === "Fair"
+                        ? "warning"
+                        : "secondary"
+                }
+                className="text-[10px]"
+              >
+                {app.matchSummary.score}% {app.matchSummary.matchLevel}
+              </Badge>
+            </div>
+            {app.matchSummary.strengths.length > 0 && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {app.matchSummary.strengths.slice(0, 2).join(" · ")}
+              </p>
+            )}
+          </div>
         )}
 
         <div className="mt-2 flex items-center justify-between">
