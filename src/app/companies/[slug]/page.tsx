@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -6,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { deriveCompanyInsights } from "@/lib/company-insights";
 import { deriveEmployerProfileCompleteness } from "@/lib/employer-profile-completeness";
+import { deriveEmployerTrustSignals } from "@/lib/employer-trust-signals";
 import { formatDate, formatSalary, daysAgo } from "@/lib/utils";
 import {
   MapPin,
@@ -81,6 +83,19 @@ export default async function CompanyProfilePage({
     ? Math.round((insights.salaryTransparentRoles / insights.activeRoles) * 100)
     : 0;
   const profileCompleteness = deriveEmployerProfileCompleteness(emp);
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  const { data: employerApplications } = await serviceSupabase
+    .from("applications")
+    .select("status, created_at, updated_at")
+    .eq("employer_id", emp.id)
+    .limit(100);
+  const trustSignals = deriveEmployerTrustSignals({
+    activeJobsCount: typedJobs.length,
+    applications: employerApplications || [],
+  });
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -303,6 +318,12 @@ export default async function CompanyProfilePage({
               </li>
               <li>
                 Employer profile completeness: {profileCompleteness.score}/100.
+              </li>
+              <li>
+                Response signal: {trustSignals.responseBadge}
+                {trustSignals.averageResponseHours !== null
+                  ? ` (avg. first response ${trustSignals.averageResponseHours}h)`
+                  : ""}
               </li>
             </ul>
           </div>

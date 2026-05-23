@@ -36,7 +36,7 @@
 - [~] Build trust signals
   - [x] Public company hiring freshness and salary transparency indicators.
   - [x] Listing quality checks in employer jobs.
-  - [ ] Verified response times and richer employer activity signals.
+  - [x] Public response-time and employer activity signals.
 - [ ] Improve monetization
   - Credit packs, subscriptions, promotion bundles, and screening upsells.
 
