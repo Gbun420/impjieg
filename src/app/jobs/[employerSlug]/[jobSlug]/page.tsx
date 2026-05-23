@@ -8,15 +8,14 @@ import { Card } from "@/components/ui/card";
 import {
   MapPin,
   Briefcase,
-  Clock,
   Banknote,
   Globe,
   ArrowLeft,
   CheckCircle2,
   Eye,
-  Share2,
 } from "lucide-react";
 import { formatSalary, formatDate, daysAgo, addDaysIso } from "@/lib/utils";
+import { isJobPubliclyLive } from "@/lib/job-visibility";
 import type { Database, JobWithEmployer } from "@/lib/supabase/types";
 import ApplyForm from "@/components/jobs/apply-form";
 import { ShareJobButton } from "@/components/jobs/share-job";
@@ -33,13 +32,14 @@ export async function generateMetadata({
 }: {
   params: Promise<{ employerSlug: string; jobSlug: string }>;
 }): Promise<Metadata> {
-  const { employerSlug, jobSlug } = await params;
+  const { jobSlug } = await params;
   const supabase = await createClient();
   const { data: jobData } = await supabase
     .from("jobs")
     .select("title, description, employers(name)")
     .eq("slug", jobSlug)
     .eq("status", "active")
+    .gte("expires_at", new Date().toISOString())
     .single();
   const job = jobData as {
     title: string;
@@ -110,7 +110,7 @@ export default async function JobDetailPage({
 }: {
   params: Promise<{ employerSlug: string; jobSlug: string }>;
 }) {
-  const { employerSlug, jobSlug } = await params;
+  const { jobSlug } = await params;
   const supabase = await createClient();
 
   const { data: job } = await supabase
@@ -118,9 +118,10 @@ export default async function JobDetailPage({
     .select("*, employers(id, name, slug, logo_url, location, website)")
     .eq("slug", jobSlug)
     .eq("status", "active")
+    .gte("expires_at", new Date().toISOString())
     .single() as { data: JobWithEmployer | null; error: unknown };
 
-  if (!job) {
+  if (!job || !isJobPubliclyLive(job)) {
     notFound();
   }
 

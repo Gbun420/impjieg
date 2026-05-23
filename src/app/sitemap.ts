@@ -1,9 +1,15 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
+import { isJobPubliclyLive } from "@/lib/job-visibility";
 import type { Employer } from "@/lib/supabase/types";
 
-type SitemapJobRef = { slug: string; employers: { slug: string } | null };
+type SitemapJobRef = {
+  slug: string;
+  status: string;
+  expires_at: string | null;
+  employers: { slug: string } | null;
+};
 
 function labelToSlug(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
@@ -55,17 +61,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: jobs } = await supabase
       .from("jobs")
-      .select("slug, employers(slug)")
+      .select("slug, status, expires_at, employers(slug)")
       .eq("status", "active")
+      .gte("expires_at", new Date().toISOString())
       .limit(1000);
 
     if (jobs) {
-      jobPages = (jobs as SitemapJobRef[]).map((job) => ({
-        url: `${baseUrl}/jobs/${job.employers?.slug}/${job.slug}`,
-        lastModified: new Date(),
-        changeFrequency: "daily" as const,
-        priority: 0.6,
-      }));
+      jobPages = (jobs as SitemapJobRef[])
+        .filter((job) => job.employers?.slug && isJobPubliclyLive(job))
+        .map((job) => ({
+          url: `${baseUrl}/jobs/${job.employers?.slug}/${job.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "daily" as const,
+          priority: 0.6,
+        }));
     }
 
     const { data: companies } = await supabase

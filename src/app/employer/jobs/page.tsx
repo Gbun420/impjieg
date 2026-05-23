@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { buildEmployerPromotionLinks } from "@/lib/job-promotion";
+import { deriveJobQuality } from "@/lib/job-quality";
 import { SITE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
@@ -130,6 +131,7 @@ export default async function EmployerJobsPage() {
               ? daysUntil(job.expires_at)
               : 0;
             const appRate = job.views > 0 ? ((job.applications_count / job.views) * 100).toFixed(1) : "0";
+            const quality = deriveJobQuality(job);
             const promotionLinks = job.employers?.slug
               ? buildEmployerPromotionLinks({
                   baseUrl: SITE.url,
@@ -158,6 +160,21 @@ export default async function EmployerJobsPage() {
                         <h3 className="font-semibold text-foreground truncate">{job.title}</h3>
                         {job.is_featured && <Badge variant="default">Featured</Badge>}
                         {job.status === "draft" && <Badge variant="secondary">Draft</Badge>}
+                        <Badge
+                          variant={
+                            quality.level === "high"
+                              ? "success"
+                              : quality.level === "medium"
+                                ? "warning"
+                                : "error"
+                          }
+                        >
+                          {quality.level === "high"
+                            ? "High quality"
+                            : quality.level === "medium"
+                              ? "Needs polish"
+                              : "Needs attention"}
+                        </Badge>
                       </div>
                       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -177,6 +194,11 @@ export default async function EmployerJobsPage() {
                           {daysLeft > 0 ? `${daysLeft}d left` : "Expired"}
                         </span>
                       </div>
+                      {quality.issues.length > 0 && (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Improve this listing: {quality.issues.slice(0, 2).join(" ")}
+                        </p>
+                      )}
                     </div>
                   </div>
 
