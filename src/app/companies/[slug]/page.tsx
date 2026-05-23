@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { deriveCompanyInsights } from "@/lib/company-insights";
+import { deriveEmployerProfileCompleteness } from "@/lib/employer-profile-completeness";
 import { formatDate, formatSalary, daysAgo } from "@/lib/utils";
 import {
   MapPin,
@@ -79,6 +80,7 @@ export default async function CompanyProfilePage({
   const salaryCoverage = insights.activeRoles > 0
     ? Math.round((insights.salaryTransparentRoles / insights.activeRoles) * 100)
     : 0;
+  const profileCompleteness = deriveEmployerProfileCompleteness(emp);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -167,6 +169,43 @@ export default async function CompanyProfilePage({
           </div>
         </div>
       </Card>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {emp.culture_summary && (
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Team & culture</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {emp.culture_summary}
+            </p>
+            {emp.workplace_highlights && emp.workplace_highlights.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {emp.workplace_highlights.map((item) => (
+                  <Badge key={item} variant="secondary">{item}</Badge>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
+
+        {(emp.hiring_process || emp.response_time_days) && (
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Hiring process</h2>
+            {emp.hiring_process && (
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {emp.hiring_process}
+              </p>
+            )}
+            {emp.response_time_days && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                Expected response time:{" "}
+                <span className="font-medium text-foreground">
+                  {emp.response_time_days} day{emp.response_time_days === 1 ? "" : "s"}
+                </span>
+              </p>
+            )}
+          </Card>
+        )}
+      </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card className="p-5">
@@ -261,6 +300,9 @@ export default async function CompanyProfilePage({
                 {insights.latestPostingDate
                   ? `The most recent active role was posted ${daysAgo(insights.latestPostingDate)} ago.`
                   : "No current open roles are listed on Impjieg."}
+              </li>
+              <li>
+                Employer profile completeness: {profileCompleteness.score}/100.
               </li>
             </ul>
           </div>

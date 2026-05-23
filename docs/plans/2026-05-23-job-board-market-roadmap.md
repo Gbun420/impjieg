@@ -22,7 +22,7 @@
   - [ ] Add broader off-platform distribution beyond direct sharing.
 - [~] Upgrade employer brand surfaces
   - [x] Add richer public company trust and hiring signals from existing data.
-  - [ ] Add richer editable employer content: benefits, culture, process, workplace details, hiring response expectations.
+  - [x] Add richer editable employer content: benefits, culture, process, workplace details, hiring response expectations.
 - [ ] Deepen recruiter workflow
   - [x] Add response-SLA and backlog visibility.
   - [x] Add better candidate filtering.

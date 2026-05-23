@@ -22,6 +22,10 @@ export interface Database {
           location: string | null;
           company_size: string | null;
           industry: string | null;
+          culture_summary: string | null;
+          hiring_process: string | null;
+          workplace_highlights: string[];
+          response_time_days: number | null;
           is_verified: boolean | null;
           email_notifications: boolean | null;
           whatsapp_notifications: boolean | null;
@@ -41,6 +45,10 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          culture_summary?: string | null;
+          hiring_process?: string | null;
+          workplace_highlights?: string[];
+          response_time_days?: number | null;
           is_verified?: boolean | null;
           email_notifications?: boolean | null;
           whatsapp_notifications?: boolean | null;
@@ -60,6 +68,10 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          culture_summary?: string | null;
+          hiring_process?: string | null;
+          workplace_highlights?: string[];
+          response_time_days?: number | null;
           is_verified?: boolean | null;
           email_notifications?: boolean | null;
           whatsapp_notifications?: boolean | null;

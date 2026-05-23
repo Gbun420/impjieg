@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { SECTORS } from "@/lib/constants";
+import { deriveEmployerProfileCompleteness } from "@/lib/employer-profile-completeness";
 import { updateNotificationSettings } from "@/lib/actions/notifications";
-import { Shield, ShieldCheck, ShieldX } from "lucide-react";
+import { ShieldCheck, ShieldX } from "lucide-react";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerUpdate = Database["public"]["Tables"]["employers"]["Update"];
@@ -42,6 +43,10 @@ export default function SettingsPage() {
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [companySize, setCompanySize] = useState("");
   const [industry, setIndustry] = useState("");
+  const [cultureSummary, setCultureSummary] = useState("");
+  const [hiringProcess, setHiringProcess] = useState("");
+  const [workplaceHighlights, setWorkplaceHighlights] = useState("");
+  const [responseTimeDays, setResponseTimeDays] = useState("");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [whatsappNotifications, setWhatsappNotifications] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
@@ -72,6 +77,10 @@ export default function SettingsPage() {
         setCoverImageUrl(emp.cover_image_url || "");
         setCompanySize(emp.company_size || "");
         setIndustry(emp.industry || "");
+        setCultureSummary(emp.culture_summary || "");
+        setHiringProcess(emp.hiring_process || "");
+        setWorkplaceHighlights((emp.workplace_highlights || []).join(", "));
+        setResponseTimeDays(emp.response_time_days ? String(emp.response_time_days) : "");
         setEmailNotifications(emp.email_notifications ?? true);
         setWhatsappNotifications(emp.whatsapp_notifications ?? false);
         setWhatsappNumber(emp.whatsapp_number || "");
@@ -107,6 +116,13 @@ export default function SettingsPage() {
         cover_image_url: coverImageUrl,
         company_size: companySize || null,
         industry: industry || null,
+        culture_summary: cultureSummary || null,
+        hiring_process: hiringProcess || null,
+        workplace_highlights: workplaceHighlights
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        response_time_days: responseTimeDays ? parseInt(responseTimeDays, 10) : null,
       } as EmployerUpdate)
       .eq("user_id", user.id);
 
@@ -120,6 +136,22 @@ export default function SettingsPage() {
       setSuccess(true);
     }
   }
+
+  const profileCompleteness = deriveEmployerProfileCompleteness({
+    description,
+    website,
+    logo_url: logoUrl,
+    cover_image_url: coverImageUrl,
+    company_size: companySize,
+    industry,
+    culture_summary: cultureSummary,
+    hiring_process: hiringProcess,
+    workplace_highlights: workplaceHighlights
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
+    response_time_days: responseTimeDays ? parseInt(responseTimeDays, 10) : null,
+  });
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -211,6 +243,34 @@ export default function SettingsPage() {
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Sliema, Malta"
           />
+          <Textarea
+            label="Culture Summary"
+            value={cultureSummary}
+            onChange={(e) => setCultureSummary(e.target.value)}
+            placeholder="Describe how your team works, communicates, and grows."
+            className="min-h-[100px]"
+          />
+          <Textarea
+            label="Hiring Process"
+            value={hiringProcess}
+            onChange={(e) => setHiringProcess(e.target.value)}
+            placeholder="Explain your interview stages and timelines."
+            className="min-h-[100px]"
+          />
+          <Input
+            label="Workplace Highlights"
+            value={workplaceHighlights}
+            onChange={(e) => setWorkplaceHighlights(e.target.value)}
+            placeholder="Remote-friendly, Health insurance, Learning budget"
+          />
+          <Input
+            label="Expected Response Time (days)"
+            type="number"
+            min="1"
+            value={responseTimeDays}
+            onChange={(e) => setResponseTimeDays(e.target.value)}
+            placeholder="5"
+          />
           <Button
             type="submit"
             variant="primary"
@@ -219,6 +279,40 @@ export default function SettingsPage() {
             Save Changes
           </Button>
         </form>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold text-foreground">
+          Profile Strength
+        </h2>
+        <div className="mt-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Employer brand completeness</p>
+            <span className="text-sm font-semibold text-foreground">
+              {profileCompleteness.score}/100
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-muted">
+            <div
+              className="h-2 rounded-full bg-primary transition-all"
+              style={{ width: `${profileCompleteness.score}%` }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {profileCompleteness.level === "high"
+              ? "Your company profile is strong and candidate-friendly."
+              : profileCompleteness.level === "medium"
+                ? "Your profile is solid, but a few more trust signals would help conversion."
+                : "Your profile needs more detail to build candidate trust."}
+          </p>
+          {profileCompleteness.missing.length > 0 && (
+            <ul className="space-y-1 text-xs text-muted-foreground">
+              {profileCompleteness.missing.slice(0, 4).map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
+          )}
+        </div>
       </Card>
 
       <Card className="p-6">
