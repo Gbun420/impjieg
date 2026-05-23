@@ -19,23 +19,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app";
 
-  const staticPages = [
-    "",
-    "/jobs",
-    "/companies",
-    "/pricing",
-    "/about",
-    "/contact",
-    "/salary-calculator",
-    "/alerts",
-    "/blog",
-    "/saved-jobs",
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: "daily" as const,
-    priority: route === "" ? 1 : 0.8,
-  }));
+    const staticPages = [
+      "",
+      "/jobs",
+      "/companies",
+      "/pricing",
+      "/about",
+      "/contact",
+      "/salary-calculator",
+      "/alerts",
+      "/blog",
+      "/saved-jobs",
+      "/api/jobs/feed",
+      "/api/jobs/rss"
+    ].map((route) => ({
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: route === "" ? 1 : 0.8,
+    }));
 
   const seoSectorPages = SECTORS.map((sector) => ({
     url: `${baseUrl}/jobs/sector/${labelToSlug(sector)}`,
