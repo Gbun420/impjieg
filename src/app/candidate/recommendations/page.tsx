@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
+import { analyzeJobMatchWithAI, type AIJobMatchAnalysis } from "@/lib/ai-match.service";
 
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
@@ -77,32 +77,32 @@ export default async function RecommendationsPage() {
   );
 
   // Score jobs based on profile match
-  const scoredJobs: ScoredJob[] = filteredJobs.map((job) => {
-    if (!profile) {
-      return { ...job, matchScore: 0, matchLevel: "Low", matchStrengths: [], matchGaps: [] };
-    }
+    const scoredJobs: ScoredJob[] = await Promise.all(
+      filteredJobs.map(async (job) => {
+        if (!profile) {
+          return { ...job, matchScore: 0, matchLevel: "Low", matchStrengths: [], matchGaps: [] };
+        }
 
-    const match = scoreCandidateJobMatch({
-      candidate: profile,
-      job: {
-        sector: job.sector,
-        job_type: job.job_type,
-        remote_type: job.remote_type,
-        salary_min: job.salary_min,
-        skills: job.skills || [],
-        seniority: job.seniority,
-        is_featured: job.is_featured,
-      },
-    });
+        const match = await analyzeJobMatchWithAI(job, {
+          skills: profile.skills,
+          sectors: profile.sectors,
+          jobTypes: profile.job_types,
+          remotePreference: profile.remote_preference,
+          experienceYears: profile.experience_years,
+          desiredSalaryMin: profile.desired_salary_min,
+          fullName: profile.full_name,
+          headline: profile.headline,
+        });
 
-    return {
-      ...job,
-      matchScore: match.score,
-      matchLevel: match.matchLevel,
-      matchStrengths: match.strengths,
-      matchGaps: match.gaps,
-    };
-  });
+        return {
+          ...job,
+          matchScore: match.score,
+          matchLevel: match.matchLevel,
+          matchStrengths: match.strengths,
+          matchGaps: match.gaps,
+        };
+      })
+    );
 
   // Sort by match score
   scoredJobs.sort((a, b) => b.matchScore - a.matchScore);

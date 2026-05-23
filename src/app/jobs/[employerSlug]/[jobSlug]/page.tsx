@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
+import { analyzeJobMatchWithAI, type AIJobMatchAnalysis } from "@/lib/ai-match.service";
 import {
   MapPin,
   Briefcase,
@@ -135,38 +135,36 @@ export default async function JobDetailPage({
     .eq("id", job.id);
 
   const j = job as unknown as JobWithEmployer;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  let candidateMatch: ReturnType<typeof scoreCandidateJobMatch> | null = null;
+   const {
+     data: { user },
+   } = await supabase.auth.getUser();
+   let candidateMatch: AIJobMatchAnalysis | null = null;
 
-  if (user) {
-    const { data: profileData } = await supabase
-      .from("candidate_profiles")
-      .select("skills, sectors, job_types, remote_preference, desired_salary_min, experience_years")
-      .eq("user_id", user.id)
-      .single();
+   if (user) {
+     const { data: profileData } = await supabase
+       .from("candidate_profiles")
+       .select("skills, sectors, job_types, remote_preference, desired_salary_min, experience_years")
+       .eq("user_id", user.id)
+       .single();
 
-    const profile = profileData as Pick<
-      CandidateProfile,
-      "skills" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min" | "experience_years"
-    > | null;
+     const profile = profileData as Pick<
+       CandidateProfile,
+       "skills" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min" | "experience_years"
+     > | null;
 
-    if (profile) {
-      candidateMatch = scoreCandidateJobMatch({
-        candidate: profile,
-        job: {
-          sector: j.sector,
-          job_type: j.job_type,
-          remote_type: j.remote_type,
-          salary_min: j.salary_min,
-          skills: j.skills || [],
-          seniority: j.seniority,
-          is_featured: j.is_featured,
-        },
-      });
-    }
-  }
+     if (profile) {
+       candidateMatch = await analyzeJobMatchWithAI(j, {
+         skills: profile.skills,
+         sectors: profile.sectors,
+         jobTypes: profile.job_types,
+         remotePreference: profile.remote_preference,
+         experienceYears: profile.experience_years,
+         desiredSalaryMin: profile.desired_salary_min,
+         fullName: profile.full_name,
+         headline: profile.headline,
+       });
+     }
+   }
 
   const salaryText = (j.salary_min || j.salary_max)
     ? `${formatSalary(j.salary_min ?? 0)}${j.salary_max ? ` - ${formatSalary(j.salary_max)}` : "+"}`

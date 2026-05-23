@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import ApplicationPipeline from "@/components/jobs/application-pipeline";
-import { scoreCandidateJobMatch } from "@/lib/candidate-job-match";
+import { analyzeJobMatchWithAI, type AIJobMatchAnalysis } from "@/lib/ai-match.service";
 import type { Application, CandidateProfile, Database, Employer, Json } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -89,34 +89,34 @@ export default async function ApplicationsPage() {
         ((candidateProfiles || []) as CandidateProfileRef[]).map((profile) => [profile.user_id, profile])
       );
 
-      enrichedApps = typedApps.map((app) => {
-        const userId = applicationMap.get(app.id);
-        const candidateProfile = userId ? profileMap.get(userId) || null : null;
+      enrichedApps = await Promise.all(
+        typedApps.map(async (app) => {
+          const userId = applicationMap.get(app.id);
+          const candidateProfile = userId ? profileMap.get(userId) || null : null;
 
-        const matchSummary =
-          candidateProfile && app.jobs
-            ? scoreCandidateJobMatch({
-                candidate: candidateProfile,
-                job: {
-                  sector: app.jobs.sector,
-                  job_type: app.jobs.job_type,
-                  remote_type: app.jobs.remote_type,
-                  salary_min: null,
-                  skills: app.jobs.skills || [],
-                  seniority: app.jobs.seniority,
-                  is_featured: false,
-                },
-              })
-            : null;
+          let matchSummary: AIJobMatchAnalysis | null = null;
+          if (candidateProfile && app.jobs) {
+            matchSummary = await analyzeJobMatchWithAI(app.jobs, {
+              skills: candidateProfile.skills,
+              sectors: candidateProfile.sectors,
+              jobTypes: candidateProfile.job_types,
+              remotePreference: candidateProfile.remote_preference,
+              experienceYears: candidateProfile.experience_years,
+              desiredSalaryMin: candidateProfile.desired_salary_min,
+              fullName: candidateProfile.full_name,
+              headline: candidateProfile.headline,
+            });
+          }
 
-         return {
-           ...app,
-           candidateProfile,
-           matchSummary,
-           recruiterNotes: null,
-           scorecardData: null,
-         };
-      });
+           return {
+             ...app,
+             candidateProfile,
+             matchSummary,
+             recruiterNotes: null,
+             scorecardData: null,
+           };
+        })
+      );
     }
   }
 
