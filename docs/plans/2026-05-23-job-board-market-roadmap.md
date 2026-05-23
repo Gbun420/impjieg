@@ -24,7 +24,9 @@
   - [x] Add richer public company trust and hiring signals from existing data.
   - [ ] Add richer editable employer content: benefits, culture, process, workplace details, hiring response expectations.
 - [ ] Deepen recruiter workflow
-  - Add notes, scorecards, collaborator support, response SLAs, and better candidate filtering.
+  - [x] Add response-SLA and backlog visibility.
+  - [x] Add better candidate filtering.
+  - [ ] Add notes, scorecards, and collaborator support.
 
 ## Next 30 Days
 

@@ -3,10 +3,12 @@
 import { useState, useCallback } from "react";
 import { updateApplicationStatus, sendCandidateEmail } from "@/lib/actions/applications";
 import { deriveApplicationInsights } from "@/lib/application-insights";
+import { filterApplications } from "@/lib/application-filters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
-import { Mail, Phone, FileText, Send, X } from "lucide-react";
+import { Mail, Phone, FileText, Send, X, Search, AlertTriangle } from "lucide-react";
 import type { Application } from "@/lib/supabase/types";
 
 const COLUMNS = [
@@ -299,7 +301,10 @@ export default function ApplicationsPage({
   applications: AppWithJob[];
 }) {
   const [apps, setApps] = useState(applications);
+  const [search, setSearch] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
   const insights = deriveApplicationInsights(apps);
+  const filteredApps = filterApplications(apps, { search, attentionOnly });
 
   const handleDrop = async (appId: string, newStatus: string) => {
     const result = await updateApplicationStatus(appId, newStatus);
@@ -330,12 +335,31 @@ export default function ApplicationsPage({
         </div>
       </div>
 
+      <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-1 items-center gap-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search candidates, emails, or job titles"
+          />
+        </div>
+        <Button
+          variant={attentionOnly ? "primary" : "outline"}
+          size="sm"
+          onClick={() => setAttentionOnly((value) => !value)}
+        >
+          <AlertTriangle className="mr-1.5 h-4 w-4" />
+          {attentionOnly ? "Showing Needs Attention" : "Filter Needs Attention"}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
         {COLUMNS.map((column) => (
           <KanbanColumn
             key={column.id}
             column={column}
-            applications={apps.filter((a) => a.status === column.id)}
+            applications={filteredApps.filter((a) => a.status === column.id)}
             onDrop={handleDrop}
           />
         ))}
