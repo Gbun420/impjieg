@@ -289,27 +289,178 @@ export interface Database {
           updated_at?: string;
         };
       };
-      saved_jobs: {
-        Row: {
-          id: string;
-          user_id: string;
-          job_id: string;
-          created_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          job_id: string;
-          created_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          job_id?: string;
-          created_at?: string | null;
-        };
-      };
-      candidate_profiles: {
+       saved_jobs: {
+         Row: {
+           id: string;
+           user_id: string;
+           job_id: string;
+           created_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           user_id: string;
+           job_id: string;
+           created_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           user_id?: string;
+           job_id?: string;
+           created_at?: string | null;
+         };
+       };
+       subscriptions: {
+         Row: {
+           id: string;
+           employer_id: string;
+           plan_type: "basic" | "professional" | "enterprise";
+           billing_cycle: "monthly" | "annual";
+           status: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end: string | null;
+           trial_end: string | null;
+           job_credits_used: number;
+           job_credits_reset_date: string | null;
+           created_at: string;
+           updated_at: string;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           plan_type?: "basic" | "professional" | "enterprise";
+           billing_cycle?: "monthly" | "annual";
+           status?: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end?: string | null;
+           trial_end?: string | null;
+           job_credits_used?: number;
+           job_credits_reset_date?: string | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           plan_type?: "basic" | "professional" | "enterprise";
+           billing_cycle?: "monthly" | "annual";
+           status?: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end?: string | null;
+           trial_end?: string | null;
+           job_credits_used?: number;
+           job_credits_reset_date?: string | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+       };
+       subscription_job_credits: {
+         Row: {
+           id: string;
+           subscription_id: string;
+           job_id: string | null;
+           credit_type: "standard" | "featured";
+           used_at: string;
+         };
+         Insert: {
+           id?: string;
+           subscription_id: string;
+           job_id?: string | null;
+           credit_type?: "standard" | "featured";
+           used_at?: string;
+         };
+         Update: {
+           id?: string;
+           subscription_id?: string;
+           job_id?: string | null;
+           credit_type?: "standard" | "featured";
+           used_at?: string;
+         };
+       };
+       credit_packs: {
+         Row: {
+           id: string;
+           employer_id: string;
+           pack_type: "starter" | "standard" | "premium";
+           credits_purchased: number;
+           credits_remaining: number;
+           purchased_at: string;
+           expires_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           pack_type?: "starter" | "standard" | "premium";
+           credits_purchased?: number;
+           credits_remaining?: number;
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           pack_type?: "starter" | "standard" | "premium";
+           credits_purchased?: number;
+           credits_remaining?: number;
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+       };
+       promotion_bundles: {
+         Row: {
+           id: string;
+           employer_id: string;
+           job_id: string;
+           bundle_type: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at: string;
+           expires_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           job_id?: string;
+           bundle_type?: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           job_id?: string;
+           bundle_type?: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+       };
+       screening_services: {
+         Row: {
+           id: string;
+           employer_id: string;
+           application_id: string;
+           service_type: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status: "pending" | "completed" | "failed";
+           result: Json | null;
+           purchased_at: string;
+           completed_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           application_id?: string;
+           service_type?: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status?: "pending" | "completed" | "failed";
+           result?: Json | null;
+           purchased_at?: string;
+           completed_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           application_id?: string;
+           service_type?: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status?: "pending" | "completed" | "failed";
+           result?: Json | null;
+           purchased_at?: string;
+           completed_at?: string | null;
+         };
+       };
+       candidate_profiles: {
         Row: {
           id: string;
           user_id: string;
