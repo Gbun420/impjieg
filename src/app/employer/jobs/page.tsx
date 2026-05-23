@@ -1,14 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { buildEmployerPromotionLinks } from "@/lib/job-promotion";
+import { SITE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Copy, Zap, Trash2, BarChart3 } from "lucide-react";
-import { formatDate, daysUntil } from "@/lib/utils";
+import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Copy, Zap, Trash2, BarChart3, Mail, Globe } from "lucide-react";
+import { daysUntil } from "@/lib/utils";
 import type { Employer, Job } from "@/lib/supabase/types";
 import { duplicateJob, boostJob, deleteJob } from "@/lib/actions/applications";
+
+type EmployerJob = Job & { employers: { slug: string | null } | null };
 
 export default async function EmployerJobsPage() {
   const supabase = await createClient();
@@ -29,14 +33,13 @@ export default async function EmployerJobsPage() {
 
   const { data: jobs } = await supabase
     .from("jobs")
-    .select("*")
+    .select("*, employers(slug)")
     .eq("employer_id", (employer as Employer).id)
     .order("created_at", { ascending: false });
 
-  const typedJobs = (jobs || []) as Job[];
+  const typedJobs = (jobs || []) as EmployerJob[];
 
   const activeJobs = typedJobs.filter((j) => j.status === "active");
-  const draftJobs = typedJobs.filter((j) => j.status === "draft");
   const totalViews = typedJobs.reduce((sum, j) => sum + (j.views || 0), 0);
   const totalApplications = typedJobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
   const avgApplicationRate = totalViews > 0 ? ((totalApplications / totalViews) * 100).toFixed(1) : "0";
@@ -127,6 +130,14 @@ export default async function EmployerJobsPage() {
               ? daysUntil(job.expires_at)
               : 0;
             const appRate = job.views > 0 ? ((job.applications_count / job.views) * 100).toFixed(1) : "0";
+            const promotionLinks = job.employers?.slug
+              ? buildEmployerPromotionLinks({
+                  baseUrl: SITE.url,
+                  employerSlug: job.employers.slug,
+                  jobSlug: job.slug,
+                  title: job.title,
+                })
+              : null;
 
             return (
               <Card
@@ -170,6 +181,20 @@ export default async function EmployerJobsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto">
+                    {promotionLinks && (
+                      <>
+                        <Link href={promotionLinks.linkedinUrl} target="_blank">
+                          <Button variant="ghost" size="sm" title="Share on LinkedIn">
+                            <Globe className="h-3.5 w-3.5" />
+                          </Button>
+                        </Link>
+                        <Link href={promotionLinks.emailUrl}>
+                          <Button variant="ghost" size="sm" title="Share by email">
+                            <Mail className="h-3.5 w-3.5" />
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                     <Link href={`/employer/jobs/${job.id}/analytics`}>
                       <Button variant="ghost" size="sm" title="View analytics">
                         <BarChart3 className="h-3.5 w-3.5" />
@@ -194,11 +219,18 @@ export default async function EmployerJobsPage() {
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                     </form>
-                    <Link href={`/jobs/${job.slug.split("-").slice(0, -2).join("-")}/${job.slug}`} target="_blank">
+                    {promotionLinks && (
+                      <Link href={promotionLinks.jobUrl} target="_blank">
+                        <Button variant="ghost" size="sm" title="View live">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    )}
+                    {!promotionLinks && (
                       <Button variant="ghost" size="sm" title="View live">
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
-                    </Link>
+                    )}
                     {job.status !== "deleted" && (
                       <form action={async () => {
                         "use server";
