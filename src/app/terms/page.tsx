@@ -1,4 +1,10 @@
 import { SITE } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms",
+  description: "Terms of Service for Impjieg. Read our terms and conditions for posting jobs and using our platform.",
+};
 
 export default function TermsPage() {
   return (

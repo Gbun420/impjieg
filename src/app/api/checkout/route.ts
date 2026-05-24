@@ -117,7 +117,7 @@ export async function POST(request: Request) {
     }
 
     // Create a payment record first
-    const paymentsTable = supabase.from("payments");
+    const paymentsTable = supabase.from("payments") as any;
     
     const { data: payment, error: paymentError } = await paymentsTable
       .insert([
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
           listing_type: listingType || planType || packType || bundleType || serviceType || "unknown",
         },
       ])
-      .select<{ id: string }>()
+      .select()
       .single();
 
     if (paymentError) {
@@ -157,8 +157,8 @@ export async function POST(request: Request) {
 
     // Update payment with Stripe session ID
     if (payment) {
-      await supabase
-        .from("payments")
+      await (supabase
+        .from("payments") as any)
         .update({
           stripe_checkout_session_id: session.id,
         })

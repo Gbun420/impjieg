@@ -78,7 +78,7 @@ export default function SalaryCalculatorPage() {
 
       <form onSubmit={handleSubmit} className="flex gap-3">
         <Input
-          label="Gross Annual Salary (EUR)"
+          label="Gross Annual Salary"
           type="number"
           value={gross}
           onChange={(e) => setGross(e.target.value)}
@@ -145,28 +145,28 @@ export default function SalaryCalculatorPage() {
             </h2>
             <div className="mt-4 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Gross Annual</span>
+                <span className="text-foreground/75">Gross Annual</span>
                 <span className="font-mono font-medium text-foreground">
                   {formatSalary(breakdown.gross)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Income Tax</span>
-                <span className="font-mono font-medium text-error">
+                <span className="text-foreground/75">Income Tax</span>
+                <span className="font-mono font-medium text-red-600 dark:text-red-400">
                   -{formatSalary(breakdown.tax)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">
+                <span className="text-foreground/75">
                   NIC (10%)
                 </span>
-                <span className="font-mono font-medium text-error">
+                <span className="font-mono font-medium text-red-600 dark:text-red-400">
                   -{formatSalary(breakdown.nic)}
                 </span>
               </div>
               <div className="border-t border-border/50 pt-3 flex justify-between items-center">
                 <span className="font-semibold text-foreground">Net Annual</span>
-                <span className="font-mono font-bold text-success">
+                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   {formatSalary(breakdown.netAnnual)}
                 </span>
               </div>
@@ -175,32 +175,32 @@ export default function SalaryCalculatorPage() {
 
           {/* Tax Brackets */}
           <Card className="p-6 bg-muted/20">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            <h2 className="text-sm font-semibold text-foreground/75 uppercase tracking-wider">
               Tax Brackets (Malta)
             </h2>
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">€0 - €9,100</span>
-                <span className="font-medium text-success">0%</span>
+                <span className="text-foreground/75">€0 - €9,100</span>
+                <span className="font-medium text-emerald-700 dark:text-emerald-400">0%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">€9,101 - €14,500</span>
+                <span className="text-foreground/75">€9,101 - €14,500</span>
                 <span className="font-medium text-foreground">15%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">€14,501 - €19,500</span>
+                <span className="text-foreground/75">€14,501 - €19,500</span>
                 <span className="font-medium text-foreground">25%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">€19,501 - €60,000</span>
+                <span className="text-foreground/75">€19,501 - €60,000</span>
                 <span className="font-medium text-foreground">25%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">€60,001+</span>
-                <span className="font-medium text-error">35%</span>
+                <span className="text-foreground/75">€60,001+</span>
+                <span className="font-medium text-red-600 dark:text-red-400">35%</span>
               </div>
               <div className="flex justify-between border-t border-border/50 pt-2 mt-2">
-                <span className="text-muted-foreground">NIC</span>
+                <span className="text-foreground/75">NIC</span>
                 <span className="font-medium text-foreground">10% of gross</span>
               </div>
             </div>

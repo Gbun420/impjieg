@@ -46,15 +46,15 @@ export default function JobCard({ job }: JobCardProps) {
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-1.5">
-                <h3 className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                <h2 className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                   {job.title}
-                </h3>
+                </h2>
                 {job.is_featured && (
                   <Badge variant="default">Featured</Badge>
                 )}
               </div>
 
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-foreground/75">
                 {job.employers.name}
                 {job.employers.is_verified && (
                   <ShieldCheck className="h-3.5 w-3.5 text-success shrink-0" />
@@ -70,7 +70,7 @@ export default function JobCard({ job }: JobCardProps) {
             </span>
           </div>
 
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm text-muted-foreground">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm text-foreground/75">
             <span className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
               {job.location}

@@ -1,6 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Mail } from "lucide-react";
 import { SITE } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Get in touch with Impjieg. Send us your feedback, questions, or general enquiries.",
+};
 
 export default function ContactPage() {
   return (

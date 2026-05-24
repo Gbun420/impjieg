@@ -32,17 +32,17 @@ async function StatsSection() {
     <div className="flex items-center justify-center gap-6 sm:gap-10 text-sm">
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">{count ?? 0}</p>
-        <p className="text-muted-foreground mt-0.5">Active jobs</p>
+        <p className="text-foreground/75 mt-0.5">Active jobs</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">100%</p>
-        <p className="text-muted-foreground mt-0.5">Salary transparency</p>
+        <p className="text-foreground/75 mt-0.5">Salary transparency</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">30d</p>
-        <p className="text-muted-foreground mt-0.5">Fresh listings</p>
+        <p className="text-foreground/75 mt-0.5">Fresh listings</p>
       </div>
     </div>
   );

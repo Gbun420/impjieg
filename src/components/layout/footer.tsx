@@ -27,13 +27,13 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-block">
+            <Link href="/" className="inline-block" aria-label="Impjieg Homepage">
               <img src="/logo.svg" alt="Impjieg" className="h-6 dark:invert" />
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
               {SITE.tagline}
             </p>
-            <p className="mt-1.5 text-xs text-muted-foreground/50">
+            <p className="mt-1.5 text-xs text-muted-foreground">
               Made in Malta
             </p>
           </div>
@@ -93,7 +93,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-border pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-muted-foreground/60">
+        <div className="mt-8 border-t border-border pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-foreground/80">
           <p>
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
@@ -103,7 +103,7 @@ export default function Footer() {
               href="https://mackmedia.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground underline hover:text-foreground transition-colors"
+              className="text-foreground underline hover:text-primary transition-colors"
             >
               Mack Media
             </a>
@@ -112,7 +112,7 @@ export default function Footer() {
               href="https://dopaminedigital.co/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground underline hover:text-foreground transition-colors"
+              className="text-foreground underline hover:text-primary transition-colors"
             >
               Dopamine Digital
             </a>

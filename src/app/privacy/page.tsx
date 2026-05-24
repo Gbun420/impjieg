@@ -1,4 +1,10 @@
 import { SITE } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy",
+  description: "Privacy Policy for Impjieg. Learn how we collect, process, and protect your personal data in compliance with GDPR.",
+};
 
 export default function PrivacyPage() {
   return (

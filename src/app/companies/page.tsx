@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Companies",
+  description: "Browse companies hiring in Malta. Discover company culture, workplace highlights, and open job roles.",
+};
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, MapPin } from "lucide-react";
@@ -66,9 +72,9 @@ export default async function CompaniesPage() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <h2 className="truncate text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                       {employer.name}
-                    </h3>
+                    </h2>
                     {employer.location && (
                       <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                         <MapPin className="h-3.5 w-3.5" />

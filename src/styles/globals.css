@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Light mode — clean, trustworthy, premium */
   --background: #FAFAFA;
@@ -12,7 +14,7 @@
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
   --muted: #F4F4F5;
-  --muted-foreground: #71717A;
+  --muted-foreground: #5E5E66;
   --card: #FFFFFF;
   --card-foreground: #0A0A0A;
   --card-hover: #FAFAFA;

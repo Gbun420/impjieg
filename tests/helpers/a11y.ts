@@ -9,6 +9,20 @@ export async function checkA11y(page: Page) {
     url: 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js',
   });
 
+  // Disable all transitions and animations to prevent color contrast issues during fade-ins
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        animation-delay: 0s !important;
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-delay: 0s !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
+      }
+    `
+  });
+
   const results = await page.evaluate(async () => {
     // @ts-ignore – axe is attached to window by the script tag
     return await (window as any).axe.run({

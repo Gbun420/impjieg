@@ -92,47 +92,35 @@ export default function SignupPage() {
       )}
 
       <form action={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Company Name</label>
-          <div className="relative">
-            <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="companyName"
-              type="text"
-              placeholder="Acme Ltd"
-              required
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Email</label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="email"
-              type="email"
-              placeholder="you@company.com"
-              required
-              autoComplete="email"
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Password</label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="password"
-              type="password"
-              placeholder="At least 6 characters"
-              required
-              minLength={6}
-              autoComplete="new-password"
-              className="pl-10"
-            />
-          </div>
+        <Input
+          label="Company Name"
+          name="companyName"
+          type="text"
+          placeholder="Acme Ltd"
+          required
+          icon={<Building2 className="h-4 w-4" />}
+        />
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          placeholder="you@company.com"
+          required
+          autoComplete="email"
+          icon={<Mail className="h-4 w-4" />}
+        />
+        <Input
+          label="Password"
+          name="password"
+          type="password"
+          placeholder="At least 6 characters"
+          required
+          minLength={6}
+          autoComplete="new-password"
+          icon={<Lock className="h-4 w-4" />}
+          error={undefined}
+        />
+        <div className="-mt-2">
           <p className="text-xs text-muted-foreground">
             Must be at least 6 characters long
           </p>

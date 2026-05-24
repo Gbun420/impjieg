@@ -1,4 +1,10 @@
 import { SITE } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "Learn more about Impjieg, Malta's modern job board built for salary transparency and efficiency.",
+};
 
 export default function AboutPage() {
   return (

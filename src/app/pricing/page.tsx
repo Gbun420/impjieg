@@ -1,4 +1,11 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description: "Simple, transparent pricing. Post standard listings, featured listings, or purchase bulk credits and monthly subscriptions.",
+};
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,13 +71,13 @@ export default function PricingPage() {
 
       <Tabs defaultValue="pay-per-job" className="mt-12 w-full">
         <TabsList className="grid w-full grid-cols-3 border-b">
-          <TabsTrigger value="pay-per-job" className="px-4 py-2 font-medium text-muted-foreground hover:text-foreground">
+          <TabsTrigger value="pay-per-job" className="px-4 py-2 font-medium text-foreground/75 hover:text-foreground">
             Pay Per Job
           </TabsTrigger>
-          <TabsTrigger value="subscriptions" className="px-4 py-2 font-medium text-muted-foreground hover:text-foreground">
+          <TabsTrigger value="subscriptions" className="px-4 py-2 font-medium text-foreground/75 hover:text-foreground">
             Subscriptions
           </TabsTrigger>
-          <TabsTrigger value="add-ons" className="px-4 py-2 font-medium text-muted-foreground hover:text-foreground">
+          <TabsTrigger value="add-ons" className="px-4 py-2 font-medium text-foreground/75 hover:text-foreground">
             Add-ons & Upsells
           </TabsTrigger>
         </TabsList>

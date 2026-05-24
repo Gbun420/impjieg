@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Browse Jobs",
+  description: "Browse the latest jobs in Malta. Find tech, finance, administration, and hospitality roles with salary transparency.",
+};
 import SearchFilters from "@/components/jobs/search-filters";
 import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";

@@ -20,7 +20,7 @@ test('browse jobs page loads', async ({ page }) => {
 test('pricing page loads', async ({ page }) => {
   await page.goto('/pricing');
   await expect(page).toHaveTitle(/Pricing/);
-  await expect(page.getByRole('heading', { name: /Simple, Transparent Pricing/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Flexible Pricing/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
@@ -67,15 +67,21 @@ test('mobile navigation opens and is accessible', async ({ page }) => {
   const menuButton = page.getByRole('button', { name: /Toggle menu/ });
   await expect(menuButton).toBeVisible();
   await menuButton.click();
-  await expect(page.getByRole('link', { name: 'Browse Jobs' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Pricing' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Companies' })).toBeVisible();
+  const mobileNav = page.locator('.md\\:hidden nav');
+  await expect(mobileNav.getByRole('link', { name: 'Jobs' })).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: 'Pricing', exact: true })).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: 'Companies' })).toBeVisible();
   await checkAccessibleNames(page);
 });
 
 test('theme toggle switches between dark and light', async ({ page }) => {
   await page.goto('/');
-  const themeButton = page.getByRole('button', { name: /Toggle theme/ });
+  let themeButton = page.getByRole('button', { name: /Toggle theme/ });
+  if (await themeButton.isHidden()) {
+    const menuButton = page.getByRole('button', { name: /Toggle menu/ });
+    await menuButton.click();
+    themeButton = page.getByRole('button', { name: /Dark Mode|Light Mode/ });
+  }
   await expect(themeButton).toBeVisible();
   await themeButton.click();
   const htmlClass = await page.locator('html').getAttribute('class');

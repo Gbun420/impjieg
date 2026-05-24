@@ -85,34 +85,24 @@ function LoginForm() {
       )}
 
       <form action={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Email</label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="email"
-              type="email"
-              placeholder="you@company.com"
-              required
-              autoComplete="email"
-              className="pl-10"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Password</label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              required
-              autoComplete="current-password"
-              className="pl-10"
-            />
-          </div>
-        </div>
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          placeholder="you@company.com"
+          required
+          autoComplete="email"
+          icon={<Mail className="h-4 w-4" />}
+        />
+        <Input
+          label="Password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          required
+          autoComplete="current-password"
+          icon={<Lock className="h-4 w-4" />}
+        />
         <div className="flex justify-end">
           <Link
             href="/auth/reset-password"

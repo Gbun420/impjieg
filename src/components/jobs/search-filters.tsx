@@ -64,6 +64,7 @@ export default function SearchFilters() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             name="search"
+            aria-label="Search jobs, companies, skills"
             placeholder="Search jobs, companies, skills..."
             className="pl-9"
             defaultValue={searchParams.get("search") || ""}
@@ -76,8 +77,9 @@ export default function SearchFilters() {
           type="button"
           variant={hasActiveFilters || showFilters ? "primary" : "outline"}
           onClick={() => setShowFilters(!showFilters)}
+          aria-label="Filters"
         >
-          <Filter className="h-4 w-4 sm:mr-1.5" />
+          <Filter className="h-4 w-4 sm:mr-1.5" aria-hidden="true" />
           <span className="hidden sm:inline">Filters</span>
         </Button>
       </div>
@@ -104,6 +106,7 @@ export default function SearchFilters() {
           />
           <Input
             name="location"
+            aria-label="Location"
             placeholder="Location"
             defaultValue={searchParams.get("location") || ""}
           />

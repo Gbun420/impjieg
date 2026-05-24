@@ -88,7 +88,7 @@ export default function Header() {
     return (
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="Impjieg Homepage">
             <img src="/logo.svg" alt="Impjieg" className="h-6 dark:invert" />
           </Link>
           <div className="h-8 w-20 rounded-lg bg-muted animate-pulse" />
@@ -100,7 +100,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" aria-label="Impjieg Homepage">
           <img src="/logo.svg" alt="Impjieg" className="h-6 dark:invert" />
         </Link>
 

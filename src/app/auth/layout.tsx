@@ -11,7 +11,7 @@ export default async function AuthLayout({
       <div className="absolute inset-0 bg-gradient-to-br from-muted/30 via-background to-primary/5" />
       <div className="relative w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="Impjieg Homepage">
             <img src="/logo.svg" alt="Impjieg" className="h-8 dark:invert" />
           </Link>
         </div>
