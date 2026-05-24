@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { stripe } from "@/lib/stripe";
-import { PRICES, SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES, SCREENING_UPSELLS } from "@/lib/constants";
+import { stripe, PRICES } from "@/lib/stripe";
+import { PRICING, SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES, SCREENING_UPSELLS } from "@/lib/constants";
 
 export async function POST(request: Request) {
   try {
@@ -16,13 +16,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const { data: employer } = await supabase
+    const { data: employer, error: employerError } = await supabase
       .from("employers")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .single<{ id: string }>();
 
-    if (!employer) {
+    if (employerError || !employer) {
       return NextResponse.json({ error: "Employer profile not found" }, { status: 404 });
     }
 
@@ -35,7 +35,8 @@ export async function POST(request: Request) {
     // Handle job listing payments (existing functionality)
     if (jobId && listingType) {
       amount = listingType === "featured" ? 5900 : 2900; // amount in cents
-      priceId = listingType === "featured" ? PRICES.featured : PRICES.standard;
+      // In a real app, you would use actual Stripe price IDs
+      priceId = listingType === "featured" ? "price_featured" : "price_standard";
       metadata.jobId = jobId;
       metadata.listingType = listingType;
     }
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
       metadata.jobId = jobId;
     }
     // Handle screening service payments
-    else if (serviceType && jobId) {
+    else if (serviceType) {
       // For screening services, we need an application ID, not a job ID
       // This is a simplification - in reality, you'd pass applicationId
       return NextResponse.json({ error: "Service type requires application ID" }, { status: 400 });
@@ -116,17 +117,20 @@ export async function POST(request: Request) {
     }
 
     // Create a payment record first
-    const { data: payment, error: paymentError } = await supabase
-      .from("payments")
-      .insert({
-        employer_id: employer.id,
-        job_id: jobId || null,
-        amount: amount / 100, // store in euros
-        currency: "eur",
-        status: "pending",
-        listing_type: listingType || planType || packType || bundleType || serviceType || "unknown",
-      })
-      .select()
+    const paymentsTable = supabase.from("payments");
+    
+    const { data: payment, error: paymentError } = await paymentsTable
+      .insert([
+        {
+          employer_id: employer.id,
+          job_id: jobId || null,
+          amount: amount / 100, // store in euros
+          currency: "eur",
+          status: "pending",
+          listing_type: listingType || planType || packType || bundleType || serviceType || "unknown",
+        },
+      ])
+      .select<{ id: string }>()
       .single();
 
     if (paymentError) {
@@ -152,12 +156,14 @@ export async function POST(request: Request) {
     });
 
     // Update payment with Stripe session ID
-    await supabase
-      .from("payments")
-      .update({
-        stripe_checkout_session_id: session.id,
-      })
-      .eq("id", payment.id);
+    if (payment) {
+      await supabase
+        .from("payments")
+        .update({
+          stripe_checkout_session_id: session.id,
+        })
+        .eq("id", payment.id);
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

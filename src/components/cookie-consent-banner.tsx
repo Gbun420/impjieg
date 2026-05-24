@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCookieConsent, type CookieCategory } from "@/hooks/use-cookie-consent";
 
@@ -34,10 +34,15 @@ const categories: {
 ];
 
 export default function CookieConsentBanner() {
-  const { consent, hasConsented, mounted, saveConsent, acceptAll, rejectAll } =
+  const { consent, hasConsented, saveConsent, acceptAll, rejectAll } =
     useCookieConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [localConsent, setLocalConsent] = useState(consent);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!mounted || hasConsented) return null;
 
