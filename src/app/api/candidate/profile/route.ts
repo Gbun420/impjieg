@@ -51,6 +51,21 @@ export async function GET() {
   return NextResponse.json({ profile });
 }
 
+import { z } from "zod";
+
+const candidateProfileSchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required").optional(),
+  headline: z.string().trim().max(100).optional().nullable(),
+  skills: z.array(z.string()).optional(),
+  sectors: z.array(z.string()).optional(),
+  job_types: z.array(z.string()).optional(),
+  remote_preference: z.string().optional().nullable(),
+  desired_salary_min: z.number().int().min(0).optional().nullable(),
+  experience_years: z.number().int().min(0).optional().nullable(),
+  bio: z.string().trim().optional().nullable(),
+  resume_url: z.string().trim().url().or(z.literal("")).optional().nullable(),
+});
+
 export async function POST(request: Request) {
   const supabase = await createClient();
 
@@ -62,7 +77,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json()) as CandidateProfileUpdate;
+  const json = await request.json().catch(() => null);
+  if (!json) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const parsed = candidateProfileSchema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid profile data", details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
+
+  const body = parsed.data;
 
   const { data: existing } = await supabase
     .from("candidate_profiles")
@@ -78,7 +106,7 @@ export async function POST(request: Request) {
 
     result = await candidateProfilesTable
       .update({
-        ...(body as CandidateProfileUpdate),
+        ...body,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id)
@@ -93,7 +121,7 @@ export async function POST(request: Request) {
       .insert([
         {
           user_id: user.id,
-          ...(body as Omit<CandidateProfileInsert, "user_id">),
+          ...body,
         } satisfies CandidateProfileInsert,
       ])
       .select()

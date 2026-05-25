@@ -76,11 +76,16 @@ test('mobile navigation opens and is accessible', async ({ page }) => {
 
 test('theme toggle switches between dark and light', async ({ page }) => {
   await page.goto('/');
-  let themeButton = page.getByRole('button', { name: /Toggle theme/ });
-  if (await themeButton.isHidden()) {
+  const isMobile = (page.viewportSize()?.width ?? 0) < 768;
+  let themeButton;
+  
+  if (isMobile) {
     const menuButton = page.getByRole('button', { name: /Toggle menu/ });
+    await expect(menuButton).toBeVisible();
     await menuButton.click();
     themeButton = page.getByRole('button', { name: /Dark Mode|Light Mode/ });
+  } else {
+    themeButton = page.getByRole('button', { name: /Toggle theme/ });
   }
   await expect(themeButton).toBeVisible();
   await themeButton.click();

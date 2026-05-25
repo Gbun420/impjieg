@@ -3,9 +3,34 @@ import { createClient } from "@/lib/supabase/server";
 import { stripe, PRICES } from "@/lib/stripe";
 import { PRICING, SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES, SCREENING_UPSELLS } from "@/lib/constants";
 
+import { z } from "zod";
+
+const checkoutSchema = z.object({
+  jobId: z.string().optional().nullable(),
+  listingType: z.string().optional().nullable(), // Allow standard/featured
+  planType: z.string().optional().nullable(),
+  packType: z.string().optional().nullable(),
+  bundleType: z.string().optional().nullable(),
+  serviceType: z.string().optional().nullable(),
+  billingCycle: z.enum(["monthly", "annual"]).default("monthly"),
+});
+
 export async function POST(request: Request) {
   try {
-    const { jobId, listingType, planType, packType, bundleType, serviceType, billingCycle = "monthly" } = await request.json();
+    const json = await request.json().catch(() => null);
+    if (!json) {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const parsed = checkoutSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request parameters", details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { jobId, listingType, planType, packType, bundleType, serviceType, billingCycle } = parsed.data;
 
     const supabase = await createClient();
     const {
