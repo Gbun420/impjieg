@@ -54,10 +54,20 @@ export default function AdminLoginForm() {
       <div className="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm backdrop-blur">
         <form action={handleSubmit} className="space-y-4">
           <Input
-            label="Admin password"
+            label="Admin email"
+            name="email"
+            type="email"
+            placeholder="you@company.com"
+            required
+            autoComplete="email"
+            icon={<Shield className="h-4 w-4" />}
+          />
+
+          <Input
+            label="Password"
             name="password"
             type="password"
-            placeholder="Enter internal access token"
+            placeholder="Enter your admin password"
             required
             autoComplete="current-password"
             icon={<Lock className="h-4 w-4" />}

@@ -28,7 +28,7 @@ export default async function AdminLoginPage() {
               {[
                 ["Real-time counts", "Jobs, employers, alerts, and payments"],
                 ["Fast triage", "See what needs attention at a glance"],
-                ["Secure access", "Locked behind the internal admin token"],
+                ["Secure access", "Locked behind admin credentials"],
                 ["Production first", "Uses live data from the deployed project"],
               ].map(([title, copy]) => (
                 <div key={title} className="rounded-2xl border border-border/60 bg-background/80 p-4">
