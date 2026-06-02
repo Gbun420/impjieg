@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { buildJobAlertDigestEmail, jobMatchesAlert } from "@/lib/job-alerts";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlert = Database["public"]["Tables"]["job_alerts"]["Row"];
@@ -64,8 +65,8 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

@@ -1,4 +1,5 @@
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlertUpdate = Database["public"]["Tables"]["job_alerts"]["Update"];
@@ -25,8 +26,8 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 
   const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsUpdateTable;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildJobAlertConfirmationEmail } from "@/lib/job-alerts";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlertInsert = Database["public"]["Tables"]["job_alerts"]["Insert"];
@@ -30,8 +31,8 @@ export async function POST(request: Request) {
   }
 
   const supabase = createServiceClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
   const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsTable;
 
