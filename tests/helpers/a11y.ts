@@ -43,7 +43,7 @@ export async function checkA11y(page: Page) {
   });
 
   const results = await page.evaluate<AxeResults>(async () => {
-    const axe = (window as Window & {
+    const axe = (window as unknown as Window & {
       axe: { run: (options: { runOnly: { type: string; values: string[] } }) => Promise<AxeResults> };
     }).axe;
 

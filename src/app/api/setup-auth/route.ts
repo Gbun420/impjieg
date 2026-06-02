@@ -56,6 +56,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const projectRef = new URL(getSupabaseUrl()).hostname.split(".")[0];
     // Try the Supabase SQL API endpoint
     const response = await fetch(
       `${getSupabaseUrl()}/rest/v1/rpc/exec_sql`,
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
         message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
         sql: TRIGGER_SQL,
         instructions: [
-          "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+          `1. Go to https://supabase.com/dashboard/project/${projectRef}/sql`,
           "2. Click 'New Query'",
           "3. Paste the SQL below and click 'Run'",
           "4. Employer profiles will now be created automatically on signup",

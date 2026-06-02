@@ -30,6 +30,15 @@ test("hasSupabasePublicEnv reports whether the public Supabase config is present
 
   assert.equal(hasSupabasePublicEnv(), false);
 
-  process.env.NEXT_PUBLIC_SUPABASE_URL = backupUrl;
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = backupAnonKey;
+  if (backupUrl === undefined) {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+  } else {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = backupUrl;
+  }
+
+  if (backupAnonKey === undefined) {
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  } else {
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = backupAnonKey;
+  }
 });

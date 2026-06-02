@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { stripe, PRICES } from "@/lib/stripe";
-import { PRICING, SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES, SCREENING_UPSELLS } from "@/lib/constants";
+import { stripe } from "@/lib/stripe";
+import { SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES } from "@/lib/constants";
+import type { Database } from "@/lib/supabase/types";
 
 import { z } from "zod";
 
@@ -14,6 +15,21 @@ const checkoutSchema = z.object({
   serviceType: z.string().optional().nullable(),
   billingCycle: z.enum(["monthly", "annual"]).default("monthly"),
 });
+
+type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"];
+type PaymentsMutationTable = {
+  insert(values: PaymentInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: { id: string } | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+  update(values: { stripe_checkout_session_id: string }): {
+    eq(column: "id", value: string): Promise<unknown>;
+  };
+};
 
 export async function POST(request: Request) {
   try {
@@ -53,7 +69,7 @@ export async function POST(request: Request) {
 
     let amount: number;
     let priceId: string;
-    let metadata: Record<string, string> = {
+    const metadata: Record<string, string> = {
       employerId: employer.id,
     };
 
@@ -142,8 +158,8 @@ export async function POST(request: Request) {
     }
 
     // Create a payment record first
-    const paymentsTable = supabase.from("payments") as any;
-    
+    const paymentsTable = supabase.from("payments") as unknown as PaymentsMutationTable;
+
     const { data: payment, error: paymentError } = await paymentsTable
       .insert([
         {
@@ -160,6 +176,10 @@ export async function POST(request: Request) {
 
     if (paymentError) {
       return NextResponse.json({ error: paymentError.message }, { status: 500 });
+    }
+
+    if (!payment) {
+      return NextResponse.json({ error: "Failed to create payment" }, { status: 500 });
     }
 
     // Create Stripe checkout session
@@ -181,14 +201,12 @@ export async function POST(request: Request) {
     });
 
     // Update payment with Stripe session ID
-    if (payment) {
-      await (supabase
-        .from("payments") as any)
-        .update({
-          stripe_checkout_session_id: session.id,
-        })
-        .eq("id", payment.id);
-    }
+    await supabase
+      .from("payments")
+      .update({
+        stripe_checkout_session_id: session.id,
+      })
+      .eq("id", payment.id);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

@@ -98,6 +98,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const projectRef = new URL(getSupabaseUrl()).hostname.split(".")[0];
     const response = await fetch(
       `${getSupabaseUrl()}/rest/v1/`,
       {
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
         message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
         sql: MIGRATION_SQL,
         instructions: [
-          "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+          `1. Go to https://supabase.com/dashboard/project/${projectRef}/sql`,
           "2. Click 'New Query'",
           "3. Paste the SQL and click 'Run'",
         ],
@@ -127,7 +128,7 @@ export async function POST(request: Request) {
       message: "Please run this SQL in your Supabase Dashboard SQL Editor:",
       sql: MIGRATION_SQL,
       instructions: [
-        "1. Go to https://supabase.com/dashboard/project/vmdjxomkmcbewtcyfrlp/sql",
+        `1. Go to https://supabase.com/dashboard/project/${projectRef}/sql`,
         "2. Click 'New Query'",
         "3. Paste the SQL and click 'Run'",
       ],

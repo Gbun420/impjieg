@@ -16,9 +16,16 @@ function getSupabaseAdmin() {
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();
-  const signature = headersList.get("stripe-signature")!;
+  const signature = headersList.get("stripe-signature");
 
-  let event;
+  if (!signature) {
+    return NextResponse.json(
+      { error: "Missing Stripe signature" },
+      { status: 400 }
+    );
+  }
+
+  let event: Stripe.Event;
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -26,7 +33,7 @@ export async function POST(request: Request) {
       signature,
       requireEnv("STRIPE_WEBHOOK_SECRET")
     );
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       { error: "Webhook signature verification failed" },
       { status: 400 }
