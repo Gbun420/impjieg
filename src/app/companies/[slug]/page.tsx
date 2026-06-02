@@ -3,6 +3,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { deriveCompanyInsights } from "@/lib/company-insights";
@@ -84,8 +85,8 @@ export default async function CompanyProfilePage({
     : 0;
   const profileCompleteness = deriveEmployerProfileCompleteness(emp);
   const serviceSupabase = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
   const { data: employerApplications } = await serviceSupabase
     .from("applications")
