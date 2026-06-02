@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useCookieConsent, type CookieCategory } from "@/hooks/use-cookie-consent";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 const categories: {
   key: CookieCategory;
@@ -38,13 +39,8 @@ export default function CookieConsentBanner() {
     useCookieConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [localConsent, setLocalConsent] = useState(consent);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || hasConsented) return null;
+  const hydrated = useHydrated();
+  if (!hydrated || hasConsented) return null;
 
   const handleToggle = (key: CookieCategory) => {
     if (key === "necessary") return;

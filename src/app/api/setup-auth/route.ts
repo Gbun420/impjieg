@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternalAdminToken } from "../_lib/internal-route-guard";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 const TRIGGER_SQL = `
 -- Auto-create employer profile when a new user signs up
@@ -57,13 +58,13 @@ export async function POST(request: Request) {
   try {
     // Try the Supabase SQL API endpoint
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/exec_sql`,
+      `${getSupabaseUrl()}/rest/v1/rpc/exec_sql`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          apikey: getSupabaseServiceKey(),
+          Authorization: `Bearer ${getSupabaseServiceKey()}`,
           Prefer: "return=minimal",
         },
         body: JSON.stringify({}),

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { buildEmployerNotificationEmail } from "./apply-helpers";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type {
   Application,
   CandidateApplication,
@@ -84,8 +85,8 @@ export async function submitApplication(formData: FormData) {
 
   if (user) {
     const serviceSupabase = createServiceClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      getSupabaseUrl(),
+      getSupabaseServiceKey()
     );
 
     const candidateApplicationsTable = serviceSupabase.from(
@@ -143,8 +144,8 @@ export async function submitApplication(formData: FormData) {
   let employerEmail: string | null = null;
   if (employer?.user_id) {
     const serviceSupabase = createServiceClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      getSupabaseUrl(),
+      getSupabaseServiceKey()
     );
     const {
       data: { user: employerUser },
@@ -194,7 +195,7 @@ export async function submitApplication(formData: FormData) {
           "Content-Type": "application/json",
           "x-internal-admin-token":
             process.env.INTERNAL_ADMIN_TOKEN ||
-            process.env.SUPABASE_SERVICE_ROLE_KEY ||
+            getSupabaseServiceKey() ||
             "",
         },
         body: JSON.stringify({

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -21,6 +22,7 @@ export default function Header() {
   const [isEmployer, setIsEmployer] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const { theme, toggleTheme } = useTheme();
+  const hydrated = useHydrated();
   const router = useRouter();
 
   useEffect(() => {
@@ -117,17 +119,24 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <button
-            onClick={toggleTheme}
-            className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
+          {hydrated ? (
+            <button
+              onClick={toggleTheme}
+              className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+          ) : (
+            <span
+              className="hidden md:flex h-8 w-8"
+              aria-hidden="true"
+            />
+          )}
 
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
@@ -187,23 +196,25 @@ export default function Header() {
               </Link>
             ))}
             <div className="pt-2 mt-2 border-t border-border space-y-1">
-              <button
-                onClick={() => {
-                  toggleTheme();
-                  setMobileOpen(false);
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
-              >
-                {theme === "dark" ? (
-                  <>
-                    <Sun className="h-4 w-4" /> Light Mode
-                  </>
-                ) : (
-                  <>
-                    <Moon className="h-4 w-4" /> Dark Mode
-                  </>
-                )}
-              </button>
+              {hydrated ? (
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                    setMobileOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="h-4 w-4" /> Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-4 w-4" /> Dark Mode
+                    </>
+                  )}
+                </button>
+              ) : null}
               {isLoggedIn ? (
                 <>
                   <Link

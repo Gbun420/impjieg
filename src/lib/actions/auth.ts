@@ -5,6 +5,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
 import { signupWithAutoConfirm } from "./auth-signup";
 import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -22,8 +23,8 @@ type EmployersMutationTable = {
 export async function signup(formData: FormData) {
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 
   const data = {
@@ -55,8 +56,8 @@ export async function signup(formData: FormData) {
 export async function login(formData: FormData) {
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 
   const email = formData.get("email") as string;
@@ -130,8 +131,8 @@ export async function resetPassword(formData: FormData) {
 export async function ensureEmployerProfile() {
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 
   const {

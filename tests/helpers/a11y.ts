@@ -1,5 +1,24 @@
 import { expect, type Page } from '@playwright/test';
 
+type AxeNodeResult = {
+  target: string[];
+  html: string;
+  failureSummary: string | null;
+};
+
+type AxeViolation = {
+  id: string;
+  impact: string | null;
+  description: string;
+  help: string;
+  helpUrl: string;
+  nodes: AxeNodeResult[];
+};
+
+type AxeResults = {
+  violations: AxeViolation[];
+};
+
 /**
  * Runs axe-core on the current page and asserts that no WCAG 2.1 AA violations exist.
  * Fails the test with a detailed JSON report when violations are found.
@@ -23,9 +42,12 @@ export async function checkA11y(page: Page) {
     `
   });
 
-  const results = await page.evaluate(async () => {
-    // @ts-ignore – axe is attached to window by the script tag
-    return await (window as any).axe.run({
+  const results = await page.evaluate<AxeResults>(async () => {
+    const axe = (window as Window & {
+      axe: { run: (options: { runOnly: { type: string; values: string[] } }) => Promise<AxeResults> };
+    }).axe;
+
+    return await axe.run({
       runOnly: {
         type: 'tag',
         values: ['wcag2aa'],
@@ -34,13 +56,13 @@ export async function checkA11y(page: Page) {
   });
 
   if (results.violations.length > 0) {
-    const report = results.violations.map((v: any) => ({
+    const report = results.violations.map((v) => ({
       id: v.id,
       impact: v.impact,
       description: v.description,
       help: v.help,
       helpUrl: v.helpUrl,
-      nodes: v.nodes.map((n: any) => ({
+      nodes: v.nodes.map((n) => ({
         target: n.target,
         html: n.html,
         failureSummary: n.failureSummary,

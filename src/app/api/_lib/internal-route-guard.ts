@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireEnv } from "@/lib/runtime-env";
 
 export function requireInternalAdminToken(request: Request) {
-  const configuredToken =
-    process.env.INTERNAL_ADMIN_TOKEN || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const configuredToken = requireEnv("INTERNAL_ADMIN_TOKEN");
   const providedToken = request.headers.get("x-internal-admin-token");
 
   if (!configuredToken || providedToken !== configuredToken) {

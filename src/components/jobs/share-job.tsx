@@ -1,20 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Share2, X, Copy, Mail, Check, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function ShareJobButton({ title }: { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  const hydrated = useHydrated();
+  const url = hydrated ? window.location.href : "";
   const text = `Check out this job: ${title}`;
 
   const handleCopy = async () => {
@@ -57,7 +53,7 @@ export function ShareJobButton({ title }: { title: string }) {
     },
   ];
 
-  if (mounted && typeof navigator !== "undefined" && navigator.share) {
+  if (hydrated && typeof navigator !== "undefined" && navigator.share) {
     return (
       <Button
         variant="ghost"
