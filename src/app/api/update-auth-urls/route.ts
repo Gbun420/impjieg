@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternalAdminToken } from "../_lib/internal-route-guard";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 export async function POST(request: Request) {
   const forbidden = requireInternalAdminToken(request);
@@ -8,8 +9,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const serviceKey = getSupabaseServiceKey();
+    const supabaseUrl = getSupabaseUrl();
     const productionUrl = "https://impjieg.vercel.app";
 
     // Update Supabase auth settings

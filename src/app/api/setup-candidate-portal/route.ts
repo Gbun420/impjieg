@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternalAdminToken } from "../_lib/internal-route-guard";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 const MIGRATION_SQL = `
 -- Candidate profiles for job seekers
@@ -98,12 +99,12 @@ export async function POST(request: Request) {
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/`,
+      `${getSupabaseUrl()}/rest/v1/`,
       {
         method: "GET",
         headers: {
-          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          apikey: getSupabaseServiceKey(),
+          Authorization: `Bearer ${getSupabaseServiceKey()}`,
         },
       }
     );
