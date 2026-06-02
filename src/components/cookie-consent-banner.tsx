@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useCookieConsent, type CookieCategory } from "@/hooks/use-cookie-consent";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -40,7 +41,8 @@ export default function CookieConsentBanner() {
   const [showDetails, setShowDetails] = useState(false);
   const [localConsent, setLocalConsent] = useState(consent);
   const hydrated = useHydrated();
-  if (!hydrated || hasConsented) return null;
+  const pathname = usePathname();
+  if (!hydrated || hasConsented || pathname.startsWith("/admin")) return null;
 
   const handleToggle = (key: CookieCategory) => {
     if (key === "necessary") return;

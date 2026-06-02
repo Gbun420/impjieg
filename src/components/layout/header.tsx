@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
@@ -20,12 +21,16 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isEmployer, setIsEmployer] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isChecking, setIsChecking] = useState(hasSupabasePublicEnv());
   const { theme, toggleTheme } = useTheme();
   const hydrated = useHydrated();
   const router = useRouter();
 
   useEffect(() => {
+    if (!hasSupabasePublicEnv()) {
+      return;
+    }
+
     const supabase = createClient();
 
     const checkAuth = async () => {

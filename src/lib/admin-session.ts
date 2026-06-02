@@ -6,9 +6,14 @@ import { requireEnv } from "@/lib/runtime-env";
 export const ADMIN_SESSION_COOKIE = "impjieg_admin_session";
 const ADMIN_SESSION_MESSAGE = "impjieg-admin-session";
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8;
+const DEV_ADMIN_TOKEN = "local-admin";
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
 
 export function getAdminToken(value = process.env.INTERNAL_ADMIN_TOKEN) {
+  if (process.env.NODE_ENV !== "production" && !value) {
+    return DEV_ADMIN_TOKEN;
+  }
+
   return requireEnv("INTERNAL_ADMIN_TOKEN", value);
 }
 
