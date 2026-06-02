@@ -18,7 +18,6 @@ import {
   Clock,
   ArrowLeft,
   ExternalLink,
-  Trash2,
 } from "lucide-react";
 import { daysAgo } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";

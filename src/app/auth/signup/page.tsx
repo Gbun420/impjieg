@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building2, Mail, Lock, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { Building2, Mail, Lock, AlertCircle } from "lucide-react";
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);

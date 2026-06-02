@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { analyzeJobMatchWithAI, type AIJobMatchAnalysis } from "@/lib/ai-match.service";
+import { analyzeJobMatchWithAI } from "@/lib/ai-match.service";
 
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,6 @@ import {
   Briefcase,
   Banknote,
   Clock,
-  CheckCircle2,
   AlertCircle,
 } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
@@ -49,14 +48,14 @@ export default async function RecommendationsPage() {
     .from("saved_jobs")
     .select("job_id")
     .eq("user_id", user.id);
-  const savedJobIds = (savedJobs || [] as SavedJobRef[]).map((s) => s.job_id);
+  const savedJobIds = ((savedJobs || []) as SavedJobRef[]).map((s) => s.job_id);
 
   // Get applied job IDs to exclude
   const { data: appliedJobs } = await supabase
     .from("candidate_applications")
     .select("job_id")
     .eq("user_id", user.id);
-  const appliedJobIds = (appliedJobs || [] as AppliedJobRef[]).map((a) => a.job_id);
+  const appliedJobIds = ((appliedJobs || []) as AppliedJobRef[]).map((a) => a.job_id);
   const excludedIds = [...savedJobIds, ...appliedJobIds];
 
   // Build query based on profile

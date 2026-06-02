@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,11 +55,9 @@ const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Freelance", "Internshi
 const REMOTE_OPTIONS = ["On-site", "Remote", "Hybrid", "No preference"];
 
 export default function CandidateProfilePage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [profile, setProfile] = useState<CandidateProfileForm | null>(null);
   const [formData, setFormData] = useState<CandidateProfileForm>({
     full_name: "",
     headline: "",
@@ -92,7 +89,6 @@ export default function CandidateProfilePage() {
         const res = await fetch("/api/candidate/profile");
         const data = await res.json();
         if (!cancelled && data.profile) {
-          setProfile(data.profile);
           setFormData({
             full_name: data.profile.full_name || "",
             headline: data.profile.headline || "",

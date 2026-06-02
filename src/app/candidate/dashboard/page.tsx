@@ -27,7 +27,6 @@ import { applyCandidateJobFilters } from "../candidate-queries";
 import type {
   CandidateAlert,
   CandidateApplication,
-  CandidateCv,
   CandidateProfile,
   JobWithEmployer,
 } from "@/lib/supabase/types";
@@ -82,8 +81,6 @@ export default async function CandidateDashboardPage() {
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
-  const cvs = (cvsData || []) as CandidateCv[];
-
   const typedApps = (applications || []) as CandidateApplicationWithJob[];
   const statusCounts = {
     applied: typedApps.filter((a) => a.status === "applied").length,
