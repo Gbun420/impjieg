@@ -14,7 +14,7 @@ import {
   REMOTE_OPTIONS,
   PRICING,
 } from "@/lib/constants";
-import { Sparkles, Loader2, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Sparkles, ShieldCheck, AlertTriangle } from "lucide-react";
 
 export default function PostJobPage() {
   const [isLoading, setIsLoading] = useState(false);
