@@ -201,8 +201,7 @@ export async function POST(request: Request) {
     });
 
     // Update payment with Stripe session ID
-    await supabase
-      .from("payments")
+    await paymentsTable
       .update({
         stripe_checkout_session_id: session.id,
       })
