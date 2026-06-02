@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
   const { applicationId, candidateName, jobTitle, employerPhone } = parsed.data;
 
-  const message = `🔔 New Application on Impjieg\n\n${candidateName} has applied for: ${jobTitle}\n\nLog in to your dashboard to review: https://impjieg.vercel.app/employer/applications`;
+  const message = `🔔 New Application on Impjieg\n\nApplication ID: ${applicationId}\n${candidateName} has applied for: ${jobTitle}\n\nLog in to your dashboard to review: https://impjieg.vercel.app/employer/applications`;
 
   try {
     const result = await sendWhatsAppMessage({

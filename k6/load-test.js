@@ -37,7 +37,6 @@ export const options = {
 
 const BASE_URL = __ENV.TEST_URL || 'https://impjieg.vercel.app';
 
-// Static job slugs for realistic browsing
 const JOB_SLUGS = [
   'software-engineer',
   'frontend-developer',
@@ -118,6 +117,15 @@ export default function () {
     const res = http.get(`${BASE_URL}/about`, { headers });
     check(res, {
       'about page status is 200': (r) => r.status === 200,
+    }) || errorRate.add(1);
+    sleep(Math.random() * 1 + 0.5);
+  });
+
+  group('Company Page', function () {
+    const randomCompany = COMPANY_SLUGS[Math.floor(Math.random() * COMPANY_SLUGS.length)];
+    const res = http.get(`${BASE_URL}/companies/${randomCompany}`, { headers });
+    check(res, {
+      'company page status is 200 or 404': (r) => r.status === 200 || r.status === 404,
     }) || errorRate.add(1);
     sleep(Math.random() * 1 + 0.5);
   });
