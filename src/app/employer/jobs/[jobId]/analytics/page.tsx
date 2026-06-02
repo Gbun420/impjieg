@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye, Users, TrendingUp, Clock, Calendar, MapPin, Briefcase, FileText } from "lucide-react";
-import { formatDate, daysAgo, formatSalary, daysSince, daysUntil } from "@/lib/utils";
+import { ArrowLeft, Eye, Users, TrendingUp, Calendar, FileText } from "lucide-react";
+import { formatDate, formatSalary, daysSince, daysUntil } from "@/lib/utils";
 import type { Job, Application, Employer } from "@/lib/supabase/types";
 
 export default async function JobAnalyticsPage({

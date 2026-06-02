@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Eye, Users, TrendingUp, Calendar, Briefcase, Clock } from "lucide-react";
-import { formatDate, daysAgo, formatSalary, daysSince, daysUntil } from "@/lib/utils";
+import { ArrowLeft, Download, Briefcase } from "lucide-react";
+import { formatDate, formatSalary, daysSince, daysUntil } from "@/lib/utils";
 import type { Job, Application, Employer } from "@/lib/supabase/types";
 
 export default async function JobReportPage({
@@ -54,9 +54,6 @@ export default async function JobReportPage({
 
   const appRate = j.views > 0 ? ((j.applications_count / j.views) * 100).toFixed(1) : "0";
   const daysSincePosted = daysSince(j.created_at);
-  const daysLeft = j.expires_at ? daysUntil(j.expires_at) : 0;
-  const avgApplicationsPerDay = (j.applications_count / daysSincePosted).toFixed(1);
-
   const statusBreakdown = apps.reduce((acc, app) => {
     acc[app.status] = (acc[app.status] || 0) + 1;
     return acc;
