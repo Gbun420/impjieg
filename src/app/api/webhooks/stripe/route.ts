@@ -2,12 +2,14 @@ import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { requireEnv } from "@/lib/runtime-env";
 import type Stripe from "stripe";
 
 function getSupabaseAdmin() {
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
-    process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder"
+    getSupabaseUrl(),
+    getSupabaseServiceKey()
   );
 }
 
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      requireEnv("STRIPE_WEBHOOK_SECRET")
     );
   } catch (err) {
     return NextResponse.json(
