@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Briefcase, Clock, Banknote, ArrowRight } from "lucide-react";
-import { formatSalary, formatDate, daysAgo, addDaysIso } from "@/lib/utils";
+import { formatSalary, daysAgo, addDaysIso } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
 

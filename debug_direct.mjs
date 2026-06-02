@@ -24,7 +24,7 @@ async function run() {
           const text = await response.text();
           console.log(`  Response body:`, text);
         }
-      } catch (_e) {
+      } catch {
         // ignore
       }
     }
@@ -44,7 +44,7 @@ async function run() {
   try {
     await page.waitForURL('**/employer/dashboard', { timeout: 15000 });
     console.log('Redirected successfully to:', page.url());
-  } catch (_err) {
+  } catch {
     console.log('Failed to redirect to dashboard. Current URL:', page.url());
   }
   

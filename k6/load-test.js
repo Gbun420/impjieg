@@ -52,7 +52,7 @@ const COMPANY_SLUGS = [
   'startup-malta',
 ];
 
-export default function () {
+export default function loadTest() {
   const headers = {
     'User-Agent': 'k6-load-test/1.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -60,20 +60,24 @@ export default function () {
 
   group('Homepage', function () {
     const res = http.get(`${BASE_URL}/`, { headers });
-    check(res, {
+    if (!check(res, {
       'homepage status is 200': (r) => r.status === 200,
       'homepage loads under 500ms': (r) => r.timings.duration < 500,
       'homepage contains Impjieg': (r) => r.body.includes('Impjieg'),
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 2 + 1);
   });
 
   group('Browse Jobs', function () {
     const res = http.get(`${BASE_URL}/jobs`, { headers });
-    check(res, {
+    if (!check(res, {
       'jobs page status is 200': (r) => r.status === 200,
       'jobs page loads under 500ms': (r) => r.timings.duration < 500,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 2 + 1);
   });
 
@@ -83,50 +87,62 @@ export default function () {
       `${BASE_URL}/jobs/${randomJob}/${randomJob}`,
       { headers }
     );
-    check(res, {
+    if (!check(res, {
       'job detail status is 200 or 404': (r) => r.status === 200 || r.status === 404,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 2 + 1);
   });
 
   group('Companies', function () {
     const res = http.get(`${BASE_URL}/companies`, { headers });
-    check(res, {
+    if (!check(res, {
       'companies page status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 1 + 0.5);
   });
 
   group('Pricing', function () {
     const res = http.get(`${BASE_URL}/pricing`, { headers });
-    check(res, {
+    if (!check(res, {
       'pricing page status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 1 + 0.5);
   });
 
   group('Salary Calculator', function () {
     const res = http.get(`${BASE_URL}/salary-calculator`, { headers });
-    check(res, {
+    if (!check(res, {
       'calculator page status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 1 + 0.5);
   });
 
   group('About Page', function () {
     const res = http.get(`${BASE_URL}/about`, { headers });
-    check(res, {
+    if (!check(res, {
       'about page status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 1 + 0.5);
   });
 
   group('Company Page', function () {
     const randomCompany = COMPANY_SLUGS[Math.floor(Math.random() * COMPANY_SLUGS.length)];
     const res = http.get(`${BASE_URL}/companies/${randomCompany}`, { headers });
-    check(res, {
+    if (!check(res, {
       'company page status is 200 or 404': (r) => r.status === 200 || r.status === 404,
-    }) || errorRate.add(1);
+    })) {
+      errorRate.add(1);
+    }
     sleep(Math.random() * 1 + 0.5);
   });
 }

@@ -19,7 +19,7 @@ test('debug login flow', async ({ page }) => {
           const text = await response.text();
           console.log(`  Response body:`, text);
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -39,7 +39,7 @@ test('debug login flow', async ({ page }) => {
   try {
     await page.waitForURL('**/employer/dashboard', { timeout: 10000 });
     console.log('Success! Redirected to:', page.url());
-  } catch (err) {
+  } catch {
     console.log('Redirect failed. Current URL:', page.url());
   }
   

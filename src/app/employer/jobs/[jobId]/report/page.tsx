@@ -3,11 +3,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Briefcase } from "lucide-react";
-import { formatDate, formatSalary, daysSince, daysUntil } from "@/lib/utils";
+import { formatDate, formatSalary, daysSince } from "@/lib/utils";
 import type { Job, Application, Employer } from "@/lib/supabase/types";
 
 export default async function JobReportPage({

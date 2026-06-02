@@ -15,6 +15,7 @@ import {
   Banknote,
   Clock,
   AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
 import { applyCandidateJobFilters } from "../candidate-queries";

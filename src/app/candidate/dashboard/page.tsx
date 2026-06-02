@@ -75,12 +75,6 @@ export default async function CandidateDashboardPage() {
     .eq("is_active", true);
   const alerts = (alertsData || []) as CandidateAlert[];
 
-  // Get CVs
-  const { data: cvsData } = await supabase
-    .from("candidate_cvs")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
   const typedApps = (applications || []) as CandidateApplicationWithJob[];
   const statusCounts = {
     applied: typedApps.filter((a) => a.status === "applied").length,
