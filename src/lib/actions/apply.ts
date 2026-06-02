@@ -7,7 +7,6 @@ import { buildEmployerNotificationEmail } from "./apply-helpers";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type {
   Application,
-  CandidateApplication,
   Database,
   Employer,
   Job,
