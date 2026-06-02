@@ -13,17 +13,23 @@ test("getSupabaseUrl prefers configured environment values", () => {
   );
 });
 
-test("getSupabaseUrl falls back to the project default when unset", () => {
-  assert.equal(
-    getSupabaseUrl(""),
-    "https://vmdjxomkmcbewtcyfrlp.supabase.co"
-  );
+test("getSupabaseUrl throws when the public Supabase URL is missing", () => {
+  assert.throws(() => getSupabaseUrl(""), /NEXT_PUBLIC_SUPABASE_URL/);
 });
 
-test("getSupabaseAnonKey falls back to the project public anon key when unset", () => {
-  assert.match(getSupabaseAnonKey(""), /^eyJhbGciOiJIUzI1Ni/);
+test("getSupabaseAnonKey throws when the public Supabase anon key is missing", () => {
+  assert.throws(() => getSupabaseAnonKey(""), /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
 });
 
-test("hasSupabasePublicEnv reports availability when either configured or fallback values exist", () => {
-  assert.equal(hasSupabasePublicEnv(), true);
+test("hasSupabasePublicEnv reports whether the public Supabase config is present", () => {
+  const backupUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const backupAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  assert.equal(hasSupabasePublicEnv(), false);
+
+  process.env.NEXT_PUBLIC_SUPABASE_URL = backupUrl;
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = backupAnonKey;
 });
