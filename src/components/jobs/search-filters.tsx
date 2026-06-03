@@ -52,6 +52,9 @@ function buildQuery(params: {
     searchParams.set("visa", "true");
   }
 
+  searchParams.delete("page");
+  searchParams.delete("pageSize");
+
   return searchParams.toString();
 }
 
