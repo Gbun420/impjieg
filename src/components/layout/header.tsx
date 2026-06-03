@@ -165,10 +165,10 @@ export default function Header() {
             ) : (
               <>
                 <Link href="/auth/login">
-                  <Button variant="ghost" size="sm">Sign In</Button>
+                  <Button variant="ghost" size="sm">Login</Button>
                 </Link>
-                <Link href="/employer/post-job">
-                  <Button variant="primary" size="sm">Post a Job</Button>
+                <Link href="/auth/signup">
+                  <Button variant="primary" size="sm">Sign Up</Button>
                 </Link>
               </>
             )}
@@ -256,15 +256,15 @@ export default function Header() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="ghost" size="md" className="w-full justify-start">
-                      Sign In
+                      Login
                     </Button>
                   </Link>
                   <Link
-                    href="/employer/post-job"
+                    href="/auth/signup"
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="primary" size="md" className="w-full justify-start">
-                      Post a Job
+                      Sign Up
                     </Button>
                   </Link>
                 </>
