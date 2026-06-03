@@ -48,12 +48,31 @@ type AdminClient = {
 
 type CandidateProfileInsert = Database["public"]["Tables"]["candidate_profiles"]["Insert"];
 
-type ServiceClient = {
-  from(table: "employers" | "candidate_profiles"): any;
+type DeleteQuery = {
+  eq(column: "user_id", value: string): Promise<{ error: { message: string } | null }>;
 };
 
-async function deleteEmployerProfile(serviceClient: ServiceClient, userId: string) {
-  const { error } = await serviceClient
+type EmployerMutationTable = {
+  delete(): DeleteQuery;
+};
+
+type CandidateProfilesMutationTable = {
+  delete(): DeleteQuery;
+  insert(values: CandidateProfileInsert[]): {
+    select(): {
+      single(): Promise<{
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
+
+async function deleteEmployerProfile(serviceClient: unknown, userId: string) {
+  const employerTable = serviceClient as {
+    from(table: "employers"): EmployerMutationTable;
+  };
+
+  const { error } = await employerTable
     .from("employers")
     .delete()
     .eq("user_id", userId);
@@ -64,11 +83,15 @@ async function deleteEmployerProfile(serviceClient: ServiceClient, userId: strin
 }
 
 async function createCandidateProfile(
-  serviceClient: ServiceClient,
+  serviceClient: unknown,
   userId: string,
   fullName: string
 ) {
-  const { error: deleteError } = await serviceClient
+  const candidateProfilesTable = serviceClient as {
+    from(table: "candidate_profiles"): CandidateProfilesMutationTable;
+  };
+
+  const { error: deleteError } = await candidateProfilesTable
     .from("candidate_profiles")
     .delete()
     .eq("user_id", userId);
@@ -77,7 +100,7 @@ async function createCandidateProfile(
     throw new Error(deleteError.message);
   }
 
-  const { error } = await serviceClient
+  const { error } = await candidateProfilesTable
     .from("candidate_profiles")
     .insert([
       {
@@ -102,7 +125,7 @@ export async function signupWithAutoConfirm({
 }: {
   adminClient: AdminClient;
   userClient: UserClient;
-  serviceClient: ServiceClient;
+  serviceClient: unknown;
   input: SignupInput;
 }): Promise<SignupResult> {
   const createPayload =
