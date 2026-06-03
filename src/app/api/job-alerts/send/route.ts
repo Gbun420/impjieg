@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { buildJobAlertDigestEmail, jobMatchesAlert } from "@/lib/job-alerts";
+import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
@@ -28,41 +29,14 @@ function isAuthorized(request: Request) {
   return false;
 }
 
-async function sendEmail({
-  to,
-  subject,
-  html,
-}: {
-  to: string;
-  subject: string;
-  html: string;
-}) {
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (!resendApiKey) {
-    return { success: false, reason: "missing_resend_key" } as const;
-  }
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Impjieg <notifications@impjieg.com>",
-      to: [to],
-      subject,
-      html,
-    }),
-  });
-
-  return { success: response.ok } as const;
-}
-
 export async function GET(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const { searchParams } = new URL(request.url);
+  const dryRun = searchParams.get("dryRun") === "true";
+  const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
 
   const supabase = createServiceClient<Database>(
     getSupabaseUrl(),
@@ -73,7 +47,7 @@ export async function GET(request: Request) {
 
   const [{ data: alerts, error: alertsError }, { data: jobs, error: jobsError }] =
     await Promise.all([
-      supabase.from("job_alerts").select("*").eq("is_active", true),
+      supabase.from("job_alerts").select("*").eq("is_active", true).limit(limit),
       supabase
         .from("jobs")
         .select("*, employers!inner(id, name, slug)")
@@ -110,7 +84,12 @@ export async function GET(request: Request) {
       continue;
     }
 
-    const email = buildJobAlertDigestEmail({
+    if (dryRun) {
+      sent += 1;
+      continue;
+    }
+
+    const emailPayload = buildJobAlertDigestEmail({
       alertId: alert.id,
       jobs: matches,
       baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
@@ -118,8 +97,8 @@ export async function GET(request: Request) {
 
     const result = await sendEmail({
       to: alert.email,
-      subject: email.subject,
-      html: email.html,
+      subject: emailPayload.subject,
+      html: emailPayload.html,
     });
 
     if (result.success) {
@@ -129,6 +108,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     success: true,
+    dryRun,
     alertsProcessed: (alerts || []).length,
     sent,
     skipped,

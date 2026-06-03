@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildJobAlertConfirmationEmail } from "@/lib/job-alerts";
+import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
@@ -57,26 +58,17 @@ export async function POST(request: Request) {
 
   const alertId = data?.[0]?.id ?? null;
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (resendApiKey && alertId) {
-    const email = buildJobAlertConfirmationEmail({
+  if (alertId) {
+    const emailPayload = buildJobAlertConfirmationEmail({
       alertId,
       baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
     });
 
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Impjieg <notifications@impjieg.com>",
-        to: [payload.email],
-        subject: email.subject,
-        html: email.html,
-      }),
-    }).catch(() => undefined);
+    await sendEmail({
+      to: payload.email,
+      subject: emailPayload.subject,
+      html: emailPayload.html,
+    });
   }
 
   return NextResponse.json({ success: true, alertId });

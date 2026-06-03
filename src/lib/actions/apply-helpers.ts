@@ -44,3 +44,32 @@ export function buildEmployerNotificationEmail({
     `,
   };
 }
+
+export function buildCandidateConfirmationEmail({
+  candidateName,
+  jobTitle,
+  employerName,
+}: {
+  candidateName: string;
+  jobTitle: string;
+  employerName: string;
+}) {
+  const safeCandidateName = escapeHtml(candidateName);
+  const safeJobTitle = escapeHtml(jobTitle);
+  const safeEmployerName = escapeHtml(employerName);
+
+  return {
+    subject: sanitizeEmailHeader(`Application Received: ${jobTitle} at ${employerName}`),
+    html: `
+      <h2>Application Received</h2>
+      <p>Hi ${safeCandidateName},</p>
+      <p>Thank you for applying for the <strong>${safeJobTitle}</strong> position at <strong>${safeEmployerName}</strong>.</p>
+      <p>The employer has been notified of your application and will contact you directly if they wish to proceed.</p>
+      <p>Good luck with your application!</p>
+      <hr>
+      <p style="font-size:12px;color:#6b7280;">
+        This is an automated confirmation from Impjieg.
+      </p>
+    `,
+  };
+}

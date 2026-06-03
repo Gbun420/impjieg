@@ -3,7 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
-import { buildEmployerNotificationEmail } from "./apply-helpers";
+import { buildEmployerNotificationEmail, buildCandidateConfirmationEmail } from "./apply-helpers";
+import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type {
   Application,
@@ -126,12 +127,13 @@ export async function submitApplication(formData: FormData) {
   // Get job title for notification
   const { data: jobData } = await supabase
     .from("jobs")
-    .select("title")
+    .select("title, employers(name)")
     .eq("id", jobId)
     .single();
-  const job = jobData as Pick<Job, "title"> | null;
+  const job = jobData as (Pick<Job, "title"> & { employers: { name: string } }) | null;
 
   const jobTitleStr = job?.title || "a position";
+  const employerName = job?.employers?.name || "the employer";
 
   let employerEmail: string | null = null;
   if (employer?.user_id) {
@@ -147,36 +149,35 @@ export async function submitApplication(formData: FormData) {
 
   // Send email notification to employer
   if (employer && employer.email_notifications !== false && employerEmail) {
-    try {
-      const resendApiKey = process.env.RESEND_API_KEY;
-      if (resendApiKey) {
-        const emailPayload = buildEmployerNotificationEmail({
-          employerEmail,
-          candidateEmail,
-          candidateName,
-          candidatePhone,
-          coverLetter,
-          cvUrl,
-          jobTitle: jobTitleStr,
-          dashboardUrl: `${process.env.NEXT_PUBLIC_URL}/employer/applications`,
-        });
+    const emailPayload = buildEmployerNotificationEmail({
+      employerEmail,
+      candidateEmail,
+      candidateName,
+      candidatePhone,
+      coverLetter,
+      cvUrl,
+      jobTitle: jobTitleStr,
+      dashboardUrl: `${process.env.NEXT_PUBLIC_URL}/employer/applications`,
+    });
 
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Impjieg <notifications@impjieg.com>",
-            ...emailPayload,
-          }),
-        });
-      }
-    } catch {
-      // Silently fail email notification
-    }
+    await sendEmail({
+      to: employerEmail,
+      subject: emailPayload.subject,
+      html: emailPayload.html,
+      replyTo: candidateEmail,
+    });
   }
+
+  // Send email confirmation to candidate
+  await sendEmail({
+    to: candidateEmail,
+    subject: `Application Received: ${jobTitleStr} at ${employerName}`,
+    html: buildCandidateConfirmationEmail({
+      candidateName,
+      jobTitle: jobTitleStr,
+      employerName,
+    }).html,
+  });
 
   // Send WhatsApp notification if enabled
   if (employer && employer.whatsapp_notifications && employer.whatsapp_number) {
