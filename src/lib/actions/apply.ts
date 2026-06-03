@@ -28,10 +28,11 @@ type ApplicationMutationTable = {
 type CandidateApplicationTable = {
   insert(values: CandidateApplicationInsert[]): Promise<unknown>;
 };
-type JobsMutationTable = {
-  update(values: Database["public"]["Tables"]["jobs"]["Update"]): {
-    eq(column: "id", value: string): Promise<unknown>;
-  };
+type ApplicationCountRpcClient = {
+  rpc(
+    fn: "increment_job_applications_count",
+    args: { job_uuid: string }
+  ): Promise<{ error: { message: string } | null }>;
 };
 
 export async function submitApplication(formData: FormData) {
@@ -102,22 +103,14 @@ export async function submitApplication(formData: FormData) {
     ]);
   }
 
-  // Increment job applications count
-  const { data: currentJob } = await supabase
-    .from("jobs")
-    .select("applications_count")
-    .eq("id", jobId)
-    .single();
+  const { error: applicationCountError } = await (supabase as unknown as ApplicationCountRpcClient).rpc(
+    "increment_job_applications_count",
+    { job_uuid: jobId }
+  );
 
-  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
-
-  await jobsTable
-    .update({
-      applications_count:
-        ((currentJob as { applications_count?: number } | null)
-          ?.applications_count ?? 0) + 1,
-    })
-    .eq("id", jobId);
+  if (applicationCountError) {
+    return { error: applicationCountError.message };
+  }
 
   // Get employer info for notification
   const { data: employerData } = await supabase
