@@ -6,6 +6,10 @@ import {
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type JobAlertUpdate = Database["public"]["Tables"]["job_alerts"]["Update"];
 type JobAlertsUpdateTable = {
   update(values: JobAlertUpdate): {
@@ -24,7 +28,7 @@ type JobAlertUnsubscribeDeps = {
 };
 
 function buildHtmlResponse(status: number, title: string, bodyText: string) {
-  return new Response(`<h1>${title}</h1><p>${bodyText}</p>`, {
+  return new Response(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="font-family: system-ui, -apple-system, sans-serif; line-height: 1.5; max-width: 40rem; margin: 2rem auto; padding: 0 1rem;"><h1>${title}</h1><p>${bodyText}</p></body></html>`, {
     status,
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
@@ -34,9 +38,21 @@ export async function unsubscribeJobAlertWithDeps(
   request: Request,
   deps: JobAlertUnsubscribeDeps
 ) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get("token");
-  const verification = deps.verifyToken?.(token, deps.now?.() ?? Date.now()) ?? verifySignedToken(token);
+  let token: string | null = null;
+  try {
+    const { searchParams } = new URL(request.url);
+    token = searchParams.get("token");
+  } catch {
+    return buildHtmlResponse(
+      400,
+      "Invalid request",
+      "This unsubscribe link is invalid or malformed."
+    );
+  }
+
+  const verification = deps.verifyToken
+    ? deps.verifyToken(token, deps.now?.() ?? Date.now())
+    : verifySignedToken(token, deps.now?.() ?? Date.now());
 
   if (!verification.valid || typeof verification.payload.alertId !== "string") {
     console.warn("job-alert unsubscribe rejected", {
@@ -54,7 +70,7 @@ export async function unsubscribeJobAlertWithDeps(
 
     if (error) {
       console.warn("job-alert unsubscribe update failed", {
-        message: error.message,
+        category: "update_failed",
       });
       return buildHtmlResponse(
         500,
@@ -62,9 +78,9 @@ export async function unsubscribeJobAlertWithDeps(
         "Please try again later."
       );
     }
-  } catch (caughtError) {
+  } catch {
     console.warn("job-alert unsubscribe update threw", {
-      message: caughtError instanceof Error ? caughtError.message : "unknown",
+      category: "unexpected_error",
     });
     return buildHtmlResponse(
       500,
@@ -82,27 +98,41 @@ export async function unsubscribeJobAlertWithDeps(
 
 export async function GET(request: Request) {
   try {
+    const supabaseUrl = getSupabaseUrl();
+    const supabaseServiceKey = getSupabaseServiceKey();
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn("job-alert unsubscribe setup failed", {
+        category: "setup_failed",
+      });
+      return buildHtmlResponse(
+        500,
+        "Unable to unsubscribe alert",
+        "System configuration error. Please try again later."
+      );
+    }
+
     const supabase = createServiceClient<Database>(
-      getSupabaseUrl(),
-      getSupabaseServiceKey()
+      supabaseUrl,
+      supabaseServiceKey
     );
 
     const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsUpdateTable;
 
-    return unsubscribeJobAlertWithDeps(request, {
+    return await unsubscribeJobAlertWithDeps(request, {
       updateAlertById: async (alertId) =>
         jobAlertsTable
           .update({ is_active: false, updated_at: new Date().toISOString() })
           .eq("id", alertId),
     });
-  } catch (caughtError) {
-    console.warn("job-alert unsubscribe setup failed", {
-      message: caughtError instanceof Error ? caughtError.message : "unknown",
+  } catch {
+    console.warn("job-alert unsubscribe unexpected error", {
+      category: "unexpected_error",
     });
     return buildHtmlResponse(
       500,
       "Unable to unsubscribe alert",
-      "Please try again later."
+      "An unexpected error occurred. Please try again later."
     );
   }
 }

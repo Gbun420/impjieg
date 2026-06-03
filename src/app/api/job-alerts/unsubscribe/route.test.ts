@@ -35,6 +35,7 @@ test("unsubscribe route accepts a valid signed token", async () => {
           assert.equal(alertId, "alert_123");
           return { error: null };
         },
+        now: () => 1000,
       }
     );
 
@@ -134,6 +135,7 @@ test("unsubscribe route returns safe error when update fails", async () => {
         updateAlertById: async () => ({
           error: { message: "database unavailable" },
         }),
+        now: () => 1000,
       }
     );
 
