@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,9 @@ export default async function JobReportPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect(`/auth/login?redirect=/employer/jobs/${jobId}/report`);
+  }
 
   const { data: employerData } = await supabase
     .from("employers")
@@ -30,7 +32,9 @@ export default async function JobReportPage({
     .single();
   const employer = employerData as Pick<Employer, "id" | "name"> | null;
 
-  if (!employer) return null;
+  if (!employer) {
+    redirect("/employer/dashboard");
+  }
 
   const { data: job } = await supabase
     .from("jobs")
@@ -39,7 +43,9 @@ export default async function JobReportPage({
     .eq("employer_id", (employer as Employer).id)
     .single();
 
-  if (!job) notFound();
+  if (!job) {
+    redirect("/employer/jobs?error=job-not-found");
+  }
 
   const j = job as Job;
 
