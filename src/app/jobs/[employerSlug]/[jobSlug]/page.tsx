@@ -22,6 +22,7 @@ import { isJobPubliclyLive } from "@/lib/job-visibility";
 import type { CandidateProfile, Database, JobWithEmployer } from "@/lib/supabase/types";
 import ApplyForm from "@/components/jobs/apply-form";
 import { ShareJobButton } from "@/components/jobs/share-job";
+import { SaveJobButton } from "@/components/jobs/save-job-button";
 
 type JobUpdate = Database["public"]["Tables"]["jobs"]["Update"];
 type JobsMutationTable = {
@@ -138,6 +139,15 @@ export default async function JobDetailPage({
    const {
      data: { user },
    } = await supabase.auth.getUser();
+  const { data: savedJob } = user
+    ? await supabase
+        .from("saved_jobs")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("job_id", j.id)
+        .maybeSingle()
+    : { data: null };
+  const isSaved = !!savedJob;
    let candidateMatch: AIJobMatchAnalysis | null = null;
 
    if (user) {
@@ -219,7 +229,15 @@ export default async function JobDetailPage({
                       {j.employers.name}
                     </Link>
                   </div>
-                  <ShareJobButton title={j.title} />
+                  <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+                    <SaveJobButton
+                      jobId={j.id}
+                      saved={isSaved}
+                      authenticated={!!user}
+                      redirectTo={`/jobs/${j.employers.slug}/${j.slug}`}
+                    />
+                    <ShareJobButton title={j.title} />
+                  </div>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">

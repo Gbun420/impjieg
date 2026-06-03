@@ -113,6 +113,7 @@ export default function JobAlertsPage() {
           name="salaryMin"
           type="number"
           placeholder="30000"
+          min="0"
         />
         <Button
           type="submit"

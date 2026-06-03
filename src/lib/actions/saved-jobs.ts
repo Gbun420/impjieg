@@ -38,6 +38,7 @@ export async function saveJob(jobId: string) {
 
   revalidatePath("/jobs");
   revalidatePath("/saved-jobs");
+  revalidatePath("/candidate/dashboard");
   return { success: true };
 }
 
@@ -64,6 +65,7 @@ export async function unsaveJob(jobId: string) {
 
   revalidatePath("/jobs");
   revalidatePath("/saved-jobs");
+  revalidatePath("/candidate/dashboard");
   return { success: true };
 }
 
