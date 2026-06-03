@@ -5,6 +5,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
 import { signupWithAutoConfirm } from "./auth-signup";
 import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
+import { isSuperAdminEmail } from "@/lib/admin-access";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database, Employer } from "@/lib/supabase/types";
 
@@ -30,10 +31,13 @@ export async function signup(formData: FormData) {
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
-    companyName: formData.get("companyName") as string,
+    accountType:
+      (formData.get("accountType") as "candidate" | "employer" | null) ?? "employer",
+    fullName: String(formData.get("fullName") ?? "").trim(),
+    companyName: String(formData.get("companyName") ?? "").trim(),
   };
 
-  if (!data.email || !data.password || !data.companyName) {
+  if (!data.email || !data.password || !data.accountType) {
     return { error: "All fields are required" };
   }
 
@@ -46,9 +50,18 @@ export async function signup(formData: FormData) {
     return { error: "Please enter a valid email address" };
   }
 
+  if (data.accountType === "candidate" && !data.fullName) {
+    return { error: "Full name is required for job seeker accounts" };
+  }
+
+  if (data.accountType === "employer" && !data.companyName) {
+    return { error: "Company name is required for employer accounts" };
+  }
+
   return signupWithAutoConfirm({
     adminClient: serviceSupabase,
     userClient: supabase,
+    serviceClient: serviceSupabase,
     input: data,
   });
 }
@@ -86,6 +99,8 @@ export async function login(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isAdmin = Boolean(user?.email && isSuperAdminEmail(user.email) && user.app_metadata?.role === "admin");
+
   const { data: employer } = user
     ? await serviceSupabase
         .from("employers")
@@ -98,6 +113,7 @@ export async function login(formData: FormData) {
     success: true,
     redirectTo: resolvePostLoginDestination({
       redirectUrl: null,
+      isAdmin,
       hasEmployerProfile: Boolean(employer),
     }),
   };
@@ -118,7 +134,7 @@ export async function resetPassword(formData: FormData) {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/callback?next=/employer/settings`,
+    redirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/callback?next=${encodeURIComponent("/auth/login?message=reset-sent")}`,
   });
 
   if (error) {

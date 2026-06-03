@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isSuperAdminEmail } from "@/lib/admin-access";
 import { clearAdminSession, setAdminSession } from "@/lib/admin-session";
 
 export async function adminLogin(formData: FormData) {
@@ -40,7 +41,7 @@ export async function adminLogin(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user?.app_metadata?.role !== "admin") {
+  if (!user || user.app_metadata?.role !== "admin" || !user.email || !isSuperAdminEmail(user.email)) {
     await supabase.auth.signOut();
     await clearAdminSession(cookieStore);
     return { error: "This account is not authorized for admin access." };

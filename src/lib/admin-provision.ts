@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { normalizeEmail } from "./admin-access";
 
 type AdminUser = {
   id: string;
@@ -48,10 +49,6 @@ export type AdminProvisionClient = {
 
 const ADMIN_APP_METADATA = { role: "admin" } as const;
 const ADMIN_LIST_PAGE_SIZE = 100;
-
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}
 
 function makeTemporaryPassword() {
   return randomBytes(24).toString("hex");

@@ -20,7 +20,7 @@ export default async function AdminLoginPage() {
                 Monitor jobs, employers, applications, and payments from one place.
               </h2>
               <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-                The admin console is designed for quick operational checks: live inventory, account health, payment activity, and the newest platform events.
+                The admin console is designed for quick operational checks: live inventory, account health, payment activity, and the newest platform events. Only approved admin emails can sign in.
               </p>
             </div>
 

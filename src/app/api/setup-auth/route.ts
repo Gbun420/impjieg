@@ -3,7 +3,7 @@ import { requireInternalAdminToken } from "../_lib/internal-route-guard";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 const TRIGGER_SQL = `
--- Auto-create employer profile when a new user signs up
+-- Auto-create the correct portal profile when a new user signs up
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -14,15 +14,24 @@ declare
   v_slug text;
   v_name text;
 begin
-  v_name := coalesce(new.raw_user_meta_data->>'companyName', 'New Employer');
-  v_slug := lower(regexp_replace(v_name, '[^a-zA-Z0-9]+', '-', 'g'));
-  if v_slug = '' then
-    v_slug := 'employer';
-  end if;
-  v_slug := v_slug || '-' || substr(md5(random()::text || clock_timestamp()::text), 1, 4);
+  if new.raw_user_meta_data->>'accountType' = 'employer' then
+    v_name := coalesce(new.raw_user_meta_data->>'companyName', 'New Employer');
+    v_slug := lower(regexp_replace(v_name, '[^a-zA-Z0-9]+', '-', 'g'));
+    if v_slug = '' then
+      v_slug := 'employer';
+    end if;
+    v_slug := v_slug || '-' || substr(md5(random()::text || clock_timestamp()::text), 1, 4);
 
-  insert into public.employers (user_id, name, slug)
-  values (new.id, v_name, v_slug);
+    insert into public.employers (user_id, name, slug)
+    values (new.id, v_name, v_slug);
+  elsif new.raw_user_meta_data->>'accountType' = 'candidate' then
+    insert into public.candidate_profiles (user_id, full_name, is_open_to_work)
+    values (
+      new.id,
+      coalesce(new.raw_user_meta_data->>'fullName', split_part(coalesce(new.email, 'job seeker'), '@', 1)),
+      true
+    );
+  end if;
 
   return new;
 end;

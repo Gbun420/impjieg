@@ -39,13 +39,19 @@ export function applyCandidateJobFilters<T extends FilterQuery>(
 
 export function resolvePostLoginDestination({
   redirectUrl,
+  isAdmin,
   hasEmployerProfile,
 }: {
   redirectUrl: string | null;
+  isAdmin: boolean;
   hasEmployerProfile: boolean;
 }) {
   if (redirectUrl) {
     return redirectUrl;
+  }
+
+  if (isAdmin) {
+    return "/admin/dashboard";
   }
 
   return hasEmployerProfile ? "/employer/dashboard" : "/candidate/dashboard";

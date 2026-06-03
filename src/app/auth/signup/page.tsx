@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building2, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
+import { Building2, Mail, Lock, User, Briefcase, AlertCircle, Loader2 } from "lucide-react";
+
+type AccountType = "candidate" | "employer";
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [needsConfirmation, setNeedsConfirmation] = useState(false);
-  const [email, setEmail] = useState("");
+  const [accountType, setAccountType] = useState<AccountType>("employer");
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
@@ -23,54 +24,13 @@ export default function SignupPage() {
 
     if (result?.error) {
       setError(result.error);
-    } else if (result?.success) {
-      setEmail(formData.get("email") as string);
-      if (result.needsConfirmation) {
-        setNeedsConfirmation(true);
-      } else {
-        router.push("/auth/login?message=signed-up");
-      }
+      return;
     }
-  }
 
-  if (needsConfirmation) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success/10">
-            <Mail className="h-6 w-6 text-success" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Check your email
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We&apos;ve sent a confirmation link to{" "}
-            <span className="font-medium text-foreground">{email}</span>
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Click the link to activate your account and start posting jobs.
-          </p>
-        </div>
-        <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => router.push("/auth/login")}
-          >
-            Back to Sign In
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            Didn&apos;t receive the email? Check your spam folder or{" "}
-            <Link
-              href="/auth/signup"
-              className="text-primary hover:underline"
-            >
-              try again
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
+    if (result?.success) {
+      router.push(result.redirectTo || "/auth/login?message=signed-up");
+      router.refresh();
+    }
   }
 
   return (
@@ -80,7 +40,7 @@ export default function SignupPage() {
           Create your account
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Start posting jobs on Impjieg in minutes
+          One sign-up for job seekers and employers
         </p>
       </div>
 
@@ -92,19 +52,62 @@ export default function SignupPage() {
       )}
 
       <form action={handleSubmit} className="space-y-4">
-        <Input
-          label="Company Name"
-          name="companyName"
-          type="text"
-          placeholder="Acme Ltd"
-          required
-          icon={<Building2 className="h-4 w-4" />}
-        />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Account type</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setAccountType("employer")}
+              className={`rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors ${
+                accountType === "employer"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Briefcase className="mb-2 h-4 w-4" />
+              Employer
+            </button>
+            <button
+              type="button"
+              onClick={() => setAccountType("candidate")}
+              className={`rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors ${
+                accountType === "candidate"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <User className="mb-2 h-4 w-4" />
+              Job seeker
+            </button>
+          </div>
+          <input type="hidden" name="accountType" value={accountType} />
+        </div>
+
+        {accountType === "employer" ? (
+          <Input
+            label="Company Name"
+            name="companyName"
+            type="text"
+            placeholder="Acme Ltd"
+            required
+            icon={<Building2 className="h-4 w-4" />}
+          />
+        ) : (
+          <Input
+            label="Full Name"
+            name="fullName"
+            type="text"
+            placeholder="Jane Doe"
+            required
+            icon={<User className="h-4 w-4" />}
+          />
+        )}
+
         <Input
           label="Email"
           name="email"
           type="email"
-          placeholder="you@company.com"
+          placeholder="you@example.com"
           required
           autoComplete="email"
           icon={<Mail className="h-4 w-4" />}

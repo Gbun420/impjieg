@@ -41,6 +41,7 @@ test("resolvePostLoginDestination prefers explicit redirects", () => {
   assert.equal(
     resolvePostLoginDestination({
       redirectUrl: "/candidate/recommendations",
+      isAdmin: false,
       hasEmployerProfile: true,
     }),
     "/candidate/recommendations"
@@ -51,8 +52,20 @@ test("resolvePostLoginDestination falls back to candidate dashboard when no empl
   assert.equal(
     resolvePostLoginDestination({
       redirectUrl: null,
+      isAdmin: false,
       hasEmployerProfile: false,
     }),
     "/candidate/dashboard"
+  );
+});
+
+test("resolvePostLoginDestination falls back to admin dashboard for super admins", () => {
+  assert.equal(
+    resolvePostLoginDestination({
+      redirectUrl: null,
+      isAdmin: true,
+      hasEmployerProfile: false,
+    }),
+    "/admin/dashboard"
   );
 });
