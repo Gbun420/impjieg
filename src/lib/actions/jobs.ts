@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import type { Database, Employer, Job } from "@/lib/supabase/types";
+import { sanitizeJobDescription } from "@/lib/job-description";
 
 type EmployerRef = Pick<Employer, "id">;
 type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
@@ -66,6 +67,7 @@ export async function createJob(formData: FormData) {
   const applicationEmail = formData.get("applicationEmail") as string;
   const applicationUrl = formData.get("applicationUrl") as string;
   const listingType = formData.get("listingType") as string;
+  const sanitizedDescription = sanitizeJobDescription(description);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
@@ -80,7 +82,7 @@ export async function createJob(formData: FormData) {
         employer_id: typedEmployer.id,
         title,
         slug: jobSlug,
-        description,
+        description: sanitizedDescription,
         location,
         sector,
         job_type: jobType,

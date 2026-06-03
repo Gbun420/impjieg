@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sanitizeJobDescription } from "@/lib/job-description";
 
 export async function POST(request: Request) {
   const { title, sector, jobType, seniority, location, description, skills, benefits } = await request.json();
@@ -23,16 +24,16 @@ ${skills ? `Key Skills: ${skills}` : ""}
 ${benefits ? `Benefits: ${benefits}` : ""}
 ${description ? `Additional context: ${description}` : ""}
 
-Format the response as HTML with the following sections:
+Format the response as plain text with these sections:
 1. A compelling 2-3 sentence role overview
-2. Key Responsibilities (5-7 bullet points as <li> elements)
-3. Requirements & Qualifications (5-7 bullet points as <li> elements)
-4. What We Offer (3-5 bullet points as <li> elements)
+2. Key Responsibilities
+3. Requirements & Qualifications
+4. What We Offer
 
-Wrap each section in <h3> tags for the section title and <ul>/<li> for the bullet points.
+Use short headings followed by bullet points with simple hyphens.
 Keep it concise, professional, and tailored to the Malta job market.
-Do not include any HTML wrapper tags (no <html>, <body>, etc).
-Only return the HTML content for the sections.
+Do not include HTML, Markdown tables, code fences, or tags.
+Only return plain text.
 
 IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focus on skills and competencies, not personal characteristics.`;
 
@@ -48,7 +49,7 @@ IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focu
         messages: [
           {
             role: "system",
-            content: "You are an expert HR writer specializing in creating inclusive, bias-free job descriptions for the Malta job market. Always use gender-neutral language, avoid age-related terms, and focus on skills and competencies. Format output as clean HTML with h3 headings and ul/li lists.",
+            content: "You are an expert HR writer specializing in creating inclusive, bias-free job descriptions for the Malta job market. Always use gender-neutral language, avoid age-related terms, and focus on skills and competencies. Return clean plain text only.",
           },
           { role: "user", content: prompt },
         ],
@@ -64,7 +65,9 @@ IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focu
       return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
     }
 
-    const generatedDescription = data.choices[0].message.content;
+    const generatedDescription = sanitizeJobDescription(
+      data.choices[0].message.content || ""
+    );
 
     return NextResponse.json({ description: generatedDescription });
   } catch (error) {

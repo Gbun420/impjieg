@@ -5,6 +5,7 @@ import { ExternalLink, LogOut, Briefcase, Building2, FileText, Bell, CreditCard,
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { adminNavItems } from "@/components/admin/admin-section-shell";
 import { adminLogout } from "../actions";
 import { getAdminDashboardData } from "@/lib/admin-dashboard";
 import { hasValidAdminSession } from "@/lib/admin-session";
@@ -128,6 +129,24 @@ export default async function AdminDashboardPage() {
             />
           );
         })}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {adminNavItems.slice(0, 6).map((item) => (
+          <Link key={item.href} href={item.href}>
+            <Card className="group h-full border-border/60 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{item.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Open the {item.label.toLowerCase()} console
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </Card>
+          </Link>
+        ))}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">

@@ -23,6 +23,7 @@ import type { CandidateProfile, Database, JobWithEmployer } from "@/lib/supabase
 import ApplyForm from "@/components/jobs/apply-form";
 import { ShareJobButton } from "@/components/jobs/share-job";
 import { SaveJobButton } from "@/components/jobs/save-job-button";
+import { sanitizeJobDescription, sanitizeJobDescriptionForMetadata } from "@/lib/job-description";
 
 type JobUpdate = Database["public"]["Tables"]["jobs"]["Update"];
 type JobsMutationTable = {
@@ -66,7 +67,7 @@ export async function generateMetadata({
 
   return {
     title: employerName ? `${job.title} at ${employerName}` : job.title,
-    description: job.description.substring(0, 160),
+    description: sanitizeJobDescriptionForMetadata(job.description),
   };
 }
 
@@ -75,7 +76,7 @@ function JobPostingSchema({ job }: { job: JobWithEmployer }) {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
     title: job.title,
-    description: job.description.replace(/<[^>]*>/g, ""),
+    description: sanitizeJobDescription(job.description),
     datePosted: job.created_at,
     validThrough: job.expires_at || addDaysIso(30),
     employmentType: job.job_type,
@@ -145,6 +146,7 @@ export default async function JobDetailPage({
     .eq("id", job.id);
 
   const j = job as unknown as JobWithEmployer;
+  const safeDescription = sanitizeJobDescription(j.description);
    const {
      data: { user },
    } = await supabase.auth.getUser();
@@ -353,10 +355,9 @@ export default async function JobDetailPage({
             <h2 className="text-lg font-semibold text-foreground">
               About the Role
             </h2>
-            <div
-              className="prose prose-sm mt-4 max-w-none text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
-              dangerouslySetInnerHTML={{ __html: j.description }}
-            />
+            <div className="mt-4 whitespace-pre-line text-sm leading-7 text-muted-foreground">
+              {safeDescription}
+            </div>
           </div>
 
           {/* Skills */}

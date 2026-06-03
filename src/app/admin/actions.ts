@@ -2,9 +2,12 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { isSuperAdminEmail } from "@/lib/admin-access";
+import { logAdminAction } from "@/lib/admin-audit";
 import { clearAdminSession, setAdminSession } from "@/lib/admin-session";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 export async function adminLogin(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -48,10 +51,38 @@ export async function adminLogin(formData: FormData) {
   }
 
   await setAdminSession(cookieStore);
+  await logAdminAction(
+    createServiceClient(getSupabaseUrl(), getSupabaseServiceKey()),
+    {
+      adminEmail: user.email,
+      action: "admin_login",
+      entityType: "admin_session",
+      entityId: user.id,
+      afterValue: { success: true },
+    }
+  );
   return { success: true };
 }
 
 export async function adminLogout() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.email) {
+    await logAdminAction(
+      createServiceClient(getSupabaseUrl(), getSupabaseServiceKey()),
+      {
+        adminEmail: user.email,
+        action: "admin_logout",
+        entityType: "admin_session",
+        entityId: user.id,
+        afterValue: { success: true },
+      }
+    );
+  }
+
   await clearAdminSession(await cookies());
   redirect("/admin/login");
 }
