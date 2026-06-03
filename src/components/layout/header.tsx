@@ -8,13 +8,12 @@ import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Jobs", href: "/jobs" },
   { label: "Companies", href: "/companies" },
-  { label: "Job Seeker Dashboard", href: "/candidate/dashboard" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -149,12 +148,8 @@ export default function Header() {
               <>
                 <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
                   <Button variant="ghost" size="sm">
-                    {isEmployer ? (
-                      <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
-                    ) : (
-                      <User className="mr-1.5 h-3.5 w-3.5" />
-                    )}
-                    {isEmployer ? "Dashboard" : "Job Seeker Dashboard"}
+                    <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
+                    Dashboard
                   </Button>
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -168,7 +163,7 @@ export default function Header() {
                   <Button variant="ghost" size="sm">Login</Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button variant="primary" size="sm">Sign Up</Button>
+                  <Button variant="primary" size="sm">Post a Job</Button>
                 </Link>
               </>
             )}
@@ -228,12 +223,8 @@ export default function Header() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="ghost" size="md" className="w-full justify-start">
-                      {isEmployer ? (
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                      ) : (
-                        <User className="mr-2 h-4 w-4" />
-                      )}
-                      {isEmployer ? "Dashboard" : "Job Seeker Dashboard"}
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
                     </Button>
                   </Link>
                   <Button
@@ -264,7 +255,7 @@ export default function Header() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="primary" size="md" className="w-full justify-start">
-                      Sign Up
+                      Post a Job
                     </Button>
                   </Link>
                 </>
