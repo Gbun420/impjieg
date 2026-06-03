@@ -55,8 +55,17 @@ export async function generateMetadata({
     return { title: "Job Not Found" };
   }
 
+  const employerRelation = job.employers as
+    | { name?: string }
+    | Array<{ name?: string }>
+    | null
+    | undefined;
+  const employerName = Array.isArray(employerRelation)
+    ? employerRelation[0]?.name
+    : employerRelation?.name;
+
   return {
-    title: `${job.title} at ${job.employers?.[0]?.name}`,
+    title: employerName ? `${job.title} at ${employerName}` : job.title,
     description: job.description.substring(0, 160),
   };
 }

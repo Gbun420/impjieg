@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { SITE } from "@/lib/constants";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,7 @@ export const revalidate = 3600; // Revalidate every hour
 export async function GET() {
   try {
     const supabase = await createClient();
+    const baseUrl = process.env.NEXT_PUBLIC_URL || SITE.url;
     
     // Fetch active jobs with employer information
     const { data: jobs, error } = await supabase
@@ -59,7 +61,7 @@ export async function GET() {
       id: job.id,
       title: job.title,
       description: job.description,
-      url: `${process.env.NEXT_PUBLIC_URL}/jobs/${job.employers.slug}/${job.slug}`,
+      url: `${baseUrl}/jobs/${job.employers.slug}/${job.slug}`,
       location: job.location,
       sector: job.sector,
       job_type: job.job_type,
@@ -76,7 +78,7 @@ export async function GET() {
       employer: {
         id: job.employers.id,
         name: job.employers.name,
-        url: `${process.env.NEXT_PUBLIC_URL}/companies/${job.employers.slug}`,
+        url: `${baseUrl}/companies/${job.employers.slug}`,
         logo: job.employers.logo_url,
         location: job.employers.location,
         website: job.employers.website,

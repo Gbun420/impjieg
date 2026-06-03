@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { SITE } from "@/lib/constants";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
 
+export function escapeXml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
+    const baseUrl = process.env.NEXT_PUBLIC_URL || SITE.url;
     
     // Fetch active jobs with employer information
     const { data: jobs, error } = await supabase
@@ -57,26 +68,26 @@ export async function GET() {
     // Generate RSS XML
     const jobsList = (jobs as JobWithEmployer[] || []).map(job => `
       <item>
-        <title>${job.title}</title>
-        <description>${job.description}</description>
-        <link>${process.env.NEXT_PUBLIC_URL}/jobs/${job.employers.slug}/${job.slug}</link>
-        <guid isPermaLink="false">impjieg-job-${job.id}</guid>
+        <title>${escapeXml(job.title)}</title>
+        <description>${escapeXml(job.description)}</description>
+        <link>${escapeXml(`${baseUrl}/jobs/${job.employers.slug}/${job.slug}`)}</link>
+        <guid isPermaLink="false">impjieg-job-${escapeXml(job.id)}</guid>
         <pubDate>${new Date(job.created_at).toUTCString()}</pubDate>
-        <category>${job.sector}</category>
-        <category>${job.job_type}</category>
-        ${job.salary_min ? `<salary>${job.salary_min}${job.salary_max ? `-${job.salary_max}` : ''}</salary>` : ''}
-        ${job.remote_type ? `<remote_type>${job.remote_type}</remote_type>` : ''}
+        <category>${escapeXml(job.sector)}</category>
+        <category>${escapeXml(job.job_type)}</category>
+        ${job.salary_min ? `<salary>${escapeXml(`${job.salary_min}${job.salary_max ? `-${job.salary_max}` : ''}`)}</salary>` : ''}
+        ${job.remote_type ? `<remote_type>${escapeXml(job.remote_type)}</remote_type>` : ''}
         ${job.visa_friendly ? '<visa_friendly>true</visa_friendly>' : ''}
-        <source>${process.env.NEXT_PUBLIC_URL}</source>
+        <source>${escapeXml(baseUrl)}</source>
       </item>
     `).join('');
 
     const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Impjieg Job Board</title>
-    <link>${process.env.NEXT_PUBLIC_URL}/jobs</link>
-    <description>Latest job opportunities from Impjieg</description>
+    <title>${escapeXml("Impjieg Job Board")}</title>
+    <link>${escapeXml(`${baseUrl}/jobs`)}</link>
+    <description>${escapeXml("Latest job opportunities from Impjieg")}</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${jobsList}

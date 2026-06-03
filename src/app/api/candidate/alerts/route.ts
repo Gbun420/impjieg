@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
+import { z } from "zod";
 
 type CandidateAlertInsert = Database["public"]["Tables"]["candidate_alerts"]["Insert"];
 type CandidateAlertUpdate = Database["public"]["Tables"]["candidate_alerts"]["Update"];
@@ -32,6 +33,19 @@ type CandidateAlertsMutationTable = {
     };
   };
 };
+
+export const candidateAlertInputSchema = z.object({
+  name: z.string().trim().max(255).optional().transform((value) => (value ? value : null)),
+  sectors: z.array(z.string()).default([]).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
+  job_types: z.array(z.string()).default([]).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
+  locations: z.array(z.string()).default([]).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
+  salary_min: z.coerce.number().int().min(0).default(0),
+  remote_type: z.string().trim().max(100).optional().transform((value) => (value ? value : null)),
+  frequency: z.enum(["instant", "daily", "weekly"]).default("daily"),
+  is_active: z.boolean().default(true),
+});
+
+export const candidateAlertUpdateSchema = candidateAlertInputSchema.partial();
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -77,7 +91,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json()) as Omit<CandidateAlertInsert, "user_id">;
+  const parsed = candidateAlertInputSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid alert data",
+        details: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 }
+    );
+  }
 
   const candidateAlertsTable = supabase.from(
     "candidate_alerts"
@@ -87,7 +110,7 @@ export async function POST(request: Request) {
     .insert([
       {
         user_id: user.id,
-        ...body,
+        ...parsed.data,
       } satisfies CandidateAlertInsert,
     ])
     .select()
@@ -118,7 +141,16 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Alert ID required" }, { status: 400 });
   }
 
-  const body = (await request.json()) as CandidateAlertUpdate;
+  const parsed = candidateAlertUpdateSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid alert data",
+        details: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 }
+    );
+  }
 
   const candidateAlertsTable = supabase.from(
     "candidate_alerts"
@@ -126,7 +158,7 @@ export async function PUT(request: Request) {
 
   const { data, error } = await candidateAlertsTable
     .update({
-      ...body,
+      ...parsed.data,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

@@ -193,7 +193,9 @@ export async function POST(request: Request) {
       ],
       mode: "payment",
       success_url: `${process.env.NEXT_PUBLIC_URL}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/employer/${jobId ? `jobs/${jobId}` : ""}`,
+      cancel_url: jobId
+        ? `${process.env.NEXT_PUBLIC_URL}/employer/jobs/${jobId}`
+        : `${process.env.NEXT_PUBLIC_URL}/employer/dashboard`,
       metadata: {
         ...metadata,
         paymentId: payment.id,

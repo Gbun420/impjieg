@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Blog & Career Resources | Impjieg",
+  title: "Blog & Career Resources",
   description: "Career advice, salary guides, and hiring tips for Malta's job market.",
 };
 
