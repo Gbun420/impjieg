@@ -1,21 +1,97 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import {
+  AiSecurityError,
+  buildAiRateLimitKey,
+  ensureLengthWithinLimit,
+  enforceAiRateLimit,
+  normalizePromptText,
+  readJsonBodyWithLimit,
+  type AiAuthenticatedUser,
+} from "@/lib/ai-security";
 
-export async function POST(request: Request) {
-  const { resumeText } = await request.json();
+const parseResumeBodySchema = z.object({
+  resumeText: z.string(),
+});
 
-  if (!resumeText || resumeText.trim().length < 50) {
-    return NextResponse.json(
-      { error: "Resume text is required (minimum 50 characters)" },
-      { status: 400 }
+const MAX_PARSE_RESUME_BODY_BYTES = 32_768;
+const MAX_RESUME_TEXT_CHARS = 20_000;
+const PARSE_RESUME_RATE_LIMIT = 5;
+const PARSE_RESUME_RATE_LIMIT_WINDOW_MS = 60_000;
+
+type ParseResumeDeps = {
+  getUser: () => Promise<AiAuthenticatedUser | null>;
+  fetchImpl: typeof fetch;
+  groqApiKey?: string | undefined;
+  rateLimit?: {
+    limit: number;
+    windowMs: number;
+  };
+};
+
+function buildParseResumeDeps(): ParseResumeDeps {
+  return {
+    getUser: async () => {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      return user ? { id: user.id, email: user.email } : null;
+    },
+    fetchImpl: globalThis.fetch.bind(globalThis),
+    groqApiKey: process.env.GROQ_API_KEY,
+    rateLimit: {
+      limit: PARSE_RESUME_RATE_LIMIT,
+      windowMs: PARSE_RESUME_RATE_LIMIT_WINDOW_MS,
+    },
+  };
+}
+
+async function parseResumeWithDeps(request: Request, deps: ParseResumeDeps) {
+  try {
+    const user = await deps.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    enforceAiRateLimit({
+      key: buildAiRateLimitKey("parse-resume", user, request),
+      limit: deps.rateLimit?.limit ?? PARSE_RESUME_RATE_LIMIT,
+      windowMs: deps.rateLimit?.windowMs ?? PARSE_RESUME_RATE_LIMIT_WINDOW_MS,
+    });
+
+    const payload = parseResumeBodySchema.safeParse(
+      await readJsonBodyWithLimit<Record<string, unknown>>({
+        request,
+        maxBytes: MAX_PARSE_RESUME_BODY_BYTES,
+      })
     );
-  }
 
-  const groqApiKey = process.env.GROQ_API_KEY;
-  if (!groqApiKey) {
-    return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
-  }
+    if (!payload.success) {
+      return NextResponse.json({ error: "Invalid resume data" }, { status: 400 });
+    }
 
-  const prompt = `Parse the following resume/CV text and extract structured information. Return ONLY valid JSON matching this schema:
+    const resumeText = normalizePromptText(payload.data.resumeText);
+    if (resumeText.length < 50) {
+      return NextResponse.json(
+        { error: "Resume text is required (minimum 50 characters)" },
+        { status: 400 }
+      );
+    }
+
+    ensureLengthWithinLimit(
+      resumeText,
+      MAX_RESUME_TEXT_CHARS,
+      "Resume text is too large."
+    );
+
+    if (!deps.groqApiKey) {
+      return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
+    }
+
+    const prompt = `Parse the following resume/CV text and extract structured information. Return ONLY valid JSON matching this schema:
 
 {
   "fullName": "string - the person's full name",
@@ -60,11 +136,10 @@ Rules:
 Resume text:
 ${resumeText}`;
 
-  try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await deps.fetchImpl("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${groqApiKey}`,
+        Authorization: `Bearer ${deps.groqApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -72,7 +147,8 @@ ${resumeText}`;
         messages: [
           {
             role: "system",
-            content: "You are a resume parsing expert. Extract structured data from resumes/CVs. Always return valid JSON only, no additional text.",
+            content:
+              "You are a resume parsing expert. Extract structured data from resumes/CVs. Always return valid JSON only, no additional text.",
           },
           { role: "user", content: prompt },
         ],
@@ -85,15 +161,41 @@ ${resumeText}`;
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Groq API error:", data);
-      return NextResponse.json({ error: "Failed to parse resume" }, { status: 500 });
+      console.error("Groq API error:", response.status);
+      return NextResponse.json({ error: "Failed to parse resume" }, { status: 502 });
     }
 
-    const parsed = JSON.parse(data.choices[0].message.content);
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content !== "string") {
+      return NextResponse.json({ error: "Failed to parse resume" }, { status: 502 });
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return NextResponse.json({ error: "Failed to parse resume" }, { status: 502 });
+    }
 
     return NextResponse.json({ parsed });
   } catch (error) {
+    if (error instanceof AiSecurityError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
     console.error("Resume parsing error:", error);
     return NextResponse.json({ error: "Failed to parse resume" }, { status: 500 });
   }
 }
+
+export async function POST(request: Request) {
+  return parseResumeWithDeps(request, buildParseResumeDeps());
+}
+
+export {
+  MAX_PARSE_RESUME_BODY_BYTES,
+  MAX_RESUME_TEXT_CHARS,
+  PARSE_RESUME_RATE_LIMIT,
+  PARSE_RESUME_RATE_LIMIT_WINDOW_MS,
+  parseResumeWithDeps,
+};
