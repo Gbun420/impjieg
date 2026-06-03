@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import { sanitizeJobDescription } from "@/lib/job-description";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { title, sector, jobType, seniority, location, description, skills, benefits } = await request.json();
 
   if (!title) {

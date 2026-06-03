@@ -29,7 +29,7 @@ test("candidate alert create schema normalizes empty values", () => {
   });
 
   assert.equal(parsed.name, null);
-  assert.deepEqual(parsed.sectors, ["Technology", ""]);
+  assert.deepEqual(parsed.sectors, ["Technology"]);
   assert.equal(parsed.salary_min, 35000);
   assert.equal(parsed.remote_type, null);
   assert.equal(parsed.frequency, "weekly");
