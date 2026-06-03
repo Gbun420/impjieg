@@ -72,14 +72,14 @@ export default async function JobReportPage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-8 flex items-center justify-between" data-print-hide>
-        <Link href={`/employer/jobs/${jobId}/analytics`}>
+      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-print-hide>
+        <Link href={`/employer/jobs/${jobId}/analytics`} className="self-start sm:self-auto">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-1.5 h-4 w-4" />
             Back to Analytics
           </Button>
         </Link>
-        <Button variant="outline" onClick={() => window.print()}>
+        <Button variant="outline" onClick={() => window.print()} className="self-start sm:self-auto">
           <Download className="mr-1.5 h-4 w-4" />
           Print / Save PDF
         </Button>
@@ -87,11 +87,11 @@ export default async function JobReportPage({
 
       {/* Report Header */}
       <div className="mb-8 border-b border-border/50 pb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
             <Briefcase className="h-6 w-6 text-primary" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">{j.title}</h1>
             <p className="text-sm text-muted-foreground">Hiring Report • Generated {generatedAt}</p>
           </div>

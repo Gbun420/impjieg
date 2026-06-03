@@ -223,25 +223,28 @@ export default function CandidateProfilePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/candidate/dashboard">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Dashboard
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            My Profile
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Complete your profile to get better job matches
-          </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <Link href="/candidate/dashboard" className="shrink-0">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Dashboard
+            </Button>
+          </Link>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              My Profile
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Complete your profile to get better job matches
+            </p>
+          </div>
         </div>
         <Button
           variant="primary"
           onClick={handleSave}
           disabled={isSaving}
+          className="self-start sm:self-auto"
         >
           {isSaving ? (
             <>

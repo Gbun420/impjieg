@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 const navLinks = [
   { label: "Jobs", href: "/jobs" },
   { label: "Companies", href: "/companies" },
+  { label: "Job Seeker Dashboard", href: "/candidate/dashboard" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -153,7 +154,7 @@ export default function Header() {
                     ) : (
                       <User className="mr-1.5 h-3.5 w-3.5" />
                     )}
-                    {isEmployer ? "Dashboard" : "My Jobs"}
+                    {isEmployer ? "Dashboard" : "Job Seeker Dashboard"}
                   </Button>
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -232,7 +233,7 @@ export default function Header() {
                       ) : (
                         <User className="mr-2 h-4 w-4" />
                       )}
-                      {isEmployer ? "Dashboard" : "My Jobs"}
+                      {isEmployer ? "Dashboard" : "Job Seeker Dashboard"}
                     </Button>
                   </Link>
                   <Button

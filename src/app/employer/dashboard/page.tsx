@@ -65,8 +65,8 @@ export default async function EmployerDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Welcome back, {employer.name}
           </h1>
@@ -74,7 +74,7 @@ export default async function EmployerDashboardPage() {
             Here&apos;s an overview of your hiring activity
           </p>
         </div>
-        <Link href="/employer/post-job">
+        <Link href="/employer/post-job" className="self-start sm:self-auto">
           <Button variant="primary">
             <PlusCircle className="mr-2 h-4 w-4" />
             Post a New Job

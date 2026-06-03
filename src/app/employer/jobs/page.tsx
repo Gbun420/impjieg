@@ -47,17 +47,17 @@ export default async function EmployerJobsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">My Jobs</h1>
-        <div className="flex gap-2">
-          <Link href="/employer/bulk-upload">
-            <Button variant="outline" size="sm">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/employer/bulk-upload" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
               Bulk Upload
             </Button>
           </Link>
-          <Link href="/employer/post-job">
-            <Button variant="primary">
+          <Link href="/employer/post-job" className="w-full sm:w-auto">
+            <Button variant="primary" className="w-full sm:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" />
               Post a Job
             </Button>

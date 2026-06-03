@@ -5,6 +5,14 @@ const BASE_URL = "https://impjieg.vercel.app";
 const EMAIL = "bundyglenn@gmail.com";
 const PASSWORD = "Floyd420!";
 const OUT_DIR = "output/playwright/impjieg-live-check";
+const EMPLOYER_PAGES = [
+  ["/employer/dashboard", "01-employer-dashboard"],
+  ["/employer/jobs", "02-employer-jobs"],
+  ["/employer/post-job", "03-post-job"],
+  ["/employer/bulk-upload", "04-bulk-upload"],
+  ["/employer/applications", "05-applications"],
+  ["/employer/settings", "06-settings"],
+];
 
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
@@ -27,95 +35,88 @@ async function snapshot(page, name) {
   await page.screenshot({ path: `${OUT_DIR}/${name}.png`, fullPage: true });
 }
 
+async function auditPage(page, path, name, logs) {
+  console.log(`Opening ${path}...`);
+  await page.goto(`${BASE_URL}${path}`, { waitUntil: "networkidle" });
+  console.log(`${path} landed at:`, page.url());
+  const heading = await page.locator("h1").first().textContent().catch(() => "");
+  logs.push(`[${name}] url=${page.url()}`);
+  logs.push(`[${name}] heading=${heading || "(none)"}`);
+  console.log(`${path} heading:`, heading || "(none)");
+  await snapshot(page, name);
+}
+
 async function main() {
   await ensureDir(OUT_DIR);
   const browser = await chromium.launch({ headless: true });
   const logs = [];
 
   try {
-    const context = await browser.newContext({
-      viewport: { width: 1440, height: 1600 },
-    });
-    const page = await context.newPage();
-    attachLogging(page, "employer", logs);
+    for (const [label, viewport, prefix] of [
+      ["employer-desktop", { width: 1440, height: 1600 }, ""],
+      ["employer-mobile", { width: 390, height: 844 }, "m-"],
+    ]) {
+      console.log(`Starting ${label} audit...`);
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
+      attachLogging(page, label, logs);
 
-    console.log("Checking login page...");
-    await page.goto(`${BASE_URL}/auth/login`, { waitUntil: "networkidle" });
-    await page.fill('input[name="email"]', EMAIL);
-    await page.fill('input[name="password"]', PASSWORD);
-    await Promise.all([
-      page.waitForURL("**/employer/dashboard", { timeout: 15000 }),
-      page.click('button[type="submit"]'),
-    ]);
-    console.log("Logged in at:", page.url());
-    console.log("Dashboard heading:", await page.locator("h1").first().textContent());
-    await snapshot(page, "01-employer-dashboard");
+      console.log("Checking login page...");
+      await page.goto(`${BASE_URL}/auth/login`, { waitUntil: "networkidle" });
+      await page.fill('input[name="email"]', EMAIL);
+      await page.fill('input[name="password"]', PASSWORD);
+      await Promise.all([
+        page.waitForURL("**/employer/dashboard", { timeout: 15000 }),
+        page.click('button[type="submit"]'),
+      ]);
+      console.log("Logged in at:", page.url());
+      logs.push(`[${label}] login-landing=${page.url()}`);
+      await snapshot(page, `${prefix}00-after-login`);
 
-    const expectedNav = ["Dashboard", "My Jobs", "Post a Job", "Applications", "Settings"];
-    for (const label of expectedNav) {
-      const visible = await page.getByRole("link", { name: label }).first().isVisible();
-      console.log(`Nav "${label}":`, visible ? "visible" : "missing");
-    }
+      if (label === "employer-mobile") {
+        const menuButton = page.getByRole("button", { name: /Toggle menu/ });
+        const visible = await menuButton.isVisible().catch(() => false);
+        console.log("Mobile menu button visible:", visible);
+        if (visible) {
+          await menuButton.click();
+          await snapshot(page, `${prefix}00-menu-open`);
+          await menuButton.click().catch(() => {});
+        }
+      }
 
-    console.log("Checking employer jobs...");
-    await page.goto(`${BASE_URL}/employer/jobs`, { waitUntil: "networkidle" });
-    console.log("Jobs page heading:", await page.locator("h1").first().textContent());
-    await snapshot(page, "02-employer-jobs");
+      const expectedNav = ["Dashboard", "My Jobs", "Post a Job", "Applications", "Settings"];
+      for (const navLabel of expectedNav) {
+        const visible = await page.getByRole("link", { name: navLabel }).first().isVisible().catch(() => false);
+        console.log(`Nav "${navLabel}":`, visible ? "visible" : "missing");
+      }
 
-    const jobLinks = await page
-      .locator('a[href*="/employer/jobs/"]')
-      .evaluateAll((els) => els.map((el) => el.getAttribute("href")).filter(Boolean));
-    console.log("Employer job links:", JSON.stringify(jobLinks, null, 2));
+      for (const [path, name] of EMPLOYER_PAGES) {
+        await auditPage(page, path, `${prefix}${name}`, logs);
+      }
 
-    if (jobLinks.length > 0) {
+      const jobLinks = await page
+        .locator('a[href*="/employer/jobs/"]')
+        .evaluateAll((els) => els.map((el) => el.getAttribute("href")).filter(Boolean))
+        .catch(() => []);
+      console.log("Employer job links:", JSON.stringify(jobLinks, null, 2));
+
       const analyticsHref = jobLinks.find((href) => href?.includes("/analytics")) || null;
+      const reportHref = jobLinks.find((href) => href?.includes("/report")) || null;
       if (analyticsHref) {
         console.log("Checking analytics route:", analyticsHref);
         await page.goto(`${BASE_URL}${analyticsHref}`, { waitUntil: "networkidle" });
-        await snapshot(page, "03-employer-analytics");
-        console.log("Analytics heading:", await page.locator("h1").first().textContent());
-      } else {
-        console.log("No analytics link surfaced from jobs page.");
+        await snapshot(page, `${prefix}07-analytics`);
+        console.log("Analytics heading:", await page.locator("h1").first().textContent().catch(() => ""));
       }
+      if (reportHref) {
+        console.log("Checking report route:", reportHref);
+        await page.goto(`${BASE_URL}${reportHref}`, { waitUntil: "networkidle" });
+        await snapshot(page, `${prefix}08-report`);
+        console.log("Report heading:", await page.locator("h1").first().textContent().catch(() => ""));
+      }
+
+      await context.close();
     }
-
-    console.log("Checking post job page...");
-    await page.goto(`${BASE_URL}/employer/post-job`, { waitUntil: "networkidle" });
-    await snapshot(page, "04-post-job");
-    const postJobFields = ["Job Title", "Location", "Description"];
-    for (const label of postJobFields) {
-      const fieldVisible = await page.getByLabel(label).first().isVisible().catch(() => false);
-      console.log(`Field "${label}":`, fieldVisible ? "visible" : "missing");
-    }
-
-    console.log("Checking applications page...");
-    await page.goto(`${BASE_URL}/employer/applications`, { waitUntil: "networkidle" });
-    await snapshot(page, "05-applications");
-    console.log("Applications heading:", await page.locator("h1").first().textContent());
-
-    console.log("Checking settings page...");
-    await page.goto(`${BASE_URL}/employer/settings`, { waitUntil: "networkidle" });
-    await snapshot(page, "06-settings");
-    console.log("Settings heading:", await page.locator("h1").first().textContent());
-
-    await context.close();
-
-    const anonContext = await browser.newContext({
-      viewport: { width: 1440, height: 1600 },
-    });
-    const anonPage = await anonContext.newPage();
-    attachLogging(anonPage, "candidate", logs);
-
-    console.log("Checking candidate dashboard redirect...");
-    await anonPage.goto(`${BASE_URL}/candidate/dashboard`, { waitUntil: "networkidle" });
-    await snapshot(anonPage, "07-candidate-dashboard");
-    console.log("Candidate dashboard landed at:", anonPage.url());
-    console.log(
-      "Candidate page heading:",
-      await anonPage.locator("h1").first().textContent().catch(() => "")
-    );
-
-    await anonContext.close();
   } finally {
     await browser.close();
     await fs.writeFile(`${OUT_DIR}/logs.txt`, logs.join("\n") + "\n");

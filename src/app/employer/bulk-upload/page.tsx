@@ -132,7 +132,7 @@ export default function BulkUploadPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
+      <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Bulk Upload Jobs</h1>
         <p className="text-sm text-muted-foreground">
           Upload multiple jobs at once using a CSV file
@@ -140,9 +140,9 @@ export default function BulkUploadPage() {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-foreground">CSV Template</h2>
-          <Button variant="outline" size="sm" onClick={downloadTemplate}>
+          <Button variant="outline" size="sm" onClick={downloadTemplate} className="self-start sm:self-auto">
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Download Template
           </Button>

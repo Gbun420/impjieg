@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { SECTORS } from "@/lib/constants";
+import { cropAndResizeImage } from "@/lib/image-processing";
 import { deriveEmployerProfileCompleteness } from "@/lib/employer-profile-completeness";
 import { updateNotificationSettings } from "@/lib/actions/notifications";
 import { ShieldCheck, ShieldX } from "lucide-react";
@@ -33,6 +34,10 @@ const COMPANY_SIZES = [
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [isDraggingCover, setIsDraggingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [name, setName] = useState("");
@@ -51,6 +56,81 @@ export default function SettingsPage() {
   const [whatsappNotifications, setWhatsappNotifications] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isVerified, setIsVerified] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement | null>(null);
+  const coverFileRef = useRef<HTMLInputElement | null>(null);
+
+  async function uploadAsset(kind: "logo" | "cover", file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(false);
+    if (kind === "logo") {
+      setIsUploadingLogo(true);
+    } else {
+      setIsUploadingCover(true);
+    }
+
+    try {
+      const processedFile = await cropAndResizeImage(file, kind);
+      const formData = new FormData();
+      formData.append("kind", kind);
+      formData.append("file", processedFile);
+
+      const response = await fetch("/api/employer/assets/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to upload image");
+      }
+
+      if (kind === "logo") {
+        setLogoUrl(data.url);
+      } else {
+        setCoverImageUrl(data.url);
+      }
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Failed to upload image");
+    } finally {
+      if (kind === "logo") {
+        setIsUploadingLogo(false);
+      } else {
+        setIsUploadingCover(false);
+      }
+    }
+  }
+
+  function setDragState(kind: "logo" | "cover", active: boolean) {
+    if (kind === "logo") {
+      setIsDraggingLogo(active);
+    } else {
+      setIsDraggingCover(active);
+    }
+  }
+
+  function handleAssetDrag(
+    kind: "logo" | "cover",
+    event: React.DragEvent<HTMLDivElement>
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragState(kind, event.type === "dragenter" || event.type === "dragover");
+  }
+
+  function handleAssetDrop(
+    kind: "logo" | "cover",
+    event: React.DragEvent<HTMLDivElement>
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragState(kind, false);
+    void uploadAsset(kind, event.dataTransfer.files?.[0] ?? null);
+  }
 
   useEffect(() => {
     async function loadEmployer() {
@@ -94,7 +174,7 @@ export default function SettingsPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    setSuccess(false);
+      setSuccess(false);
 
     const supabase = createClient();
     const {
@@ -108,10 +188,10 @@ export default function SettingsPage() {
 
     const result = await employersTable
       .update({
-        name,
-        description,
-        website,
-        location,
+      name,
+      description,
+      website,
+      location,
         logo_url: logoUrl,
         cover_image_url: coverImageUrl,
         company_size: companySize || null,
@@ -153,6 +233,15 @@ export default function SettingsPage() {
     response_time_days: responseTimeDays ? parseInt(responseTimeDays, 10) : null,
   });
 
+  const logoFallback = `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+      <rect width="128" height="128" rx="24" fill="#f3f4f6"/>
+      <text x="64" y="76" font-family="Arial, sans-serif" font-size="52" font-weight="700" text-anchor="middle" fill="#6b7280">${
+        name?.charAt(0)?.toUpperCase() || "L"
+      }</text>
+    </svg>`
+  )}`;
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Company Profile</h1>
@@ -179,19 +268,162 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-foreground">
             Branding
           </h2>
-          <div className="mt-4 space-y-4">
-            <Input
-              label="Cover Image URL"
-              value={coverImageUrl}
-              onChange={(e) => setCoverImageUrl(e.target.value)}
-              placeholder="https://example.com/cover.jpg"
-            />
-            <Input
-              label="Logo URL"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://example.com/logo.png"
-            />
+          <div className="mt-4 space-y-5">
+            <div className="space-y-3">
+              <Input
+                label="Cover Image URL"
+                value={coverImageUrl}
+                onChange={(e) => setCoverImageUrl(e.target.value)}
+                placeholder="https://example.com/cover.jpg"
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => coverFileRef.current?.click()}
+                  isLoading={isUploadingCover}
+                >
+                  Upload cover image
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  Auto-cropped to 1600 x 900 before upload
+                </span>
+              </div>
+              <div
+                className={`rounded-2xl border border-dashed p-4 transition-colors ${
+                  isDraggingCover
+                    ? "border-primary bg-primary/5"
+                    : "border-border/60 bg-muted/20"
+                }`}
+                onDragEnter={(event) => handleAssetDrag("cover", event)}
+                onDragOver={(event) => handleAssetDrag("cover", event)}
+                onDragLeave={() => setDragState("cover", false)}
+                onDrop={(event) => handleAssetDrop("cover", event)}
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Drag and drop a cover image
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Or choose a file from your device. The uploaded file will
+                      replace the URL field.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => coverFileRef.current?.click()}
+                    isLoading={isUploadingCover}
+                  >
+                    Choose file
+                  </Button>
+                </div>
+              </div>
+              <input
+                ref={coverFileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  void uploadAsset("cover", e.target.files?.[0] ?? null);
+                  e.currentTarget.value = "";
+                }}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Input
+                label="Logo URL"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://example.com/logo.png"
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logoFileRef.current?.click()}
+                  isLoading={isUploadingLogo}
+                >
+                  Upload logo
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  Auto-cropped to 512 x 512 before upload
+                </span>
+              </div>
+              <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-muted/20 p-3">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-background">
+                  {logoUrl ? (
+                    <img
+                      src={logoUrl}
+                      alt="Logo preview"
+                      className="h-full w-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.src = logoFallback;
+                      }}
+                    />
+                  ) : (
+                    <span className="text-lg font-semibold text-muted-foreground">
+                      {name?.charAt(0)?.toUpperCase() || "L"}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    Logo thumbnail preview
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    This reflects the URL field and the uploaded file result.
+                  </p>
+                </div>
+              </div>
+              <div
+                className={`rounded-2xl border border-dashed p-4 transition-colors ${
+                  isDraggingLogo
+                    ? "border-primary bg-primary/5"
+                    : "border-border/60 bg-muted/20"
+                }`}
+                onDragEnter={(event) => handleAssetDrag("logo", event)}
+                onDragOver={(event) => handleAssetDrag("logo", event)}
+                onDragLeave={() => setDragState("logo", false)}
+                onDrop={(event) => handleAssetDrop("logo", event)}
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Drag and drop a logo
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Or choose a file from your device. The uploaded file will
+                      replace the URL field.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => logoFileRef.current?.click()}
+                    isLoading={isUploadingLogo}
+                  >
+                    Choose file
+                  </Button>
+                </div>
+              </div>
+              <input
+                ref={logoFileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  void uploadAsset("logo", e.target.files?.[0] ?? null);
+                  e.currentTarget.value = "";
+                }}
+              />
+            </div>
           </div>
         </div>
       </Card>

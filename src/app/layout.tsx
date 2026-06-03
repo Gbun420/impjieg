@@ -108,7 +108,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <ThemeProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pb-[var(--cookie-banner-space,0px)]">{children}</main>
           <Footer />
           <CookieConsentBanner />
         </ThemeProvider>
