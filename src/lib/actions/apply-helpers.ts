@@ -1,3 +1,5 @@
+import { escapeHtml, sanitizeEmailHeader, safeUrlHref } from "@/lib/email-security";
+
 export function buildEmployerNotificationEmail({
   employerEmail,
   candidateEmail,
@@ -17,20 +19,28 @@ export function buildEmployerNotificationEmail({
   jobTitle: string;
   dashboardUrl: string;
 }) {
+  const safeCandidateName = escapeHtml(candidateName);
+  const safeCandidateEmail = escapeHtml(candidateEmail);
+  const safeCandidatePhone = candidatePhone ? escapeHtml(candidatePhone) : null;
+  const safeJobTitle = escapeHtml(jobTitle);
+  const safeCoverLetter = coverLetter ? escapeHtml(coverLetter).replace(/\n/g, "<br>") : null;
+  const safeCvUrl = cvUrl ? safeUrlHref(cvUrl) : null;
+  const safeDashboardUrl = safeUrlHref(dashboardUrl, "https://impjieg.vercel.app");
+
   return {
-    to: [employerEmail],
-    replyTo: [candidateEmail],
-    subject: `New Application: ${candidateName} applied for ${jobTitle}`,
+    to: [sanitizeEmailHeader(employerEmail)],
+    replyTo: [sanitizeEmailHeader(candidateEmail)],
+    subject: sanitizeEmailHeader(`New Application: ${candidateName} applied for ${jobTitle}`),
     html: `
       <h2>New Application Received</h2>
-      <p><strong>Candidate:</strong> ${candidateName}</p>
-      <p><strong>Email:</strong> ${candidateEmail}</p>
-      ${candidatePhone ? `<p><strong>Phone:</strong> ${candidatePhone}</p>` : ""}
-      <p><strong>Job:</strong> ${jobTitle}</p>
-      ${coverLetter ? `<h3>Cover Letter</h3><p>${coverLetter.replace(/\n/g, "<br>")}</p>` : ""}
-      ${cvUrl ? `<p><a href="${cvUrl}">View CV</a></p>` : ""}
+      <p><strong>Candidate:</strong> ${safeCandidateName}</p>
+      <p><strong>Email:</strong> ${safeCandidateEmail}</p>
+      ${safeCandidatePhone ? `<p><strong>Phone:</strong> ${safeCandidatePhone}</p>` : ""}
+      <p><strong>Job:</strong> ${safeJobTitle}</p>
+      ${safeCoverLetter ? `<h3>Cover Letter</h3><p>${safeCoverLetter}</p>` : ""}
+      ${safeCvUrl ? `<p><a href="${safeCvUrl}">View CV</a></p>` : ""}
       <hr>
-      <p><a href="${dashboardUrl}">View in Dashboard</a></p>
+      <p><a href="${safeDashboardUrl}">View in Dashboard</a></p>
     `,
   };
 }

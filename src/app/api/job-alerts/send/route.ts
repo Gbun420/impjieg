@@ -111,7 +111,6 @@ export async function GET(request: Request) {
     }
 
     const email = buildJobAlertDigestEmail({
-      email: alert.email,
       alertId: alert.id,
       jobs: matches,
       baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",

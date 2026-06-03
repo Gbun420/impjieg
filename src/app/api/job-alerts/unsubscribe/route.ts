@@ -1,30 +1,69 @@
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import {
+  verifySignedToken,
+  type VerifiedSignedToken,
+} from "@/lib/email-security";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlertUpdate = Database["public"]["Tables"]["job_alerts"]["Update"];
 type JobAlertsUpdateTable = {
   update(values: JobAlertUpdate): {
-    eq(column: "id", value: string): {
-      eq(column: "email", value: string): Promise<{
-        error: { message: string } | null;
-      }>;
-    };
+    eq(column: "id", value: string): Promise<{
+      error: { message: string } | null;
+    }>;
   };
 };
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  const email = searchParams.get("email");
+type JobAlertUnsubscribeDeps = {
+  verifyToken?: (token: string | null, now?: number) => VerifiedSignedToken;
+  updateAlertById: (alertId: string) => Promise<{
+    error: { message: string } | null;
+  }>;
+  now?: () => number;
+};
 
-  if (!id || !email) {
-    return new Response("<h1>Invalid unsubscribe link</h1>", {
-      status: 400,
-      headers: { "Content-Type": "text/html; charset=utf-8" },
-    });
+function buildHtmlResponse(status: number, title: string, bodyText: string) {
+  return new Response(`<h1>${title}</h1><p>${bodyText}</p>`, {
+    status,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+}
+
+export async function unsubscribeJobAlertWithDeps(
+  request: Request,
+  deps: JobAlertUnsubscribeDeps
+) {
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+  const verification = deps.verifyToken?.(token, deps.now?.() ?? Date.now()) ?? verifySignedToken(token);
+
+  if (!verification.valid || typeof verification.payload.alertId !== "string") {
+    return buildHtmlResponse(
+      400,
+      "Invalid unsubscribe link",
+      "This unsubscribe link is invalid or expired."
+    );
   }
 
+  const { error } = await deps.updateAlertById(verification.payload.alertId);
+
+  if (error) {
+    return buildHtmlResponse(
+      500,
+      "Unable to unsubscribe alert",
+      "Please try again later."
+    );
+  }
+
+  return buildHtmlResponse(
+    200,
+    "Job alert unsubscribed",
+    "You will no longer receive emails for this alert."
+  );
+}
+
+export async function GET(request: Request) {
   const supabase = createServiceClient<Database>(
     getSupabaseUrl(),
     getSupabaseServiceKey()
@@ -32,23 +71,10 @@ export async function GET(request: Request) {
 
   const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsUpdateTable;
 
-  const { error } = await jobAlertsTable
-    .update({ is_active: false, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("email", email);
-
-  if (error) {
-    return new Response("<h1>Unable to unsubscribe alert</h1>", {
-      status: 500,
-      headers: { "Content-Type": "text/html; charset=utf-8" },
-    });
-  }
-
-  return new Response(
-    "<h1>Job alert unsubscribed</h1><p>You will no longer receive emails for this alert.</p>",
-    {
-      status: 200,
-      headers: { "Content-Type": "text/html; charset=utf-8" },
-    }
-  );
+  return unsubscribeJobAlertWithDeps(request, {
+    updateAlertById: async (alertId) =>
+      jobAlertsTable
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq("id", alertId),
+  });
 }

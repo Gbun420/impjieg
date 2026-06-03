@@ -60,7 +60,6 @@ export async function POST(request: Request) {
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey && alertId) {
     const email = buildJobAlertConfirmationEmail({
-      email: payload.email,
       alertId,
       baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
     });

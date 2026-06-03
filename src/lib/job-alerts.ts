@@ -1,3 +1,10 @@
+import {
+  buildAbsoluteUrl,
+  buildJobAlertUnsubscribeUrl,
+  escapeHtml,
+  safeUrlHref,
+} from "@/lib/email-security";
+
 type AlertFilter = {
   sectors: string[];
   job_type: string | null;
@@ -52,29 +59,29 @@ export function jobMatchesAlert(alert: AlertFilter, job: JobForAlert) {
 }
 
 export function buildJobAlertDigestEmail({
-  email,
   alertId,
   jobs,
   baseUrl,
 }: {
-  email: string;
   alertId: string;
   jobs: JobDigestItem[];
   baseUrl: string;
 }) {
-  const unsubscribeUrl = `${baseUrl}/api/job-alerts/unsubscribe?id=${encodeURIComponent(alertId)}&email=${encodeURIComponent(email)}`;
+  const unsubscribeUrl = buildJobAlertUnsubscribeUrl({ baseUrl, alertId });
+  const browseJobsUrl = buildAbsoluteUrl(baseUrl, "/jobs");
 
   const jobsHtml = jobs
     .map((job) => {
       const salary = job.salaryMin
         ? `${formatSalary(job.salaryMin)}${job.salaryMax ? ` - ${formatSalary(job.salaryMax)}` : "+"}`
         : "Salary not specified";
+      const jobUrl = safeUrlHref(job.url, "#");
 
       return `
         <li style="margin-bottom:16px;">
-          <a href="${job.url}" style="font-weight:600;color:#111827;text-decoration:none;">${job.title}</a><br>
-          <span style="color:#4b5563;">${job.employerName} · ${job.location} · ${job.jobType}${job.remoteType ? ` · ${job.remoteType}` : ""}</span><br>
-          <span style="color:#0f766e;">${salary}</span>
+          <a href="${jobUrl}" style="font-weight:600;color:#111827;text-decoration:none;">${escapeHtml(job.title)}</a><br>
+          <span style="color:#4b5563;">${escapeHtml(job.employerName)} · ${escapeHtml(job.location)} · ${escapeHtml(job.jobType)}${job.remoteType ? ` · ${escapeHtml(job.remoteType)}` : ""}</span><br>
+          <span style="color:#0f766e;">${escapeHtml(salary)}</span>
         </li>
       `;
     })
@@ -88,7 +95,7 @@ export function buildJobAlertDigestEmail({
       <ul style="padding-left:18px;">
         ${jobsHtml}
       </ul>
-      <p><a href="${baseUrl}/jobs">Browse all jobs on Impjieg</a></p>
+      <p><a href="${browseJobsUrl}">Browse all jobs on Impjieg</a></p>
       <hr>
       <p style="font-size:12px;color:#6b7280;">
         You are receiving this email because you created a job alert on Impjieg.
@@ -99,22 +106,21 @@ export function buildJobAlertDigestEmail({
 }
 
 export function buildJobAlertConfirmationEmail({
-  email,
   alertId,
   baseUrl,
 }: {
-  email: string;
   alertId: string;
   baseUrl: string;
 }) {
-  const unsubscribeUrl = `${baseUrl}/api/job-alerts/unsubscribe?id=${encodeURIComponent(alertId)}&email=${encodeURIComponent(email)}`;
+  const unsubscribeUrl = buildJobAlertUnsubscribeUrl({ baseUrl, alertId });
+  const browseJobsUrl = buildAbsoluteUrl(baseUrl, "/jobs");
 
   return {
     subject: "Your Impjieg job alert is active",
     html: `
       <h2>Your job alert is active</h2>
       <p>We will email you when new jobs match your alert preferences.</p>
-      <p><a href="${baseUrl}/jobs">Browse the latest jobs</a></p>
+      <p><a href="${browseJobsUrl}">Browse the latest jobs</a></p>
       <hr>
       <p style="font-size:12px;color:#6b7280;">
         If you no longer want these alerts, you can

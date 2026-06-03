@@ -77,6 +77,8 @@ export async function updateApplicationStatus(applicationId: string, status: str
 
 export async function sendCandidateEmail(applicationId: string, subject: string, message: string) {
   const supabase = await createClient();
+  void subject;
+  void message;
 
   const {
     data: { user },
@@ -99,10 +101,6 @@ export async function sendCandidateEmail(applicationId: string, subject: string,
   if (!application) {
     return { error: "Application not found" };
   }
-
-  // In production, integrate with Resend/SendGrid
-  // For now, log the email (or use mailto: link in UI)
-  console.log(`Email to ${application.candidate_email}:`, { subject, message });
 
   return { success: true, email: application.candidate_email };
 }
