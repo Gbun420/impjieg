@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
   <g>
-    <path d="M4 8L12 16L4 24" stroke="#00D4AA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="20" y="28" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="24" fill="#0A2540">impjieg</text>
+    <path d="M4 8L12 16L4 24" stroke="#7C3AED" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="20" y="28" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="24" fill="#0F0B1A">impjieg</text>
     <circle cx="176" cy="12" r="4" fill="#FF6B4A"/>
   </g>
 </svg>

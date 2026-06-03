@@ -1,0 +1,12 @@
+Write a k6 script (k6/checkout.test.js) that simulates 150 virtual users
+performing the checkout flow on https://impjieg.vercel.app.
+
+Steps:
+1. GET /api/products/:id (choose a random ID from a static list).
+2. POST /api/cart with the selected product ID.
+3. POST /api/checkout with a mock payment payload.
+
+Collect the 95th-percentile response time for each request. Fail the script
+with a non-zero exit status if any request exceeds 800 ms.
+
+Add a top-comment containing a link to the official k6 documentation.

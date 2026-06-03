@@ -22,6 +22,14 @@ export interface Database {
           location: string | null;
           company_size: string | null;
           industry: string | null;
+          culture_summary: string | null;
+          hiring_process: string | null;
+          workplace_highlights: string[];
+          response_time_days: number | null;
+          is_verified: boolean | null;
+          email_notifications: boolean | null;
+          whatsapp_notifications: boolean | null;
+          whatsapp_number: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -37,6 +45,14 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          culture_summary?: string | null;
+          hiring_process?: string | null;
+          workplace_highlights?: string[];
+          response_time_days?: number | null;
+          is_verified?: boolean | null;
+          email_notifications?: boolean | null;
+          whatsapp_notifications?: boolean | null;
+          whatsapp_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -52,6 +68,14 @@ export interface Database {
           location?: string | null;
           company_size?: string | null;
           industry?: string | null;
+          culture_summary?: string | null;
+          hiring_process?: string | null;
+          workplace_highlights?: string[];
+          response_time_days?: number | null;
+          is_verified?: boolean | null;
+          email_notifications?: boolean | null;
+          whatsapp_notifications?: boolean | null;
+          whatsapp_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -136,47 +160,53 @@ export interface Database {
           updated_at?: string;
         };
       };
-      applications: {
-        Row: {
-          id: string;
-          job_id: string;
-          employer_id: string;
-          candidate_name: string;
-          candidate_email: string;
-          candidate_phone: string | null;
-          candidate_cv_url: string | null;
-          cover_letter: string | null;
-          status: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          job_id: string;
-          employer_id: string;
-          candidate_name: string;
-          candidate_email: string;
-          candidate_phone?: string | null;
-          candidate_cv_url?: string | null;
-          cover_letter?: string | null;
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          job_id?: string;
-          employer_id?: string;
-          candidate_name?: string;
-          candidate_email?: string;
-          candidate_phone?: string | null;
-          candidate_cv_url?: string | null;
-          cover_letter?: string | null;
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
+       applications: {
+         Row: {
+           id: string;
+           job_id: string;
+           employer_id: string;
+           candidate_name: string;
+           candidate_email: string;
+           candidate_phone: string | null;
+           candidate_cv_url: string | null;
+           cover_letter: string | null;
+           status: string;
+           recruiter_notes: string | null;
+           scorecard_data: Json | null;
+           created_at: string;
+           updated_at: string;
+         };
+         Insert: {
+           id?: string;
+           job_id: string;
+           employer_id: string;
+           candidate_name: string;
+           candidate_email: string;
+           candidate_phone?: string | null;
+           candidate_cv_url?: string | null;
+           cover_letter?: string | null;
+           status?: string;
+           recruiter_notes?: string | null;
+           scorecard_data?: Json | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+         Update: {
+           id?: string;
+           job_id?: string;
+           employer_id?: string;
+           candidate_name?: string;
+           candidate_email?: string;
+           candidate_phone?: string | null;
+           candidate_cv_url?: string | null;
+           cover_letter?: string | null;
+           status?: string;
+           recruiter_notes?: string | null;
+           scorecard_data?: Json | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+       };
       payments: {
         Row: {
           id: string;
@@ -259,6 +289,347 @@ export interface Database {
           updated_at?: string;
         };
       };
+       saved_jobs: {
+         Row: {
+           id: string;
+           user_id: string;
+           job_id: string;
+           created_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           user_id: string;
+           job_id: string;
+           created_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           user_id?: string;
+           job_id?: string;
+           created_at?: string | null;
+         };
+       };
+       subscriptions: {
+         Row: {
+           id: string;
+           employer_id: string;
+           plan_type: "basic" | "professional" | "enterprise";
+           billing_cycle: "monthly" | "annual";
+           status: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end: string | null;
+           trial_end: string | null;
+           job_credits_used: number;
+           job_credits_reset_date: string | null;
+           created_at: string;
+           updated_at: string;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           plan_type?: "basic" | "professional" | "enterprise";
+           billing_cycle?: "monthly" | "annual";
+           status?: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end?: string | null;
+           trial_end?: string | null;
+           job_credits_used?: number;
+           job_credits_reset_date?: string | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           plan_type?: "basic" | "professional" | "enterprise";
+           billing_cycle?: "monthly" | "annual";
+           status?: "active" | "canceled" | "past_due" | "trialing";
+           current_period_end?: string | null;
+           trial_end?: string | null;
+           job_credits_used?: number;
+           job_credits_reset_date?: string | null;
+           created_at?: string;
+           updated_at?: string;
+         };
+       };
+       subscription_job_credits: {
+         Row: {
+           id: string;
+           subscription_id: string;
+           job_id: string | null;
+           credit_type: "standard" | "featured";
+           used_at: string;
+         };
+         Insert: {
+           id?: string;
+           subscription_id: string;
+           job_id?: string | null;
+           credit_type?: "standard" | "featured";
+           used_at?: string;
+         };
+         Update: {
+           id?: string;
+           subscription_id?: string;
+           job_id?: string | null;
+           credit_type?: "standard" | "featured";
+           used_at?: string;
+         };
+       };
+       credit_packs: {
+         Row: {
+           id: string;
+           employer_id: string;
+           pack_type: "starter" | "standard" | "premium";
+           credits_purchased: number;
+           credits_remaining: number;
+           purchased_at: string;
+           expires_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           pack_type?: "starter" | "standard" | "premium";
+           credits_purchased?: number;
+           credits_remaining?: number;
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           pack_type?: "starter" | "standard" | "premium";
+           credits_purchased?: number;
+           credits_remaining?: number;
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+       };
+       promotion_bundles: {
+         Row: {
+           id: string;
+           employer_id: string;
+           job_id: string;
+           bundle_type: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at: string;
+           expires_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           job_id?: string;
+           bundle_type?: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           job_id?: string;
+           bundle_type?: "featuredBoost" | "socialPromotion" | "emailBlast";
+           purchased_at?: string;
+           expires_at?: string | null;
+         };
+       };
+       screening_services: {
+         Row: {
+           id: string;
+           employer_id: string;
+           application_id: string;
+           service_type: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status: "pending" | "completed" | "failed";
+           result: Json | null;
+           purchased_at: string;
+           completed_at: string | null;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           application_id?: string;
+           service_type?: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status?: "pending" | "completed" | "failed";
+           result?: Json | null;
+           purchased_at?: string;
+           completed_at?: string | null;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           application_id?: string;
+           service_type?: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+           status?: "pending" | "completed" | "failed";
+           result?: Json | null;
+           purchased_at?: string;
+           completed_at?: string | null;
+         };
+       };
+       candidate_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          full_name: string | null;
+          headline: string | null;
+          bio: string | null;
+          phone: string | null;
+          location: string | null;
+          website: string | null;
+          linkedin_url: string | null;
+          skills: string[];
+          experience_years: number | null;
+          desired_salary_min: number | null;
+          desired_salary_max: number | null;
+          job_types: string[];
+          sectors: string[];
+          remote_preference: string | null;
+          is_open_to_work: boolean | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          full_name?: string | null;
+          headline?: string | null;
+          bio?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          website?: string | null;
+          linkedin_url?: string | null;
+          skills?: string[];
+          experience_years?: number | null;
+          desired_salary_min?: number | null;
+          desired_salary_max?: number | null;
+          job_types?: string[];
+          sectors?: string[];
+          remote_preference?: string | null;
+          is_open_to_work?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          full_name?: string | null;
+          headline?: string | null;
+          bio?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          website?: string | null;
+          linkedin_url?: string | null;
+          skills?: string[];
+          experience_years?: number | null;
+          desired_salary_min?: number | null;
+          desired_salary_max?: number | null;
+          job_types?: string[];
+          sectors?: string[];
+          remote_preference?: string | null;
+          is_open_to_work?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      candidate_cvs: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          file_url: string;
+          file_type: string | null;
+          is_primary: boolean | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          file_url: string;
+          file_type?: string | null;
+          is_primary?: boolean | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          file_url?: string;
+          file_type?: string | null;
+          is_primary?: boolean | null;
+          created_at?: string;
+        };
+      };
+      candidate_applications: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string;
+          application_id: string | null;
+          status: string;
+          notes: string | null;
+          applied_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id: string;
+          application_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          applied_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string;
+          application_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          applied_at?: string;
+          updated_at?: string;
+        };
+      };
+      candidate_alerts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string | null;
+          sectors: string[];
+          job_types: string[];
+          locations: string[];
+          salary_min: number | null;
+          remote_type: string | null;
+          frequency: string | null;
+          is_active: boolean | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name?: string | null;
+          sectors?: string[];
+          job_types?: string[];
+          locations?: string[];
+          salary_min?: number | null;
+          remote_type?: string | null;
+          frequency?: string | null;
+          is_active?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string | null;
+          sectors?: string[];
+          job_types?: string[];
+          locations?: string[];
+          salary_min?: number | null;
+          remote_type?: string | null;
+          frequency?: string | null;
+          is_active?: boolean | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
@@ -268,10 +639,15 @@ export type Job = Database["public"]["Tables"]["jobs"]["Row"];
 export type Application = Database["public"]["Tables"]["applications"]["Row"];
 export type Payment = Database["public"]["Tables"]["payments"]["Row"];
 export type JobAlert = Database["public"]["Tables"]["job_alerts"]["Row"];
+export type SavedJob = Database["public"]["Tables"]["saved_jobs"]["Row"];
+export type CandidateProfile = Database["public"]["Tables"]["candidate_profiles"]["Row"];
+export type CandidateCv = Database["public"]["Tables"]["candidate_cvs"]["Row"];
+export type CandidateApplication = Database["public"]["Tables"]["candidate_applications"]["Row"];
+export type CandidateAlert = Database["public"]["Tables"]["candidate_alerts"]["Row"];
 
 export type JobWithEmployer = Job & {
   employers: Pick<
     Employer,
-    "id" | "name" | "slug" | "logo_url" | "location"
+    "id" | "name" | "slug" | "logo_url" | "location" | "website" | "is_verified"
   >;
 };

@@ -11,21 +11,48 @@ import { SECTORS, JOB_TYPES, REMOTE_OPTIONS } from "@/lib/constants";
 export default function JobAlertsPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
+
+    const form = new FormData(e.currentTarget);
+
+    const response = await fetch("/api/job-alerts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.get("email"),
+        sector: form.get("sector"),
+        jobType: form.get("jobType"),
+        remote: form.get("remote"),
+        salaryMin: form.get("salaryMin"),
+      }),
+    });
+
     setIsLoading(false);
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setError(payload?.error || "Failed to create alert");
+      return;
+    }
+
     setSubmitted(true);
   }
 
   if (submitted) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 sm:px-6 lg:px-8">
-        <Card className="p-8 text-center">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
-          <h1 className="mt-4 text-xl font-bold text-foreground">
+        <Card className="p-8 text-center border-primary/20">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-success/10">
+            <CheckCircle2 className="h-8 w-8 text-success" />
+          </div>
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-foreground">
             Alert Created
           </h1>
           <p className="mt-2 text-muted-foreground">
@@ -37,18 +64,25 @@ export default function JobAlertsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-lg px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
-        <Bell className="h-8 w-8 text-secondary" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+          <Bell className="h-6 w-6 text-primary" />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Job Alerts</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Job Alerts</h1>
           <p className="text-muted-foreground">
             Get notified when new jobs match your criteria
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {error && (
+          <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
+            {error}
+          </div>
+        )}
         <Input
           label="Email Address"
           name="email"
@@ -79,6 +113,7 @@ export default function JobAlertsPage() {
           name="salaryMin"
           type="number"
           placeholder="30000"
+          min="0"
         />
         <Button
           type="submit"

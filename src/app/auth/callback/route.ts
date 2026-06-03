@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/employer/dashboard";
+  const next = searchParams.get("next") ?? "/auth/login";
 
   if (code) {
     const supabase = await createClient();
@@ -12,17 +12,15 @@ export async function GET(request: Request) {
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host");
       const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      } else {
-        return NextResponse.redirect(
-          `https://${forwardedHost || "impjieg.com"}${next}`
-        );
-      }
+      const baseUrl = isLocalEnv
+        ? origin
+        : `https://${forwardedHost || process.env.NEXT_PUBLIC_URL || "impjieg.vercel.app"}`;
+      return NextResponse.redirect(`${baseUrl}${next}`);
     }
   }
 
-  return NextResponse.redirect(
-    `${origin}/auth/login?error=auth-code-error`
-  );
+  // Return to login with error
+  const redirectUrl = new URL("/auth/login", origin);
+  redirectUrl.searchParams.set("error", "auth-code-error");
+  return NextResponse.redirect(redirectUrl);
 }

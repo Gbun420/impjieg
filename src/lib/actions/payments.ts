@@ -3,6 +3,20 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { stripe, PRICES } from "@/lib/stripe";
+import type { Database, Employer, Payment } from "@/lib/supabase/types";
+
+type EmployerRef = Pick<Employer, "id">;
+type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"];
+type PaymentsMutationTable = {
+  insert(values: PaymentInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: Payment | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function createCheckoutSession(
   jobId: string,
@@ -23,28 +37,36 @@ export async function createCheckoutSession(
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const typedEmployer = employer as EmployerRef | null;
 
-  if (!employer) {
+  if (!typedEmployer) {
     return { error: "Employer profile not found" };
   }
 
   const amount = listingType === "featured" ? 5900 : 2900;
 
-  const { data: payment, error: paymentError } = await supabase
-    .from("payments")
-    .insert({
-      employer_id: employer.id,
-      job_id: jobId,
-      amount,
-      currency: "eur",
-      status: "pending",
-      listing_type: listingType,
-    })
+  const paymentsTable = supabase.from("payments") as unknown as PaymentsMutationTable;
+
+  const { data: payment, error: paymentError } = await paymentsTable
+    .insert([
+      {
+        employer_id: typedEmployer.id,
+        job_id: jobId,
+        amount,
+        currency: "eur",
+        status: "pending",
+        listing_type: listingType,
+      },
+    ])
     .select()
     .single();
 
   if (paymentError) {
     return { error: paymentError.message };
+  }
+
+  if (!payment) {
+    return { error: "Failed to create payment" };
   }
 
   const priceId =
@@ -63,7 +85,7 @@ export async function createCheckoutSession(
     cancel_url: `${process.env.NEXT_PUBLIC_URL}/employer/post-job`,
     metadata: {
       jobId,
-      employerId: employer.id,
+      employerId: typedEmployer.id,
       paymentId: payment.id,
       listingType,
     },

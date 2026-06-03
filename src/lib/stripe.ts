@@ -1,11 +1,12 @@
 import Stripe from "stripe";
+import { requireEnv } from "@/lib/runtime-env";
 
 let stripeInstance: Stripe | null = null;
 
 export function getStripe(): Stripe {
   if (!stripeInstance) {
-    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
-      apiVersion: "2025-01-27.clover",
+    stripeInstance = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
+      apiVersion: "2026-04-22.dahlia",
       typescript: true,
     });
   }
@@ -20,6 +21,6 @@ export const stripe = new Proxy({} as Stripe, {
 });
 
 export const PRICES = {
-  standard: process.env.STRIPE_PRICE_STANDARD || "",
-  featured: process.env.STRIPE_PRICE_FEATURED || "",
+  standard: requireEnv("STRIPE_PRICE_STANDARD"),
+  featured: requireEnv("STRIPE_PRICE_FEATURED"),
 };

@@ -40,3 +40,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# worktrees
+.worktrees/
+
+# audit reports
+/reports
+/playwright-report
+/test-results
+/generated
+.env*.local

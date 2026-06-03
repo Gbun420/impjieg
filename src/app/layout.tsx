@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_MT",
-    url: "https://impjieg.com",
+    url: "https://impjieg.vercel.app",
     siteName: "Impjieg",
     title: "Impjieg — Malta's Job Board",
     description:
@@ -76,7 +77,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.com"
+    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"
   ),
 };
 
@@ -84,12 +85,14 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0A2540" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF8FF" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F0B1A" },
   ],
 };
 
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import CookieConsentBanner from "@/components/cookie-consent-banner";
 
 export default function RootLayout({
   children,
@@ -100,11 +103,15 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <Header />
+          <main className="flex-1 pb-[var(--cookie-banner-space,0px)]">{children}</main>
+          <Footer />
+          <CookieConsentBanner />
+        </ThemeProvider>
       </body>
     </html>
   );

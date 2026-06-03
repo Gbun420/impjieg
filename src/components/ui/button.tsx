@@ -7,7 +7,6 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
-  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -24,21 +23,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-lg";
+      "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-lg active:scale-[0.98]";
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+        "bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md",
       secondary:
-        "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm",
+        "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20",
       outline:
-        "border border-border bg-background hover:bg-muted text-foreground",
+        "border border-border bg-transparent hover:bg-muted text-foreground hover:border-border-hover",
       ghost: "hover:bg-muted text-foreground",
-      danger: "bg-error text-error-foreground hover:bg-error/90 shadow-sm",
+      danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20",
     };
 
     const sizes: Record<NonNullable<ButtonProps["size"]>, string> = {
-      sm: "h-9 px-3 text-sm",
+      sm: "h-8 px-3 text-sm",
       md: "h-10 px-4 text-sm",
       lg: "h-12 px-6 text-base",
     };

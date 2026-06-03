@@ -35,6 +35,30 @@ export function daysAgo(date: Date | string): string {
   return formatDate(d);
 }
 
+export function daysUntil(date: Date | string): number {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const now = new Date();
+  return Math.max(
+    0,
+    Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  );
+}
+
+export function daysSince(date: Date | string): number {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const now = new Date();
+  return Math.max(
+    1,
+    Math.ceil((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24))
+  );
+}
+
+export function addDaysIso(days: number): string {
+  const now = new Date();
+  now.setDate(now.getDate() + days);
+  return now.toISOString();
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()

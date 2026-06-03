@@ -1,7 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
-import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
-import { Mail, Phone, FileText } from "lucide-react";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
+import ApplicationPipeline from "@/components/jobs/application-pipeline";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import type { Application, CandidateProfile, Database, Employer } from "@/lib/supabase/types";
+import { normalizeApplicationScorecardData } from "@/lib/application-scorecard";
+
+export const dynamic = "force-dynamic";
+
+type CandidateApplicationRef = {
+  application_id: string | null;
+  user_id: string;
+};
+
+type CandidateProfileRef = Pick<
+  CandidateProfile,
+  "user_id" | "full_name" | "headline" | "skills" | "experience_years" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min"
+>;
 
 export default async function ApplicationsPage() {
   const supabase = await createClient();
@@ -11,101 +25,85 @@ export default async function ApplicationsPage() {
 
   if (!user) return null;
 
-  const { data: employer } = await supabase
+  const { data: employerData } = await supabase
     .from("employers")
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const employer = employerData as Pick<Employer, "id"> | null;
 
   if (!employer) return null;
 
   const { data: applications } = await supabase
     .from("applications")
-    .select("*, jobs(title)")
-    .eq("employer_id", employer.id)
+    .select("*, jobs(title, skills, sector, job_type, remote_type, seniority), recruiter_notes, scorecard_data")
+    .eq("employer_id", (employer as Employer).id)
     .order("created_at", { ascending: false });
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Applications</h1>
+  const typedApps = (applications || []) as (Application & {
+    jobs: {
+      title: string;
+      skills: string[];
+      sector: string;
+      job_type: string;
+      remote_type: string | null;
+      seniority: string | null;
+    } | null;
+  })[];
 
-      {!applications || applications.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center">
-          <p className="text-lg font-medium text-foreground">
-            No applications yet
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Applications will appear here when candidates apply to your jobs
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {applications.map((app) => (
-            <div
-              key={app.id}
-              className="rounded-xl border border-border bg-card p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground">
-                    {app.candidate_name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Applied for: {app.jobs?.title}
-                  </p>
-                </div>
-                <Badge
-                  variant={
-                    app.status === "shortlisted"
-                      ? "success"
-                      : app.status === "rejected"
-                        ? "error"
-                        : app.status === "reviewed"
-                          ? "warning"
-                          : "secondary"
-                  }
-                >
-                  {app.status}
-                </Badge>
-              </div>
+  let enrichedApps = typedApps.map((app) => ({
+    ...app,
+    candidateProfile: null as CandidateProfileRef | null,
+    matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
+    recruiterNotes: app.recruiter_notes,
+    scorecardData: app.scorecard_data,
+  }));
 
-              <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
-                  {app.candidate_email}
-                </span>
-                {app.candidate_phone && (
-                  <span className="flex items-center gap-1">
-                    <Phone className="h-4 w-4" />
-                    {app.candidate_phone}
-                  </span>
-                )}
-                {app.candidate_cv_url && (
-                  <a
-                    href={app.candidate_cv_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-secondary hover:underline"
-                  >
-                    <FileText className="h-4 w-4" />
-                    View CV
-                  </a>
-                )}
-              </div>
+  const applicationIds = typedApps.map((app) => app.id);
 
-              {app.cover_letter && (
-                <div className="mt-4 rounded-lg bg-muted/50 p-4 text-sm text-muted-foreground">
-                  {app.cover_letter}
-                </div>
-              )}
+  if (applicationIds.length > 0) {
+    const serviceSupabase = createServiceClient<Database>(
+      getSupabaseUrl(),
+      getSupabaseServiceKey()
+    );
 
-              <div className="mt-3 text-xs text-muted-foreground">
-                {formatDate(app.created_at)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+    const { data: candidateApplications } = await serviceSupabase
+      .from("candidate_applications")
+      .select("application_id, user_id")
+      .in("application_id", applicationIds);
+
+    const applicationMap = new Map(
+      ((candidateApplications || []) as CandidateApplicationRef[])
+        .filter((record) => record.application_id)
+        .map((record) => [record.application_id as string, record.user_id])
+    );
+
+    const userIds = [...new Set(applicationMap.values())];
+
+    if (userIds.length > 0) {
+      const { data: candidateProfiles } = await serviceSupabase
+        .from("candidate_profiles")
+        .select("user_id, full_name, headline, skills, experience_years, sectors, job_types, remote_preference, desired_salary_min")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(
+        ((candidateProfiles || []) as CandidateProfileRef[]).map((profile) => [profile.user_id, profile])
+      );
+
+      enrichedApps = typedApps.map((app) => {
+        const userId = applicationMap.get(app.id);
+        const candidateProfile = userId ? profileMap.get(userId) || null : null;
+
+        return {
+          ...app,
+          candidateProfile,
+          matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
+          recruiterNotes: app.recruiter_notes,
+          scorecardData: app.scorecard_data,
+        };
+      });
+    }
+  }
+
+  return <ApplicationPipeline applications={enrichedApps} />;
 }

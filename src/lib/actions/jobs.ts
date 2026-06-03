@@ -4,6 +4,21 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import type { Database, Employer, Job } from "@/lib/supabase/types";
+import { sanitizeJobDescription } from "@/lib/job-description";
+
+type EmployerRef = Pick<Employer, "id">;
+type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
+type JobsMutationTable = {
+  insert(values: JobInsert[]): {
+    select(): {
+      single(): Promise<{
+        data: Job | null;
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 
 export async function createJob(formData: FormData) {
   const supabase = await createClient();
@@ -21,8 +36,9 @@ export async function createJob(formData: FormData) {
     .select("id")
     .eq("user_id", user.id)
     .single();
+  const typedEmployer = employer as EmployerRef | null;
 
-  if (!employer) {
+  if (!typedEmployer) {
     return { error: "Employer profile not found" };
   }
 
@@ -51,40 +67,48 @@ export async function createJob(formData: FormData) {
   const applicationEmail = formData.get("applicationEmail") as string;
   const applicationUrl = formData.get("applicationUrl") as string;
   const listingType = formData.get("listingType") as string;
+  const sanitizedDescription = sanitizeJobDescription(description);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
   const jobSlug = `${slugify(title)}-${Math.random().toString(36).substring(2, 6)}`;
 
-  const { data: job, error } = await supabase
-    .from("jobs")
-    .insert({
-      employer_id: employer.id,
-      title,
-      slug: jobSlug,
-      description,
-      location,
-      sector,
-      job_type: jobType,
-      seniority: seniority || null,
-      remote_type: remoteType || null,
-      salary_min: salaryMin,
-      salary_max: salaryMax,
-      skills,
-      benefits,
-      visa_friendly: visaFriendly,
-      is_featured: listingType === "featured",
-      status: listingType === "standard" ? "active" : "pending",
-      expires_at: expiresAt.toISOString(),
-      application_email: applicationEmail || null,
-      application_url: applicationUrl || null,
-    })
+  const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
+
+  const { data: job, error } = await jobsTable
+    .insert([
+      {
+        employer_id: typedEmployer.id,
+        title,
+        slug: jobSlug,
+        description: sanitizedDescription,
+        location,
+        sector,
+        job_type: jobType,
+        seniority: seniority || null,
+        remote_type: remoteType || null,
+        salary_min: salaryMin,
+        salary_max: salaryMax,
+        skills,
+        benefits,
+        visa_friendly: visaFriendly,
+        is_featured: listingType === "featured",
+        status: listingType === "standard" ? "active" : "pending",
+        expires_at: expiresAt.toISOString(),
+        application_email: applicationEmail || null,
+        application_url: applicationUrl || null,
+      },
+    ])
     .select()
     .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!job) {
+    return { error: "Failed to create job" };
   }
 
   revalidatePath("/employer/jobs");
