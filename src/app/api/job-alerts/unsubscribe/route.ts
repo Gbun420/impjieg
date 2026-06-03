@@ -39,6 +39,9 @@ export async function unsubscribeJobAlertWithDeps(
   const verification = deps.verifyToken?.(token, deps.now?.() ?? Date.now()) ?? verifySignedToken(token);
 
   if (!verification.valid || typeof verification.payload.alertId !== "string") {
+    console.warn("job-alert unsubscribe rejected", {
+      reason: verification.valid ? "malformed" : verification.reason,
+    });
     return buildHtmlResponse(
       400,
       "Invalid unsubscribe link",
@@ -46,9 +49,23 @@ export async function unsubscribeJobAlertWithDeps(
     );
   }
 
-  const { error } = await deps.updateAlertById(verification.payload.alertId);
+  try {
+    const { error } = await deps.updateAlertById(verification.payload.alertId);
 
-  if (error) {
+    if (error) {
+      console.warn("job-alert unsubscribe update failed", {
+        message: error.message,
+      });
+      return buildHtmlResponse(
+        500,
+        "Unable to unsubscribe alert",
+        "Please try again later."
+      );
+    }
+  } catch (caughtError) {
+    console.warn("job-alert unsubscribe update threw", {
+      message: caughtError instanceof Error ? caughtError.message : "unknown",
+    });
     return buildHtmlResponse(
       500,
       "Unable to unsubscribe alert",
@@ -64,17 +81,28 @@ export async function unsubscribeJobAlertWithDeps(
 }
 
 export async function GET(request: Request) {
-  const supabase = createServiceClient<Database>(
-    getSupabaseUrl(),
-    getSupabaseServiceKey()
-  );
+  try {
+    const supabase = createServiceClient<Database>(
+      getSupabaseUrl(),
+      getSupabaseServiceKey()
+    );
 
-  const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsUpdateTable;
+    const jobAlertsTable = supabase.from("job_alerts") as unknown as JobAlertsUpdateTable;
 
-  return unsubscribeJobAlertWithDeps(request, {
-    updateAlertById: async (alertId) =>
-      jobAlertsTable
-        .update({ is_active: false, updated_at: new Date().toISOString() })
-        .eq("id", alertId),
-  });
+    return unsubscribeJobAlertWithDeps(request, {
+      updateAlertById: async (alertId) =>
+        jobAlertsTable
+          .update({ is_active: false, updated_at: new Date().toISOString() })
+          .eq("id", alertId),
+    });
+  } catch (caughtError) {
+    console.warn("job-alert unsubscribe setup failed", {
+      message: caughtError instanceof Error ? caughtError.message : "unknown",
+    });
+    return buildHtmlResponse(
+      500,
+      "Unable to unsubscribe alert",
+      "Please try again later."
+    );
+  }
 }

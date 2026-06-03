@@ -3,6 +3,20 @@ import { requireEnv } from "@/lib/runtime-env";
 
 const UNSUBSCRIBE_TOKEN_VERSION = 1;
 
+function encodeBase64Url(value: string | Buffer) {
+  return Buffer.from(value)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = "=".repeat((4 - (normalized.length % 4)) % 4);
+  return Buffer.from(normalized + padding, "base64").toString("utf8");
+}
+
 export function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -42,7 +56,7 @@ function getUnsubscribeSecret() {
 }
 
 function signTokenPayload(payload: string) {
-  return createHmac("sha256", getUnsubscribeSecret()).update(payload).digest("base64url");
+  return encodeBase64Url(createHmac("sha256", getUnsubscribeSecret()).update(payload).digest());
 }
 
 function timingSafeEquals(left: string, right: string) {
@@ -66,7 +80,7 @@ export function createSignedToken(
     exp: now + expiresInMs,
     ...payload,
   };
-  const encodedBody = Buffer.from(JSON.stringify(body)).toString("base64url");
+  const encodedBody = encodeBase64Url(JSON.stringify(body));
   const signature = signTokenPayload(encodedBody);
   return `${encodedBody}.${signature}`;
 }
@@ -101,7 +115,7 @@ export function verifySignedToken(token: string | null, now = Date.now()): Verif
   }
 
   try {
-    const parsed = JSON.parse(Buffer.from(encodedBody, "base64url").toString("utf8")) as {
+    const parsed = JSON.parse(decodeBase64Url(encodedBody)) as {
       v?: unknown;
       exp?: unknown;
       [key: string]: unknown;
