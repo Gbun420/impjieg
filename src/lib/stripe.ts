@@ -21,6 +21,8 @@ export const stripe = new Proxy({} as Stripe, {
 });
 
 export const PRICES = {
-  standard: requireEnv("STRIPE_PRICE_STANDARD"),
-  featured: requireEnv("STRIPE_PRICE_FEATURED"),
+  standard:
+    process.env.STRIPE_PRICE_STANDARD || "price_dev_standard",
+  featured:
+    process.env.STRIPE_PRICE_FEATURED || "price_dev_featured",
 };

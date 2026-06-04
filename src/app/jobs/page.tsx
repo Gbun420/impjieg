@@ -8,9 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Browse Jobs",
-  description: "Browse the latest jobs in Malta. Find tech, finance, administration, and hospitality roles with salary transparency.",
+  description:
+    "Browse the latest jobs in Malta. Find tech, finance, administration, and hospitality roles with salary clarity and direct applications.",
 };
 
 const DEFAULT_JOBS_PER_PAGE = 20;

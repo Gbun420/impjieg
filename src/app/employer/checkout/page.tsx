@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PRICING } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
+
 export default function CheckoutPage({
   searchParams,
 }: {

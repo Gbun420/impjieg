@@ -25,6 +25,8 @@ import {
 import JobCard from "@/components/jobs/job-card";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

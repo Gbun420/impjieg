@@ -85,7 +85,7 @@ export async function GET() {
     const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>${escapeXml("Impjieg Job Board")}</title>
+    <title>${escapeXml("Impjieg - Malta's transparent job board")}</title>
     <link>${escapeXml(`${baseUrl}/jobs`)}</link>
     <description>${escapeXml("Latest job opportunities from Impjieg")}</description>
     <language>en-us</language>

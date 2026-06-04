@@ -9,6 +9,8 @@ import {
   Settings,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 const navItems = [
   { href: "/employer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/employer/jobs", label: "My Jobs", icon: Briefcase },
