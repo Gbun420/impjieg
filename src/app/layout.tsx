@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: SITE.title,
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,
@@ -75,13 +75,13 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
+    },
   icons: {
     icon: [
       { url: "/favicon.ico" },
       { url: "/logo-icon.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-icon.png" }],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
   },
   manifest: "/manifest.webmanifest",
   metadataBase: new URL(SITE.url),

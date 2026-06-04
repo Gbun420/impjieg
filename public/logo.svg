@@ -1,8 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
-  <g>
-    <rect x="4" y="4" width="32" height="32" rx="10" fill="#123B67"/>
-    <path d="M12 12L20 20L12 28" stroke="#F6F1E8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="44" y="27" font-family="Manrope, Inter, system-ui, sans-serif" font-weight="700" font-size="23" fill="#0B1220">impjieg</text>
-    <circle cx="176" cy="12" r="4" fill="#D96B4C"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none" role="img" aria-label="Impjieg">
+  <defs>
+    <linearGradient id="impjieg-brand-gradient" x1="8" y1="8" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E63FF" />
+      <stop offset="1" stop-color="#14C7B7" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="40" height="40" rx="12" fill="#0B1220" />
+  <path
+    d="M14 28.5C14 23 17 18 22.5 15.5"
+    stroke="url(#impjieg-brand-gradient)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+  />
+  <path
+    d="M14.5 27.5L22 20L27 25"
+    stroke="#F5F8FC"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="28.5" cy="13.5" r="3.2" fill="#FFB020" />
+  <text
+    x="56"
+    y="30"
+    fill="#0B1220"
+    font-family="Sora, Inter, Arial, sans-serif"
+    font-size="24"
+    font-weight="700"
+    letter-spacing="-0.04em"
+  >
+    Impjieg
+  </text>
+  <circle cx="221.5" cy="14.5" r="3.5" fill="#FF6B57" />
 </svg>
