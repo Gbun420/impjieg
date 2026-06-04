@@ -25,7 +25,7 @@ export default function CheckoutPage({
 
   useEffect(() => {
     if (!jobId) {
-      router.push("/employer/jobs");
+      router.replace("/employer/jobs");
     }
   }, [jobId, router]);
 
@@ -56,7 +56,18 @@ export default function CheckoutPage({
   }
 
   if (!jobId) {
-    return null;
+    return (
+      <div className="mx-auto max-w-lg space-y-8 py-10">
+        <Card className="p-6 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Missing job selection
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Redirecting you back to your jobs list.
+          </p>
+        </Card>
+      </div>
+    );
   }
 
   return (

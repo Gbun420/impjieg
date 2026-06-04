@@ -79,6 +79,7 @@ export default async function AdminDashboardPage() {
     formattedAt,
     summary,
   } = await getAdminDashboardData();
+  const isDemoMode = serviceStatus.some((item) => item.value === "demo mode");
 
   return (
     <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -114,6 +115,20 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      {isDemoMode ? (
+        <Card className="border-amber-300 bg-amber-50 p-4 text-amber-950">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold">Demo mode active</p>
+              <p className="mt-1 text-sm">
+                This dashboard is showing demo data because the live admin services are not fully configured in this environment.
+              </p>
+            </div>
+            <Badge variant="warning">Demo data</Badge>
+          </div>
+        </Card>
+      ) : null}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {stats.map((stat, index) => {

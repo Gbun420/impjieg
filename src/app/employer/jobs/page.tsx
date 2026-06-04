@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { buildEmployerPromotionLinks } from "@/lib/job-promotion";
@@ -21,7 +22,9 @@ export default async function EmployerJobsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect("/auth/login?redirect=/employer/dashboard");
+  }
 
   const { data: employerData } = await supabase
     .from("employers")
@@ -30,7 +33,9 @@ export default async function EmployerJobsPage() {
     .single();
   const employer = employerData as Pick<Employer, "id"> | null;
 
-  if (!employer) return null;
+  if (!employer) {
+    redirect("/auth/signup");
+  }
 
   const { data: jobs } = await supabase
     .from("jobs")
@@ -249,7 +254,12 @@ export default async function EmployerJobsPage() {
                       </Link>
                     )}
                     {!promotionLinks && (
-                      <Button variant="ghost" size="sm" title="View live">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Live link unavailable"
+                        disabled
+                      >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
                     )}

@@ -47,9 +47,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Job Seekers
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {jobSeekerLinks.map((link) => (
                 <li key={link.href}>
@@ -65,9 +65,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Employers
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {employerLinks.map((link) => (
                 <li key={link.href}>
@@ -83,9 +83,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Company
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {companyLinks.map((link) => (
                 <li key={link.href}>

@@ -49,6 +49,7 @@ const FREQUENCIES = [
 export default function CandidateAlertsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<CandidateAlert[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -69,12 +70,18 @@ export default function CandidateAlertsPage() {
   }, []);
 
   async function fetchAlerts() {
+    setIsLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/candidate/alerts");
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch alerts");
+      }
       setAlerts(data.alerts || []);
     } catch (error) {
       console.error("Failed to fetch alerts:", error);
+      setError("Unable to load your alerts right now. You can retry below.");
     } finally {
       setIsLoading(false);
     }
@@ -82,6 +89,7 @@ export default function CandidateAlertsPage() {
 
   async function handleSave() {
     setIsSaving(true);
+    setError(null);
     try {
       const url = editingId
         ? `/api/candidate/alerts?id=${editingId}`
@@ -92,36 +100,56 @@ export default function CandidateAlertsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(payload?.error || "Failed to save alert. Please try again.");
+        return;
+      }
       if (res.ok) {
         await fetchAlerts();
         resetForm();
       }
     } catch (error) {
       console.error("Failed to save alert:", error);
+      setError("Unable to save your alert right now. Please try again.");
     } finally {
       setIsSaving(false);
     }
   }
 
   async function handleDelete(id: string) {
+    setError(null);
     try {
-      await fetch(`/api/candidate/alerts?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/candidate/alerts?id=${id}`, { method: "DELETE" });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(payload?.error || "Failed to delete alert. Please try again.");
+        return;
+      }
       await fetchAlerts();
     } catch (error) {
       console.error("Failed to delete alert:", error);
+      setError("Unable to delete your alert right now. Please try again.");
     }
   }
 
   async function handleToggle(id: string, isActive: boolean) {
+    setError(null);
     try {
-      await fetch(`/api/candidate/alerts?id=${id}`, {
+      const res = await fetch(`/api/candidate/alerts?id=${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_active: !isActive }),
       });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(payload?.error || "Failed to update alert. Please try again.");
+        return;
+      }
       await fetchAlerts();
     } catch (error) {
       console.error("Failed to toggle alert:", error);
+      setError("Unable to update your alert right now. Please try again.");
     }
   }
 
@@ -206,6 +234,17 @@ export default function CandidateAlertsPage() {
           </Button>
         )}
       </div>
+
+      {error && (
+        <Card className="border-warning/30 bg-warning/5 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-foreground">{error}</p>
+            <Button variant="outline" size="sm" onClick={() => void fetchAlerts()}>
+              Retry load
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Alert Form */}
       {showForm && (

@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   keywords: [
-    "Malta jobs",
+    "jobs in Malta",
     "tech jobs Malta",
     "iGaming jobs Malta",
     "digital jobs Malta",

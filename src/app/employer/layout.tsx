@@ -44,7 +44,22 @@ export default async function EmployerLayout({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
+      <nav className="border-b border-border/50 bg-muted/20 lg:hidden">
+        <div className="flex gap-2 overflow-x-auto px-4 py-3">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex shrink-0 items-center justify-center rounded-xl border border-border bg-surface px-3 py-2 text-sm font-medium whitespace-nowrap text-foreground transition-all hover:bg-muted/60 hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <item.icon className="mr-1.5 h-4 w-4" />
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
       <aside className="hidden w-64 border-r border-border/50 bg-muted/20 lg:block">
         <nav className="p-4">
           <ul className="space-y-1">
