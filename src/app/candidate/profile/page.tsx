@@ -58,6 +58,7 @@ export default function CandidateProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CandidateProfileForm>({
     full_name: "",
     headline: "",
@@ -81,45 +82,52 @@ export default function CandidateProfilePage() {
   const [parseError, setParseError] = useState<string | null>(null);
   const [parseSuccess, setParseSuccess] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  async function loadProfile() {
+    setIsLoading(true);
+    setError(null);
 
-    async function loadProfile() {
-      try {
-        const res = await fetch("/api/candidate/profile");
-        const data = await res.json();
-        if (!cancelled && data.profile) {
-          setFormData({
-            full_name: data.profile.full_name || "",
-            headline: data.profile.headline || "",
-            bio: data.profile.bio || "",
-            phone: data.profile.phone || "",
-            location: data.profile.location || "",
-            website: data.profile.website || "",
-            linkedin_url: data.profile.linkedin_url || "",
-            skills: data.profile.skills || [],
-            experience_years: data.profile.experience_years || 0,
-            desired_salary_min: data.profile.desired_salary_min || 0,
-            desired_salary_max: data.profile.desired_salary_max || 0,
-            job_types: data.profile.job_types || [],
-            sectors: data.profile.sectors || [],
-            remote_preference: data.profile.remote_preference || "",
-            is_open_to_work: data.profile.is_open_to_work ?? true,
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+    try {
+      const res = await fetch("/api/candidate/profile");
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch profile");
       }
-    }
 
-    void loadProfile();
+      if (data.profile) {
+        setFormData({
+          full_name: data.profile.full_name || "",
+          headline: data.profile.headline || "",
+          bio: data.profile.bio || "",
+          phone: data.profile.phone || "",
+          location: data.profile.location || "",
+          website: data.profile.website || "",
+          linkedin_url: data.profile.linkedin_url || "",
+          skills: data.profile.skills || [],
+          experience_years: data.profile.experience_years || 0,
+          desired_salary_min: data.profile.desired_salary_min || 0,
+          desired_salary_max: data.profile.desired_salary_max || 0,
+          job_types: data.profile.job_types || [],
+          sectors: data.profile.sectors || [],
+          remote_preference: data.profile.remote_preference || "",
+          is_open_to_work: data.profile.is_open_to_work ?? true,
+        });
+      }
+    } catch (fetchError) {
+      console.error("Failed to fetch profile:", fetchError);
+      setError("Unable to load your profile right now. You can retry below.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadProfile();
+    }, 0);
 
     return () => {
-      cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -176,18 +184,25 @@ export default function CandidateProfilePage() {
   async function handleSave() {
     setIsSaving(true);
     setSaved(false);
+    setError(null);
     try {
       const res = await fetch("/api/candidate/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(payload?.error || "Failed to save profile. Please try again.");
+        return;
+      }
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       }
     } catch (error) {
       console.error("Failed to save profile:", error);
+      setError("Unable to save your profile right now. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -264,6 +279,17 @@ export default function CandidateProfilePage() {
           )}
         </Button>
       </div>
+
+      {error && (
+        <Card className="border-warning/30 bg-warning/5 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-foreground">{error}</p>
+            <Button variant="outline" size="sm" onClick={() => void loadProfile()}>
+              Retry load
+            </Button>
+          </div>
+        </Card>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Form */}

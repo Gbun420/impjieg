@@ -12,13 +12,13 @@ export default async function AuthLayout({
       <div className="relative w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-10 w-10 dark:invert" aria-hidden="true" />
+            <img src="/logo-icon.svg" alt="" className="h-10 w-10" aria-hidden="true" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-lg font-semibold tracking-[-0.03em] text-foreground">
                 {SITE.name}
               </span>
-              <span className="text-[0.64rem] uppercase tracking-[0.34em] text-muted-foreground">
-                Malta jobs
+              <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
+                {SITE.tagline}
               </span>
             </span>
           </Link>

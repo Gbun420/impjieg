@@ -4,6 +4,7 @@ import ApplicationPipeline from "@/components/jobs/application-pipeline";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Application, CandidateProfile, Database, Employer } from "@/lib/supabase/types";
 import { normalizeApplicationScorecardData } from "@/lib/application-scorecard";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,9 @@ export default async function ApplicationsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect("/auth/login?redirect=/employer/dashboard");
+  }
 
   const { data: employerData } = await supabase
     .from("employers")
@@ -32,7 +35,9 @@ export default async function ApplicationsPage() {
     .single();
   const employer = employerData as Pick<Employer, "id"> | null;
 
-  if (!employer) return null;
+  if (!employer) {
+    redirect("/auth/signup");
+  }
 
   const { data: applications } = await supabase
     .from("applications")

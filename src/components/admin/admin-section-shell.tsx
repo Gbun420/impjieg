@@ -7,15 +7,6 @@ import { Card } from "@/components/ui/card";
 
 export const adminNavItems = [
   { href: "/admin/dashboard", label: "Overview" },
-  { href: "/admin/jobs", label: "Jobs" },
-  { href: "/admin/aggregators", label: "Aggregators" },
-  { href: "/admin/employers", label: "Employers" },
-  { href: "/admin/candidates", label: "Candidates" },
-  { href: "/admin/applications", label: "Applications" },
-  { href: "/admin/categories", label: "Categories" },
-  { href: "/admin/newsletter", label: "Newsletter" },
-  { href: "/admin/payments", label: "Payments" },
-  { href: "/admin/audit-log", label: "Audit log" },
 ] as const;
 
 type AdminSectionShellProps = {

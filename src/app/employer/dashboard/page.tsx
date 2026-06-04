@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureEmployerProfile } from "@/lib/actions/auth";
 import { deriveApplicationInsights } from "@/lib/application-insights";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 import { Card } from "@/components/ui/card";
@@ -17,7 +18,9 @@ export default async function EmployerDashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect("/auth/login?redirect=/employer/dashboard");
+  }
 
   // Ensure employer profile exists (lazy creation)
   const { profile, error: profileError } = await ensureEmployerProfile();

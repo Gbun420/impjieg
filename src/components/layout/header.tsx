@@ -97,13 +97,13 @@ export default function Header() {
         <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
+            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
                 {SITE.name}
               </span>
-              <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-                Malta jobs
+              <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
+                {SITE.tagline}
               </span>
             </span>
           </Link>
@@ -117,13 +117,13 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-          <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
+          <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
           <span className="flex flex-col leading-none">
             <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
               {SITE.name}
             </span>
-            <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-              Malta jobs
+            <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
+              {SITE.tagline}
             </span>
           </span>
         </Link>

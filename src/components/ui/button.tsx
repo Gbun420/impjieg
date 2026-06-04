@@ -23,7 +23,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-lg active:scale-[0.98]";
+      "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-xl active:scale-[0.98]";
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
@@ -31,8 +31,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary:
         "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20",
       outline:
-        "border border-border bg-transparent hover:bg-muted text-foreground hover:border-border-hover",
-      ghost: "hover:bg-muted text-foreground",
+        "border border-border bg-surface hover:bg-muted/60 text-foreground hover:border-border-hover",
+      ghost: "hover:bg-muted/60 text-foreground",
       danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20",
     };
 

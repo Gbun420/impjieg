@@ -4,7 +4,7 @@ import { checkA11y, checkAccessibleNames, checkImageAlts, checkHeadingHierarchy 
 test('homepage loads and is accessible', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Impjieg/);
-  await expect(page.getByRole('heading', { name: /Your next role/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Jobs in Malta, with pay up front\./ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });

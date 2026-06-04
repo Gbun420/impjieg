@@ -1,15 +1,15 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "@/lib/constants";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Impjieg - Malta's transparent job board",
+    name: SITE.title,
     short_name: "Impjieg",
-    description:
-      "Malta's transparent job board with verified salaries, fresh listings, and direct applications.",
+    description: SITE.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#F6F1E8",
-    theme_color: "#123B67",
+    background_color: "#F5F8FC",
+    theme_color: "#0B1220",
     icons: [
       {
         src: "/logo-icon.svg",

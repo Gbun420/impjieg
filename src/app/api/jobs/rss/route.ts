@@ -19,8 +19,7 @@ export async function GET() {
   try {
     const supabase = await createClient();
     const baseUrl = process.env.NEXT_PUBLIC_URL || SITE.url;
-    
-    // Fetch active jobs with employer information
+
     const { data: jobs, error } = await supabase
       .from("jobs")
       .select(`
@@ -65,8 +64,7 @@ export async function GET() {
       throw error;
     }
 
-    // Generate RSS XML
-    const jobsList = (jobs as JobWithEmployer[] || []).map(job => `
+    const jobsList = ((jobs as JobWithEmployer[]) || []).map((job) => `
       <item>
         <title>${escapeXml(job.title)}</title>
         <description>${escapeXml(job.description)}</description>
@@ -85,9 +83,9 @@ export async function GET() {
     const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>${escapeXml("Impjieg - Malta's transparent job board")}</title>
+    <title>${escapeXml(SITE.title)}</title>
     <link>${escapeXml(`${baseUrl}/jobs`)}</link>
-    <description>${escapeXml("Latest job opportunities from Impjieg")}</description>
+    <description>${escapeXml(SITE.description)}</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${jobsList}

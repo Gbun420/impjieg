@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Sora } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
+import CookieConsentBanner from "@/components/cookie-consent-banner";
+import { SITE } from "@/lib/constants";
 
-const manrope = Manrope({
+const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
 });
 
-const fraunces = Fraunces({
+const sora = Sora({
   variable: "--font-display-font",
   subsets: ["latin"],
   display: "swap",
@@ -23,15 +27,15 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Impjieg - Malta's transparent job board",
+    default: SITE.title,
     template: "%s | Impjieg",
   },
-  description:
-    "Malta's transparent job board for verified salaries, fresh listings, and direct applications. Hire with clarity and reach candidates faster.",
+  description: SITE.description,
   keywords: [
-    "Malta jobs",
-    "Malta job board",
     "jobs in Malta",
+    "tech jobs Malta",
+    "iGaming jobs Malta",
+    "digital jobs Malta",
     "Malta careers",
     "salary transparency",
     "Malta employment",
@@ -42,25 +46,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_MT",
-    url: "https://impjieg.vercel.app",
+    url: SITE.url,
     siteName: "Impjieg",
-    title: "Impjieg - Malta's transparent job board",
-    description:
-      "Verified salaries, direct applications, and fresh listings for Malta's job market.",
+    title: SITE.title,
+    description: SITE.description,
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Impjieg - Malta's transparent job board",
+        alt: SITE.title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Impjieg - Malta's transparent job board",
-    description:
-      "Verified salaries, direct applications, and fresh listings for Malta.",
+    title: SITE.title,
+    description: SITE.description,
     images: ["/og-image.png"],
   },
   robots: {
@@ -81,24 +83,18 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-icon.png" }],
   },
-  manifest: "/manifest.json",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"
-  ),
+  manifest: "/manifest.webmanifest",
+  metadataBase: new URL(SITE.url),
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F1E8" },
-    { media: "(prefers-color-scheme: dark)", color: "#07111D" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F8FC" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1220" },
   ],
 };
-
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import CookieConsentBanner from "@/components/cookie-consent-banner";
 
 export default function RootLayout({
   children,
@@ -108,13 +104,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <ThemeProvider>
           <Header />
-          <main className="flex-1 pb-[var(--cookie-banner-space,0px)]">{children}</main>
+          <main className="flex-1 pb-[var(--cookie-banner-space,0px)]">
+            {children}
+          </main>
           <Footer />
           <CookieConsentBanner />
         </ThemeProvider>
