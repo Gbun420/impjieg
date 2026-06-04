@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, PlusCircle, LayoutDashboard } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function CheckoutSuccessPage() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">

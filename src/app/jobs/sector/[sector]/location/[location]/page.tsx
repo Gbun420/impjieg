@@ -10,6 +10,8 @@ import { formatSalary, daysAgo, addDaysIso } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
+
 const JOBS_PER_PAGE = 20;
 
 function slugToLabel(slug: string): string {

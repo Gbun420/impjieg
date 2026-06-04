@@ -37,7 +37,7 @@ function LoginForm() {
           Welcome back
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sign in to access your candidate, employer, or admin portal
+          Sign in to manage your candidate, employer, or admin workspace
         </p>
       </div>
 

@@ -18,6 +18,8 @@ import {
 import { SECTORS } from "@/lib/constants";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
+export const dynamic = "force-dynamic";
+
 async function StatsSection() {
   const supabase = await createClient();
   const { count } = await supabase
@@ -93,14 +95,14 @@ export default async function HomePage() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-6">
               <TrendingUp className="h-3.5 w-3.5" />
-              Malta&apos;s #1 job board
+              Transparent hiring for Malta
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Your next role,{" "}
-              <span className="text-gradient">sorted.</span>
+              Jobs in Malta,{" "}
+              <span className="text-gradient">with pay up front.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Find verified salaries, fresh listings, and direct applications. No stale jobs, no hidden pay.
+              Find verified salaries, fresh listings, and direct applications. No ghost jobs, no hidden pay.
             </p>
           </div>
 
@@ -145,8 +147,8 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse by Sector</h2>
-              <p className="text-sm text-muted-foreground mt-1">Find roles in your industry</p>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse by sector</h2>
+              <p className="text-sm text-muted-foreground mt-1">Find roles in the industries that move Malta</p>
             </div>
             <Link href="/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               All sectors <ArrowRight className="inline h-3.5 w-3.5 ml-0.5" />
@@ -180,7 +182,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Why Impjieg</h2>
-            <p className="text-sm text-muted-foreground mt-1">Built differently for Malta&apos;s job market</p>
+            <p className="text-sm text-muted-foreground mt-1">Built around clarity, speed, and trust</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-border bg-card p-6">
@@ -188,10 +190,10 @@ export default async function HomePage() {
                 <Banknote className="h-5 w-5 text-primary" />
               </div>
               <h3 className="mt-3 text-base font-semibold text-foreground">
-                Salary Transparency
+                Salary clarity
               </h3>
               <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Every listing shows verified salary ranges. No more guessing what you&apos;re worth.
+                Every listing shows a salary range up front, so candidates can judge fit before they apply.
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card p-6">
@@ -199,10 +201,10 @@ export default async function HomePage() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
               <h3 className="mt-3 text-base font-semibold text-foreground">
-                Fresh Listings
+                Fresh listings
               </h3>
               <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Jobs expire after 30 days. No stale listings cluttering your search.
+                Jobs expire after 30 days, keeping the marketplace current and useful.
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card p-6">
@@ -210,7 +212,7 @@ export default async function HomePage() {
                 <Users className="h-5 w-5 text-primary" />
               </div>
               <h3 className="mt-3 text-base font-semibold text-foreground">
-                Direct Applications
+                Direct applications
               </h3>
               <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
                 Apply directly to employers. No middlemen, no hidden steps.
@@ -228,10 +230,10 @@ export default async function HomePage() {
             <Building2 className="h-6 w-6 text-primary" />
           </div>
           <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            Hiring? Post your first job free.
+            Hiring? Post a job that earns attention.
           </h2>
           <p className="mt-2 text-base text-muted-foreground">
-            Reach Malta&apos;s top talent in minutes.
+            Reach Malta&apos;s best-fit candidates with salary clarity and a cleaner application flow.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/employer/post-job">

@@ -3,29 +3,29 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Light mode — clean, trustworthy, premium */
-  --background: #FAFAFA;
-  --foreground: #0A0A0A;
-  --primary: #7C3AED;
+  /* Light mode - warm, editorial, trustworthy */
+  --background: #F6F1E8;
+  --foreground: #0B1220;
+  --primary: #123B67;
   --primary-foreground: #FFFFFF;
-  --primary-hover: #6D28D9;
-  --secondary: #A78BFA;
-  --secondary-foreground: #0A0A0A;
-  --accent: #F97316;
+  --primary-hover: #0E2E52;
+  --secondary: #1B6F68;
+  --secondary-foreground: #FFFFFF;
+  --accent: #D96B4C;
   --accent-foreground: #FFFFFF;
-  --muted: #F4F4F5;
-  --muted-foreground: #5E5E66;
-  --card: #FFFFFF;
-  --card-foreground: #0A0A0A;
-  --card-hover: #FAFAFA;
-  --border: #E4E4E7;
-  --border-hover: #A1A1AA;
-  --ring: #7C3AED;
-  --success: #059669;
+  --muted: #ECE3D5;
+  --muted-foreground: #5B6574;
+  --card: #FFFDFC;
+  --card-foreground: #0B1220;
+  --card-hover: #FDF8F1;
+  --border: #D8CCBC;
+  --border-hover: #B8AB9A;
+  --ring: #123B67;
+  --success: #117A61;
   --success-foreground: #FFFFFF;
-  --warning: #D97706;
+  --warning: #B66A1F;
   --warning-foreground: #FFFFFF;
-  --error: #DC2626;
+  --error: #B7473D;
   --error-foreground: #FFFFFF;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -36,30 +36,30 @@
 }
 
 .dark {
-  /* Dark mode — deep, premium, high-contrast */
-  --background: #09090B;
-  --foreground: #FAFAFA;
-  --primary: #8B5CF6;
+  /* Dark mode - deep, calm, high-contrast */
+  --background: #07111D;
+  --foreground: #F6F1E8;
+  --primary: #8CB7FF;
   --primary-foreground: #FFFFFF;
-  --primary-hover: #A78BFA;
-  --secondary: #A78BFA;
-  --secondary-foreground: #09090B;
-  --accent: #FB923C;
-  --accent-foreground: #09090B;
-  --muted: #18181B;
-  --muted-foreground: #A1A1AA;
-  --card: #111113;
-  --card-foreground: #FAFAFA;
-  --card-hover: #18181B;
-  --border: #27272A;
-  --border-hover: #3F3F46;
-  --ring: #8B5CF6;
-  --success: #10B981;
-  --success-foreground: #09090B;
-  --warning: #FBBF24;
-  --warning-foreground: #09090B;
-  --error: #EF4444;
-  --error-foreground: #09090B;
+  --primary-hover: #A9C8FF;
+  --secondary: #7AD9C8;
+  --secondary-foreground: #07111D;
+  --accent: #FF9C74;
+  --accent-foreground: #07111D;
+  --muted: #132232;
+  --muted-foreground: #9DAABD;
+  --card: #0B1624;
+  --card-foreground: #F6F1E8;
+  --card-hover: #112235;
+  --border: #213345;
+  --border-hover: #36506A;
+  --ring: #8CB7FF;
+  --success: #25B38C;
+  --success-foreground: #07111D;
+  --warning: #F0B35E;
+  --warning-foreground: #07111D;
+  --error: #FF7A6C;
+  --error-foreground: #07111D;
 }
 
 @theme inline {
@@ -86,7 +86,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-error: var(--error);
   --color-error-foreground: var(--error-foreground);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display-font);
   --font-mono: var(--font-jetbrains-mono);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -102,6 +103,24 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(circle at top, rgba(18, 59, 103, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 24%);
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at top, rgba(140, 183, 255, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%);
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  letter-spacing: -0.03em;
 }
 
 /* Premium animations */
@@ -136,8 +155,8 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.2); }
-  50% { box-shadow: 0 0 0 12px rgba(139, 92, 246, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(18, 59, 103, 0.2); }
+  50% { box-shadow: 0 0 0 12px rgba(18, 59, 103, 0); }
 }
 
 .animate-fade-in {
@@ -189,7 +208,7 @@ body {
 }
 
 .glow-hover:hover {
-  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3), 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 0 1px rgba(18, 59, 103, 0.28), 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Scrollbar styling */

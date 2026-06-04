@@ -25,6 +25,8 @@ import { ShareJobButton } from "@/components/jobs/share-job";
 import { SaveJobButton } from "@/components/jobs/save-job-button";
 import { sanitizeJobDescription, sanitizeJobDescriptionForMetadata } from "@/lib/job-description";
 
+export const dynamic = "force-dynamic";
+
 type JobUpdate = Database["public"]["Tables"]["jobs"]["Update"];
 type JobsMutationTable = {
   update(values: JobUpdate): {

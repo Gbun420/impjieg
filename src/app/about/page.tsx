@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Learn more about Impjieg, Malta's modern job board built for salary transparency and efficiency.",
+  description:
+    "Learn more about Impjieg, Malta's transparent job board built for salary clarity, fresh listings, and direct applications.",
 };
 
 export default function AboutPage() {
@@ -15,8 +16,8 @@ export default function AboutPage() {
 
       <div className="prose prose-sm mt-6 max-w-none text-muted-foreground">
         <p>
-          {SITE.name} is Malta&apos;s modern job board, built with a simple
-          mission: make job hunting transparent and efficient for everyone.
+          {SITE.name} is Malta&apos;s transparent job board, built with a
+          simple mission: make job hunting clearer, faster, and easier to trust.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">
@@ -24,9 +25,9 @@ export default function AboutPage() {
         </h2>
         <p>
           Too many job listings hide salary information, wasting everyone&apos;s
-          time. On {SITE.name}, every listing shows verified salary ranges so
-          candidates can make informed decisions and employers attract the right
-          talent.
+          time. On {SITE.name}, every listing shows salary ranges up front so
+          candidates can make informed decisions and employers attract better
+          matches.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">
@@ -44,7 +45,7 @@ export default function AboutPage() {
         </h2>
         <p>
           Jobs expire after 30 days. No stale listings, no ghost jobs. Every
-          listing on {SITE.name} is active and real.
+          listing on {SITE.name} is active and current.
         </p>
       </div>
     </div>
