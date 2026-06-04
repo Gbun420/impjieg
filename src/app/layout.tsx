@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Manrope, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-body",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  variable: "--font-display-font",
   subsets: ["latin"],
   display: "swap",
 });
@@ -17,11 +23,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Impjieg — Malta's Job Board | Your Next Role, Sorted",
+    default: "Impjieg - Malta's transparent job board",
     template: "%s | Impjieg",
   },
   description:
-    "Malta's modern job board with salary transparency. Find verified salaries, direct applications, and fresh listings. Hiring? Post your job in minutes.",
+    "Malta's transparent job board for verified salaries, fresh listings, and direct applications. Hire with clarity and reach candidates faster.",
   keywords: [
     "Malta jobs",
     "Malta job board",
@@ -38,23 +44,23 @@ export const metadata: Metadata = {
     locale: "en_MT",
     url: "https://impjieg.vercel.app",
     siteName: "Impjieg",
-    title: "Impjieg — Malta's Job Board",
+    title: "Impjieg - Malta's transparent job board",
     description:
-      "Malta's modern job board with salary transparency. Find verified salaries and fresh listings.",
+      "Verified salaries, direct applications, and fresh listings for Malta's job market.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Impjieg — Malta's Job Board",
+        alt: "Impjieg - Malta's transparent job board",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Impjieg — Malta's Job Board",
+    title: "Impjieg - Malta's transparent job board",
     description:
-      "Malta's modern job board with salary transparency.",
+      "Verified salaries, direct applications, and fresh listings for Malta.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -85,8 +91,8 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAF8FF" },
-    { media: "(prefers-color-scheme: dark)", color: "#0F0B1A" },
+    { media: "(prefers-color-scheme: light)", color: "#F6F1E8" },
+    { media: "(prefers-color-scheme: dark)", color: "#07111D" },
   ],
 };
 
@@ -102,7 +108,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
