@@ -1,3 +1,6 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
 import { hasValidAdminSession } from "@/lib/admin-session";
 import { createAdminGrantsServiceClient, getCurrentUserOrThrow, assertAdminUser, assertEmployerOwnsGrant, isEligibleAdminUser, AuthorizationError } from "./access";
 import { logCommercialGrantAction } from "./audit";
@@ -89,7 +92,7 @@ function getCommercialGrantsTable(
   return client.from("admin_commercial_grants") as unknown as AdminCommercialGrantsTable;
 }
 
-export function buildAdminCommercialGrantInsertRow(
+export async function buildAdminCommercialGrantInsertRow(
   payload: ReturnType<typeof createAdminCommercialGrantSchema.parse>,
   grantedBy: string
 ) {
@@ -114,7 +117,7 @@ export function buildAdminCommercialGrantInsertRow(
   };
 }
 
-export function calculateGrantCreditConsumption(grant: AdminCommercialGrantRow) {
+export async function calculateGrantCreditConsumption(grant: AdminCommercialGrantRow) {
   const creditsTotal = grant.credits_total ?? 0;
   const nextCreditsUsed = grant.credits_used + 1;
 
@@ -184,7 +187,7 @@ export async function createAdminCommercialGrant(input: unknown) {
   const grantsTable = getCommercialGrantsTable(client);
 
   const { data, error } = await grantsTable
-    .insert([buildAdminCommercialGrantInsertRow(payload, user.id)])
+    .insert([await buildAdminCommercialGrantInsertRow(payload, user.id)])
     .select("*")
     .single();
 
@@ -204,6 +207,7 @@ export async function createAdminCommercialGrant(input: unknown) {
     },
   });
 
+  revalidatePath("/admin/commercial-grants");
   return data;
 }
 
@@ -259,6 +263,7 @@ export async function updateAdminCommercialGrant(grantId: string, input: unknown
     },
   });
 
+  revalidatePath("/admin/commercial-grants");
   return data;
 }
 
@@ -295,6 +300,7 @@ export async function revokeAdminCommercialGrant(grantId: string, reason: string
     },
   });
 
+  revalidatePath("/admin/commercial-grants");
   return data;
 }
 
@@ -401,7 +407,7 @@ export async function consumeGrantCredit(input: unknown) {
     throw new Error("Grant is no longer active");
   }
 
-  const { nextCreditsUsed, nextStatus } = calculateGrantCreditConsumption(grant);
+  const { nextCreditsUsed, nextStatus } = await calculateGrantCreditConsumption(grant);
 
   const { data, error } = await grantsTable
     .update({

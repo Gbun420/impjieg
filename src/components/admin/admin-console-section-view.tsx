@@ -12,6 +12,11 @@ import {
   formatAuditEntryValue,
 } from "@/lib/admin-consoles";
 import { daysAgo, formatDate, formatSalary } from "@/lib/utils";
+import { GrantsList } from "./grants/grants-list";
+import { CreateGrantForm } from "./grants/create-grant-form";
+import { listAllCommercialGrants } from "@/lib/monetization/admin-grants/actions";
+import { GRANT_STATUSES } from "@/lib/monetization/admin-grants/constants";
+import type { AdminCommercialGrantRow } from "@/lib/monetization/admin-grants/types";
 
 type SummaryMetric = {
   label: string;
@@ -478,12 +483,45 @@ function AuditLogConsole({ data }: { data: AdminConsoleData }) {
   );
 }
 
+function CommercialGrantsConsole({ grants }: { grants: AdminCommercialGrantRow[] }) {
+  const activeGrants = grants.filter((g) => g.status === "active").length;
+
+  return (
+    <div className="space-y-6">
+      <SummaryGrid
+        metrics={[
+          { label: "Total grants", value: grants.length, note: "Recorded commercial grants" },
+          { label: "Active grants", value: activeGrants, note: "Currently providing entitlements" },
+          { label: "Revoked", value: grants.filter((g) => g.status === "revoked").length, note: "Manually stopped" },
+          { label: "Expired", value: grants.filter((g) => g.status === "expired").length, note: "Naturally concluded" },
+        ]}
+      />
+
+      <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
+        <div className="space-y-6">
+          <Panel title="Commercial grants" description="Live manual entitlements and trial states">
+            <GrantsList grants={grants} />
+          </Panel>
+        </div>
+
+        <div className="space-y-6">
+          <CreateGrantForm />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AdminConsoleSectionView({
   section,
   data,
+  extra,
 }: {
   section: AdminConsoleSection;
   data: AdminConsoleData;
+  extra?: {
+    grants?: AdminCommercialGrantRow[];
+  };
 }) {
   const meta = getAdminConsoleSectionMeta(section);
   const overviewLinks = adminConsoleNavItems.filter((item) => item.href !== "/admin/dashboard");
@@ -512,6 +550,7 @@ export function AdminConsoleSectionView({
       {section === "payments" ? <PaymentsConsole data={data} /> : null}
       {section === "alerts" ? <AlertsConsole data={data} /> : null}
       {section === "subscriptions" ? <SubscriptionsConsole data={data} /> : null}
+      {section === "commercial-grants" ? <CommercialGrantsConsole grants={extra?.grants ?? []} /> : null}
       {section === "audit-log" ? <AuditLogConsole data={data} /> : null}
     </div>
   );

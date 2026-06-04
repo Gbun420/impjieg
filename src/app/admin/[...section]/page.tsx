@@ -7,6 +7,7 @@ import {
   resolveAdminConsoleSection,
 } from "@/lib/admin-consoles";
 import { hasValidAdminSession } from "@/lib/admin-session";
+import { listAllCommercialGrants } from "@/lib/monetization/admin-grants/actions";
 
 export default async function AdminSectionPage({
   params,
@@ -24,7 +25,10 @@ export default async function AdminSectionPage({
     redirect("/admin/dashboard");
   }
 
-  const data = await getAdminConsoleData();
+  const [data, grants] = await Promise.all([
+    getAdminConsoleData(),
+    section === "commercial-grants" ? listAllCommercialGrants() : Promise.resolve([]),
+  ]);
   const meta = getAdminConsoleSectionMeta(section);
 
   return (
@@ -34,7 +38,7 @@ export default async function AdminSectionPage({
       activePath={`/admin/${section}`}
       eyebrow={meta.eyebrow}
     >
-      <AdminConsoleSectionView section={section} data={data} />
+      <AdminConsoleSectionView section={section} data={data} extra={{ grants }} />
     </AdminSectionShell>
   );
 }

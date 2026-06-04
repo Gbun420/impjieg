@@ -23,6 +23,7 @@ export type AdminConsoleSection =
   | "payments"
   | "alerts"
   | "subscriptions"
+  | "commercial-grants"
   | "audit-log";
 
 export type AdminConsoleNavItem = {
@@ -43,6 +44,7 @@ export const adminConsoleSections: Array<{
   { slug: "payments", href: "/admin/payments", label: "Payments" },
   { slug: "alerts", href: "/admin/alerts", label: "Alerts" },
   { slug: "subscriptions", href: "/admin/subscriptions", label: "Subscriptions" },
+  { slug: "commercial-grants", href: "/admin/commercial-grants", label: "Grants" },
   { slug: "audit-log", href: "/admin/audit-log", label: "Audit log" },
 ] as const;
 
@@ -116,6 +118,12 @@ export function getAdminConsoleSectionMeta(section: AdminConsoleSection) {
       description:
         "Monitor live plan states, billing cycles, and credit usage.",
       eyebrow: "Subscription operations",
+    },
+    "commercial-grants": {
+      title: "Commercial grants",
+      description:
+        "Manage manual commercial entitlements, complimentary access, and discounts.",
+      eyebrow: "Revenue operations",
     },
     "audit-log": {
       title: "Security audit log",
