@@ -32,7 +32,6 @@ test("admin console section resolver maps known console slugs", () => {
 
 test("admin console metadata stays aligned with the live consoles", () => {
   const jobsMeta = getAdminConsoleSectionMeta("jobs");
-  assert.equal(jobsMeta.title, "Jobs console");
+  assert.equal(jobsMeta.title, "Jobs operations");
   assert.match(jobsMeta.description, /Review live listings/i);
 });
-

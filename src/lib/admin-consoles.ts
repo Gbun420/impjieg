@@ -70,55 +70,55 @@ export function getAdminConsoleSectionMeta(section: AdminConsoleSection) {
     { title: string; description: string; eyebrow: string }
   > = {
     dashboard: {
-      title: "Admin overview",
+      title: "Operations overview",
       description:
-        "Live operations, account health, and the latest events across the marketplace.",
-      eyebrow: "Internal admin",
+        "Live production metrics, account health, and the latest events across the marketplace.",
+      eyebrow: "Operations hub",
     },
     jobs: {
-      title: "Jobs console",
+      title: "Jobs operations",
       description:
         "Review live listings, status changes, traffic, and application volume.",
-      eyebrow: "Job operations",
+      eyebrow: "Marketplace operations",
     },
     employers: {
-      title: "Employers console",
+      title: "Employer accounts",
       description:
-        "Check company accounts, verification state, and employer trust signals.",
-      eyebrow: "Employer operations",
+        "Check company records, verification state, and employer trust signals.",
+      eyebrow: "Account operations",
     },
     candidates: {
-      title: "Candidates console",
+      title: "Candidate intelligence",
       description:
-        "Track candidate profiles, candidate applications, and active job alerts.",
-      eyebrow: "Candidate operations",
+        "Track candidate profiles, applications, and active job alerts.",
+      eyebrow: "Talent operations",
     },
     applications: {
-      title: "Applications console",
+      title: "Hiring pipeline",
       description:
         "Monitor recent applications and pipeline activity across live jobs.",
       eyebrow: "Pipeline operations",
     },
     payments: {
-      title: "Payments console",
+      title: "Billing and revenue",
       description:
         "Review paid listing activity, pending payments, and revenue signals.",
       eyebrow: "Billing operations",
     },
     alerts: {
-      title: "Alerts console",
+      title: "Notification activity",
       description:
         "Inspect email and WhatsApp alert activity across active subscriptions.",
-      eyebrow: "Alert operations",
+      eyebrow: "Notification operations",
     },
     subscriptions: {
-      title: "Subscriptions console",
+      title: "Plan management",
       description:
         "Monitor live plan states, billing cycles, and credit usage.",
       eyebrow: "Subscription operations",
     },
     "audit-log": {
-      title: "Audit log",
+      title: "Security audit log",
       description:
         "Review the latest recorded admin actions and security-sensitive events.",
       eyebrow: "Security operations",

@@ -1,5 +1,18 @@
 import { redirect } from "next/navigation";
 
-export default function SignupAliasPage() {
-  redirect("/auth/signup");
+export default async function SignupAliasPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === "string" && value) {
+      query.set(key, value);
+    }
+  }
+
+  redirect(`/auth/signup${query.toString() ? `?${query.toString()}` : ""}`);
 }

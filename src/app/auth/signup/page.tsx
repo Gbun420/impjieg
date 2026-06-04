@@ -1,20 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { signup } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, Mail, Lock, User, Briefcase, AlertCircle, Loader2 } from "lucide-react";
 
 type AccountType = "candidate" | "employer";
 
-export default function SignupPage() {
+function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<AccountType>("employer");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -28,20 +32,43 @@ export default function SignupPage() {
     }
 
     if (result?.success) {
-      router.push(result.redirectTo || "/auth/login?message=signed-up");
+      const loginTarget = new URL("/auth/login", window.location.origin);
+      loginTarget.searchParams.set("message", "signed-up");
+      if (redirectUrl) {
+        loginTarget.searchParams.set("redirect", redirectUrl);
+      } else if (result.redirectTo) {
+        loginTarget.searchParams.set("redirect", result.redirectTo);
+      }
+      router.push(`${loginTarget.pathname}${loginTarget.search}`);
       router.refresh();
     }
   }
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Create your account
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          One sign-up for job seekers and employers
-        </p>
+      <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+              <Briefcase className="h-3.5 w-3.5" />
+              Employer ready
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
+              Candidate friendly
+            </span>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.28em] text-white/55">
+              Account setup
+            </p>
+            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-white">
+              Create your account
+            </h1>
+            <p className="max-w-xl text-sm leading-6 text-white/72">
+              One sign-up for job seekers and employers, with the right workspace routing after login.
+            </p>
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -146,6 +173,25 @@ export default function SignupPage() {
         </Button>
       </form>
 
+      <Card className="border-border/70 bg-surface p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Choose the right account type</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Employers get posting and hiring tools. Candidates get profiles, alerts, and saved jobs.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full border border-border/70 bg-muted/30 px-3 py-1 text-xs font-medium text-foreground">
+              Employer dashboard
+            </span>
+            <span className="rounded-full border border-border/70 bg-muted/30 px-3 py-1 text-xs font-medium text-foreground">
+              Candidate dashboard
+            </span>
+          </div>
+        </div>
+      </Card>
+
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
@@ -154,7 +200,31 @@ export default function SignupPage() {
         >
           Sign in
         </Link>
+        {" "}or{" "}
+        <Link
+          href="/admin/login"
+          className="font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          admin login
+        </Link>
       </p>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+            <div className="h-6 w-40 rounded bg-white/10" />
+            <div className="mt-4 h-4 w-full max-w-lg rounded bg-white/10" />
+          </div>
+        </div>
+      }
+    >
+      <SignupForm />
+    </Suspense>
   );
 }

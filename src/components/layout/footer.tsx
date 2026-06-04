@@ -11,7 +11,7 @@ const jobSeekerLinks = [
 const employerLinks = [
   { label: "Post a Job", href: "/employer/post-job" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Employer Login", href: "/auth/login?redirect=/employer/dashboard" },
+  { label: "Employer Sign in", href: "/auth/login?redirect=/employer/dashboard" },
 ];
 
 const companyLinks = [

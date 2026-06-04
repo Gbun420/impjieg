@@ -31,7 +31,7 @@ function SectionHeader({
   summary: string;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="default">
           <Shield className="mr-1.5 h-3.5 w-3.5" />
@@ -40,7 +40,10 @@ function SectionHeader({
         <Badge variant="secondary">Live data</Badge>
       </div>
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+          Operations section
+        </p>
+        <h2 className="text-2xl font-semibold tracking-[-0.04em] text-foreground sm:text-3xl">
           {title}
         </h2>
         <p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
@@ -56,9 +59,12 @@ function SummaryGrid({ metrics }: { metrics: SummaryMetric[] }) {
   return (
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
-        <Card key={metric.label} className="p-5 shadow-sm">
-          <p className="text-sm text-muted-foreground">{metric.label}</p>
-          <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+        <Card key={metric.label} className="overflow-hidden border-border/70 bg-surface p-5 shadow-sm">
+          <div className="h-1 w-full rounded-full bg-[linear-gradient(90deg,#1E63FF_0%,#14C7B7_100%)]" />
+          <p className="mt-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            {metric.label}
+          </p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
             {metric.value}
           </p>
           <p className="mt-3 text-xs text-muted-foreground">{metric.note}</p>
@@ -78,12 +84,18 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <Card className="p-6 shadow-sm">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        <p className="text-sm text-muted-foreground">{description}</p>
+    <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+      <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(30,99,255,0.95)_0%,rgba(20,199,183,0.95)_100%)]" />
+      <div className="p-6">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+            Console panel
+          </p>
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <div className="mt-5 space-y-3">{children}</div>
       </div>
-      <div className="mt-5 space-y-3">{children}</div>
     </Card>
   );
 }
@@ -118,7 +130,7 @@ function SectionItem({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)] sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-foreground">{title}</p>
@@ -148,7 +160,7 @@ function ConsoleAction({
 
   return (
     <Link href={href} target={external ? "_blank" : undefined}>
-      <Button variant={buttonVariant} size="sm">
+      <Button variant={buttonVariant} size="sm" className="shadow-none">
         {label}
         {external ? <ExternalLink className="ml-1 h-3.5 w-3.5" /> : <ArrowRight className="ml-1 h-3.5 w-3.5" />}
       </Button>
@@ -485,10 +497,12 @@ export function AdminConsoleSectionView({
         summary="Use the live overview to jump between admin consoles without leaving the protected admin shell."
       />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="rounded-[1.25rem] border border-border/70 bg-surface p-3 shadow-sm">
+        <div className="flex flex-wrap gap-2">
         {overviewLinks.map((item) => (
           <ConsoleAction key={item.href} href={item.href} label={item.label} />
         ))}
+        </div>
       </div>
 
       {section === "jobs" ? <JobsConsole data={data} /> : null}

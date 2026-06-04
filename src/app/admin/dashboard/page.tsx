@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ComponentType } from "react";
-import { ExternalLink, LogOut, Briefcase, Building2, FileText, Bell, CreditCard, Users, ArrowRight } from "lucide-react";
+import { Briefcase, Building2, FileText, Bell, CreditCard, Users, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { adminLogout } from "../actions";
-import { adminConsoleNavItems } from "@/lib/admin-consoles";
+import {
+  adminConsoleSections,
+  getAdminConsoleSectionMeta,
+} from "@/lib/admin-consoles";
 import { getAdminDashboardData } from "@/lib/admin-dashboard";
 import { hasValidAdminSession } from "@/lib/admin-session";
 import { daysAgo, formatDate, formatSalary } from "@/lib/utils";
@@ -47,18 +49,43 @@ function StatCard({
   icon: ComponentType<{ className?: string }>;
 }) {
   return (
-    <Card className="p-5 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">{value}</p>
+    <Card className="overflow-hidden border-border/70 bg-surface p-5 shadow-sm">
+      <div className="h-1 w-full rounded-full bg-[linear-gradient(90deg,#1E63FF_0%,#14C7B7_100%)]" />
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{value}</p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border/60 bg-muted/20 text-primary">
           <Icon className="h-5 w-5" />
         </div>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">{note}</p>
     </Card>
+  );
+}
+
+function QuickActionCard({
+  href,
+  title,
+  description,
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link href={href} className="group">
+      <Card className="h-full border-border/70 bg-surface p-4 shadow-sm transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:shadow-md">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+          </div>
+          <ArrowRight className="mt-0.5 h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+        </div>
+      </Card>
+    </Link>
   );
 }
 
@@ -80,53 +107,75 @@ export default async function AdminDashboardPage() {
     summary,
   } = await getAdminDashboardData();
   const isDemoMode = serviceStatus.some((item) => item.value === "demo mode");
+  const consoleShortcuts = adminConsoleSections
+    .filter((item) => item.slug !== "dashboard")
+    .map((item) => {
+      const meta = getAdminConsoleSectionMeta(item.slug);
+      return {
+        href: item.href,
+        title: item.label,
+        description: meta.description,
+      };
+    });
 
   return (
     <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="rounded-[2rem] border border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.14),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,244,255,0.84))] p-6 shadow-sm backdrop-blur">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="default">Internal admin</Badge>
-              <Badge variant="success">Production data</Badge>
-              <span className="text-xs text-muted-foreground">Last refreshed {formattedAt}</span>
+      <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] text-white shadow-[0_28px_80px_rgba(11,18,32,0.18)]">
+        <div className="relative overflow-hidden px-6 py-7 sm:px-8">
+          <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.24),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.16),transparent_28%)]" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="secondary" className="border-white/10 bg-white/10 text-white">
+                  Internal admin
+                </Badge>
+                <Badge variant="secondary" className="border-white/10 bg-white/5 text-white/85">
+                  Production data
+                </Badge>
+                <Badge variant="secondary" className="border-white/10 bg-white/5 text-white/75">
+                  Protected route
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.32em] text-white/55">
+                  Operations control plane
+                </p>
+                <h1 className="text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">
+                  Admin console
+                </h1>
+                <p className="max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
+                  Monitor the marketplace, review live operations, and spot issues quickly.
+                  This screen is wired to the deployed Supabase project and shows live production data.
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Admin console
-            </h1>
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              Monitor the marketplace, review live operations, and spot issues quickly. This screen is wired to the deployed Supabase project and shows real data from production.
-            </p>
-          </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link href="/" target="_blank">
-              <Button variant="outline" size="md">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Open site
-              </Button>
-            </Link>
-            <form action={adminLogout}>
-              <Button variant="ghost" size="md" type="submit">
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
-              </Button>
-            </form>
+            <div className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-xl">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Scope</p>
+                <p className="mt-2 text-sm font-medium text-white">Live marketplace overview</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Refreshed</p>
+                <p className="mt-2 text-sm font-medium text-white">{formattedAt}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Access</p>
+                <p className="mt-2 text-sm font-medium text-white">Authenticated only</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Mode</p>
+                <p className="mt-2 text-sm font-medium text-white">Production data</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {adminConsoleNavItems
-          .filter((item) => item.href !== "/admin/dashboard")
-          .map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button variant="outline" size="md" className="w-full">
-                {item.label}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          ))}
+        {consoleShortcuts.map((item) => (
+          <QuickActionCard key={item.href} href={item.href} title={item.title} description={item.description} />
+        ))}
       </section>
 
       {isDemoMode ? (
@@ -271,10 +320,13 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="p-6 shadow-sm">
-          <div className="flex items-center justify-between">
+        <Card className="border-border/70 p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Latest applications</h2>
+              <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                Hiring pipeline
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">Latest applications</h2>
               <p className="text-sm text-muted-foreground">
                 Recent candidates and their current pipeline status
               </p>
@@ -291,7 +343,7 @@ export default async function AdminDashboardPage() {
             {recentApplications.map((application) => (
               <div
                 key={application.id}
-                className="rounded-2xl border border-border/60 bg-muted/20 p-4"
+                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -325,10 +377,13 @@ export default async function AdminDashboardPage() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="p-6 shadow-sm">
-            <div className="flex items-center justify-between">
+          <Card className="border-border/70 p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Recent employers</h2>
+                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                  Employer accounts
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-foreground">Recent employers</h2>
                 <p className="text-sm text-muted-foreground">New company accounts and trust signals</p>
               </div>
               <Badge variant="info">{summary.verifiedEmployers} verified</Badge>
@@ -338,10 +393,10 @@ export default async function AdminDashboardPage() {
               {recentEmployers.map((employer) => (
                 <div
                   key={employer.id}
-                  className="rounded-2xl border border-border/60 bg-muted/20 p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
+                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div>
                       <p className="font-medium text-foreground">{employer.name}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {employer.industry ?? "Industry not set"} ·{" "}
@@ -357,15 +412,18 @@ export default async function AdminDashboardPage() {
             </div>
           </Card>
 
-          <Card className="p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-foreground">Recent payments</h2>
+          <Card className="border-border/70 p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+              Billing activity
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-foreground">Recent payments</h2>
             <p className="text-sm text-muted-foreground">Latest billing activity by listing type</p>
 
             <div className="mt-5 space-y-3">
               {recentPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/20 p-4"
+                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
                 >
                   <div>
                     <p className="font-medium text-foreground">{payment.listing_type}</p>
@@ -387,8 +445,9 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <Card className="p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground">Job alerts</h2>
+        <Card className="border-border/70 p-6 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Notification activity</p>
+          <h2 className="mt-1 text-lg font-semibold text-foreground">Job alerts</h2>
           <p className="text-sm text-muted-foreground">
             Live subscriber activity for email and WhatsApp alerts
           </p>
@@ -397,7 +456,7 @@ export default async function AdminDashboardPage() {
             {recentAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/20 p-4"
+                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
               >
                 <div>
                   <p className="font-medium text-foreground">{alert.email}</p>
@@ -413,15 +472,16 @@ export default async function AdminDashboardPage() {
           </div>
         </Card>
 
-        <Card className="p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground">Subscription snapshot</h2>
+        <Card className="border-border/70 p-6 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Subscription operations</p>
+          <h2 className="mt-1 text-lg font-semibold text-foreground">Subscription snapshot</h2>
           <p className="text-sm text-muted-foreground">Recent plan activity and status</p>
 
           <div className="mt-5 space-y-3">
             {recentSubscriptions.map((subscription) => (
               <div
                 key={subscription.id}
-                className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/20 p-4"
+                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
               >
                 <div>
                   <p className="font-medium text-foreground">

@@ -5,11 +5,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { logout } from "@/lib/actions/auth";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { SITE } from "@/lib/constants";
 
 const navLinks = [
@@ -26,6 +27,8 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const hydrated = useHydrated();
   const router = useRouter();
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
 
   useEffect(() => {
     if (!hasSupabasePublicEnv()) {
@@ -113,6 +116,52 @@ export default function Header() {
     );
   }
 
+  if (isAdminRoute) {
+    return (
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
+            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
+                {SITE.name}
+              </span>
+              <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
+                {SITE.tagline}
+              </span>
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="hidden border-border/60 bg-muted/70 text-foreground md:inline-flex">
+              Admin console
+            </Badge>
+
+            {hydrated ? (
+              <button
+                onClick={toggleTheme}
+                className="hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors hover:bg-muted md:flex"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </button>
+            ) : null}
+
+            <Link href="/">
+              <Button variant="outline" size="sm">
+                Open public site
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -177,7 +226,7 @@ export default function Header() {
             ) : (
               <>
                 <Link href="/auth/login">
-                  <Button variant="ghost" size="sm">Login</Button>
+                  <Button variant="ghost" size="sm">Sign in</Button>
                 </Link>
                 <Link href="/auth/signup">
                   <Button variant="primary" size="sm">Post a Job</Button>

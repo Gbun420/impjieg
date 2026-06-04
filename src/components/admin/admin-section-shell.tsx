@@ -25,56 +25,95 @@ export function AdminSectionShell({
 }: AdminSectionShellProps) {
   return (
     <div className="space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(30,99,255,0.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(245,248,252,0.9))] p-6 shadow-sm">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="default">
-                <Shield className="mr-1.5 h-3.5 w-3.5" />
-                {eyebrow}
-              </Badge>
-              <Badge variant="secondary">Protected route</Badge>
+      <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-0 text-white shadow-[0_28px_80px_rgba(11,18,32,0.18)]">
+        <div className="relative overflow-hidden p-6 sm:p-8">
+          <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.24),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.16),transparent_28%)]" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="secondary" className="border-white/10 bg-white/10 text-white">
+                  <Shield className="mr-1.5 h-3.5 w-3.5" />
+                  {eyebrow}
+                </Badge>
+                <Badge variant="secondary" className="border-white/10 bg-white/5 text-white/85">
+                  Protected route
+                </Badge>
+                <Badge variant="secondary" className="border-white/10 bg-white/5 text-white/75">
+                  Live data
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.32em] text-white/55">
+                  Operations console
+                </p>
+                <h1 className="text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">
+                  {title}
+                </h1>
+                <p className="max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
+                  {description}
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {title}
-            </h1>
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              {description}
+
+            <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-xl">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Scope</p>
+                <p className="mt-2 text-sm font-medium text-white">Admin operations</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Access</p>
+                <p className="mt-2 text-sm font-medium text-white">Authenticated only</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Source</p>
+                <p className="mt-2 text-sm font-medium text-white">Production dataset</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <div className="rounded-[1.35rem] border border-border/70 bg-surface p-3 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3 px-1">
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Consoles</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Switch between live admin sections without leaving the protected shell.
             </p>
           </div>
-
-          <div className="flex flex-wrap gap-3">
+          <div className="hidden items-center gap-2 sm:flex">
             <Link href="/admin/dashboard">
-              <Button variant="outline" size="md">
+              <Button variant="outline" size="sm">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Open overview
               </Button>
             </Link>
             <Link href="/">
-              <Button variant="ghost" size="md">
+              <Button variant="ghost" size="sm">
                 Open public site
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
         </div>
-      </Card>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {adminNavItems.map((item) => {
-          const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
-          return (
-            <Link key={item.href} href={item.href} className="shrink-0">
-              <Button
-                type="button"
-                variant={active ? "primary" : "outline"}
-                size="sm"
-              >
-                {item.label}
-              </Button>
-            </Link>
-          );
-        })}
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {adminNavItems.map((item) => {
+            const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
+            return (
+              <Link key={item.href} href={item.href} className="shrink-0">
+                <Button
+                  type="button"
+                  variant={active ? "primary" : "outline"}
+                  size="sm"
+                  className="min-w-max"
+                >
+                  {item.label}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {children}

@@ -4,9 +4,10 @@ import { useState, Suspense } from "react";
 import { login } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, AlertCircle, CheckCircle2, Shield, Briefcase, UserRound } from "lucide-react";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +16,11 @@ function LoginForm() {
   const router = useRouter();
   const message = searchParams.get("message");
   const redirectUrl = searchParams.get("redirect");
+  const destinationLabel = redirectUrl?.includes("/employer/")
+    ? "Employer workspace"
+    : redirectUrl?.includes("/admin/")
+      ? "Admin console"
+      : "Candidate dashboard";
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -32,13 +38,46 @@ function LoginForm() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Welcome back
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sign in to manage your candidate, employer, or admin workspace
-        </p>
+      <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+              <Shield className="h-3.5 w-3.5" />
+              Secure sign in
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
+              {destinationLabel}
+            </span>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.28em] text-white/55">
+              Workspace access
+            </p>
+            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-white">
+              Welcome back
+            </h1>
+            <p className="max-w-xl text-sm leading-6 text-white/72">
+              Sign in to manage your candidate, employer, or admin workspace without losing your intended destination.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
+              <Briefcase className="h-4 w-4 text-signal-teal" />
+              <p className="mt-3 text-sm font-medium">Employer tools</p>
+              <p className="mt-1 text-xs text-white/65">Post jobs, review applicants, and manage billing.</p>
+            </Card>
+            <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
+              <UserRound className="h-4 w-4 text-brand-blue" />
+              <p className="mt-3 text-sm font-medium">Candidate workspace</p>
+              <p className="mt-1 text-xs text-white/65">Track applications, alerts, and saved jobs.</p>
+            </Card>
+            <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
+              <Shield className="h-4 w-4 text-performance-amber" />
+              <p className="mt-3 text-sm font-medium">Admin access</p>
+              <p className="mt-1 text-xs text-white/65">Use the internal admin login when you need console access.</p>
+            </Card>
+          </div>
+        </div>
       </div>
 
       {message === "signed-up" && (
@@ -129,6 +168,13 @@ function LoginForm() {
           className="font-medium text-primary hover:text-primary/80 transition-colors"
         >
           Sign up
+        </Link>
+        {" "}or{" "}
+        <Link
+          href="/admin/login"
+          className="font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          admin sign in
         </Link>
       </p>
     </div>
