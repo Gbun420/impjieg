@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createJob } from "@/lib/actions/jobs";
+import { getEmployerEntitlements } from "@/lib/actions/monetization";
+import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -21,12 +24,17 @@ export default function PostJobPage() {
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCheckingBias, setIsCheckingBias] = useState(false);
+  const [entitlements, setEntitlements] = useState<ResolvedEmployerCommercialEntitlements | null>(null);
   const [biasResult, setBiasResult] = useState<{
     isClean: boolean;
     issues: Array<{ type: string; text: string; severity: string; explanation: string; suggestion: string }>;
     overallScore: number;
     summary: string;
   } | null>(null);
+
+  useEffect(() => {
+    getEmployerEntitlements().then(setEntitlements);
+  }, []);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -341,6 +349,17 @@ export default function PostJobPage() {
           <h2 className="text-lg font-semibold text-foreground">
             Listing Type
           </h2>
+          {entitlements && (entitlements.credits.job.remaining > 0 || entitlements.credits.featured.remaining > 0) && (
+            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-3 flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <div className="text-sm">
+                <p className="font-semibold text-primary">Commercial credits available</p>
+                <p className="text-muted-foreground">
+                  You have {entitlements.credits.job.remaining} standard and {entitlements.credits.featured.remaining} featured credits.
+                </p>
+              </div>
+            </div>
+          )}
           <div className="mt-4 space-y-3">
             <label className="flex items-start gap-3 rounded-xl border border-border/60 p-4 has-[:checked]:border-primary/30 has-[:checked]:bg-primary/5 transition-all cursor-pointer">
               <input
@@ -355,9 +374,13 @@ export default function PostJobPage() {
                   <span className="font-medium text-foreground">
                     {PRICING.standard.label}
                   </span>
-                  <span className="font-mono text-lg font-bold text-foreground">
-                    €{PRICING.standard.price}
-                  </span>
+                  {entitlements && entitlements.credits.job.remaining > 0 ? (
+                    <Badge variant="success">Free with credit</Badge>
+                  ) : (
+                    <span className="font-mono text-lg font-bold text-foreground">
+                      €{PRICING.standard.price}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {PRICING.standard.description}
@@ -376,9 +399,13 @@ export default function PostJobPage() {
                   <span className="font-medium text-foreground">
                     {PRICING.featured.label}
                   </span>
-                  <span className="font-mono text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    €{PRICING.featured.price}
-                  </span>
+                  {entitlements && entitlements.credits.featured.remaining > 0 ? (
+                    <Badge variant="success">Free with credit</Badge>
+                  ) : (
+                    <span className="font-mono text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      €{PRICING.featured.price}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {PRICING.featured.description}

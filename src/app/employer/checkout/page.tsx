@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PRICING } from "@/lib/constants";
+import { getEmployerEntitlements } from "@/lib/actions/monetization";
+import { selectBestCommercialDiscount } from "@/lib/monetization/admin-grants/resolver";
+import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
+import { Tag, CheckCircle2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +21,24 @@ export default function CheckoutPage({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [entitlements, setEntitlements] = useState<ResolvedEmployerCommercialEntitlements | null>(null);
 
   const jobId = params.jobId;
   const listingType = params.listingType || "standard";
 
   const pricing = PRICING[listingType as keyof typeof PRICING];
+  const originalAmountCents = pricing.price * 100;
+
+  useEffect(() => {
+    getEmployerEntitlements().then(setEntitlements);
+  }, []);
+
+  const bestDiscount = entitlements?.discounts.length 
+    ? selectBestCommercialDiscount(entitlements.discounts, originalAmountCents)
+    : null;
+
+  const finalAmountCents = bestDiscount ? bestDiscount.discountedTotalCents : originalAmountCents;
+  const finalPrice = finalAmountCents / 100;
 
   useEffect(() => {
     if (!jobId) {
@@ -89,16 +106,40 @@ export default function CheckoutPage({
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{pricing.label} Listing</span>
-            <span className="font-mono text-lg font-bold text-foreground">
+            <span className={`font-mono text-lg font-bold ${bestDiscount ? "line-through text-muted-foreground" : "text-foreground"}`}>
               €{pricing.price}
             </span>
           </div>
+          
+          {bestDiscount && (
+            <div className="flex items-center justify-between text-success">
+              <span className="flex items-center gap-1.5">
+                <Tag className="h-4 w-4" />
+                Commercial Discount
+              </span>
+              <span className="font-mono text-lg font-bold">
+                -€{bestDiscount.discountCents / 100}
+              </span>
+            </div>
+          )}
+
           <p className="text-sm text-muted-foreground">{pricing.description}</p>
+          
+          {bestDiscount && (
+            <div className="rounded-lg bg-success/5 p-3 flex items-start gap-2.5 border border-success/20">
+              <CheckCircle2 className="h-4 w-4 text-success mt-0.5" />
+              <div>
+                <p className="text-xs font-semibold text-success uppercase tracking-wider">Discount Applied</p>
+                <p className="text-xs text-success/80">{bestDiscount.discount?.reason}</p>
+              </div>
+            </div>
+          )}
+
           <div className="border-t border-border/50 pt-3">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-foreground">Total</span>
               <span className="font-mono text-xl font-bold text-foreground">
-                €{pricing.price}
+                €{finalPrice}
               </span>
             </div>
           </div>
@@ -112,7 +153,7 @@ export default function CheckoutPage({
         onClick={handleCheckout}
         isLoading={isLoading}
       >
-        {isLoading ? "Redirecting to Stripe..." : `Pay €${pricing.price}`}
+        {isLoading ? "Redirecting to Stripe..." : `Pay €${finalPrice}`}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
