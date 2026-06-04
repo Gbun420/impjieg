@@ -134,4 +134,3 @@ Use these replacements in active docs:
 - “official portal” -> “platform”
 - “registry” -> “marketplace” or “system”
 - “users” -> “candidates”, “employers”, or “admins” where context is specific
-

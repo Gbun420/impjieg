@@ -86,4 +86,3 @@ This roadmap depends on the active brand modernization plan and must not drift b
   - Sector-specific templates.
   - Local salary benchmarks.
   - SME hiring workflows.
-
