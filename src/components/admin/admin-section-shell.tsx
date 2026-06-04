@@ -4,10 +4,9 @@ import { ArrowRight, Shield, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { adminConsoleNavItems } from "@/lib/admin-consoles";
 
-export const adminNavItems = [
-  { href: "/admin/dashboard", label: "Overview" },
-] as const;
+export const adminNavItems = adminConsoleNavItems;
 
 type AdminSectionShellProps = {
   title: string;
@@ -26,7 +25,7 @@ export function AdminSectionShell({
 }: AdminSectionShellProps) {
   return (
     <div className="space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(247,244,255,0.88))] p-6 shadow-sm">
+      <Card className="border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(30,99,255,0.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(245,248,252,0.9))] p-6 shadow-sm">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl space-y-3">
             <div className="flex flex-wrap items-center gap-2">
