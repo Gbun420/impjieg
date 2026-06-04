@@ -95,15 +95,28 @@ export default async function HomePage() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-6">
               <TrendingUp className="h-3.5 w-3.5" />
-              Transparent hiring for Malta
+              Malta&apos;s modern jobs marketplace
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Jobs in Malta,{" "}
-              <span className="text-gradient">with pay up front.</span>
+              Malta&apos;s modern jobs marketplace for{" "}
+              <span className="text-gradient">tech, digital, and iGaming talent.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Find verified salaries, fresh listings, and direct applications. No ghost jobs, no hidden pay.
+              Find better roles faster, with clear work-mode tags, salary signals, and employers that actually hire.
             </p>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up stagger-2">
+            <Link href="/jobs">
+              <Button variant="primary" size="lg">
+                Find Jobs
+              </Button>
+            </Link>
+            <Link href="/employer/post-job">
+              <Button variant="outline" size="lg">
+                Post a Job
+              </Button>
+            </Link>
           </div>
 
           <div className="mx-auto mt-8 max-w-xl animate-fade-in-up stagger-2">
