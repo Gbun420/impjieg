@@ -222,6 +222,12 @@
 - Preserve job description XSS protection.
 - Do not change sanitizer behavior.
 - Do not reintroduce `dangerouslySetInnerHTML` for job descriptions.
+- Use safe JSON-LD only.
+- Keep JobPosting structured data only on individual job detail pages.
+- Do not add JobPosting markup to list, search, or homepage surfaces.
+- Do not add unsafe, unsanitized, hidden, misleading, stale, expired, or mismatched structured data.
+- Structured data must match visible page content.
+- Expired or inactive jobs must not expose misleading JobPosting markup.
 - Do not introduce unrelated refactors.
 - Stop if any verification gate fails.
 - If lint, test, or build fails, stop and do not deploy.
