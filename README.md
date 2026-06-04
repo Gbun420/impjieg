@@ -1,120 +1,114 @@
-# Impjieg — Malta's Modern Job Board
+# Impjieg
 
-> Your next role, sorted.
+Impjieg is Malta’s modern jobs marketplace for tech, digital, and iGaming talent.
 
-A production-ready job board for the Maltese market with salary transparency, employer dashboards, Stripe payments, and PWA support.
+It helps candidates discover clearer Malta-focused roles and helps employers publish and manage hiring flows with a modern, product-led experience.
 
-## Tech Stack
+## What it does
 
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS v4
-- **Database:** Supabase (PostgreSQL)
-- **Payments:** Stripe
-- **Email:** Resend
-- **Deployment:** Vercel
+- Public job discovery for Malta-focused roles.
+- Search and filters for role, sector, work mode, seniority, and location where supported.
+- Employer job posting and application management where implemented.
+- Candidate applications and job alerts where implemented.
+- AI-assisted employer tooling where protected and present.
+- Email notifications where implemented.
+- Admin and aggregation surfaces where present.
 
-## Getting Started
+## Why it matters
+
+- Less noise than generic listings.
+- Clearer work-mode and role signals.
+- Faster paths from discovery to application.
+- A better marketplace experience for candidates and employers.
+
+## Product status
+
+- Live on Vercel.
+- Active hardening and brand modernization are underway.
+- Current source of truth: [Brand modernization execution plan](docs/plans/2026-06-04-brand-modernization-execution.md)
+
+## Tech stack
+
+- Next.js App Router
+- TypeScript
+- Supabase
+- Vercel
+- Resend where implemented
+- Groq where implemented
+- Stripe where implemented
+- Twilio WhatsApp where implemented
+- Tailwind CSS and shared UI primitives where present
+
+## Getting started
 
 ### Prerequisites
 
 - Node.js 20+
 - npm
-- Supabase account
-- Stripe account
+- A local `.env.local` file based on `.env.example`
 
-### Environment Setup
-
-1. Copy the environment template:
-
-```bash
-cp .env.example .env.local
-```
-
-2. Fill in your environment variables:
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-# Stripe
-STRIPE_SECRET_KEY=your-stripe-secret-key
-STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
-STRIPE_WEBHOOK_SECRET=your-webhook-secret
-STRIPE_PRICE_STANDARD=your-standard-price-id
-STRIPE_PRICE_FEATURED=your-featured-price-id
-
-# Resend
-RESEND_API_KEY=your-resend-api-key
-
-# App
-NEXT_PUBLIC_URL=http://localhost:3000
-```
-
-### Supabase Setup
-
-1. Create a new Supabase project
-2. Run the migration in `supabase/migrations/001_initial_schema.sql`
-3. Enable Row Level Security on all tables
-4. Configure Auth redirect URLs to `http://localhost:3000/auth/callback`
-
-### Stripe Setup
-
-1. Create products in Stripe:
-   - "Standard Listing" — €29 (one-time)
-   - "Featured Listing" — €59 (one-time)
-2. Copy the Price IDs to your `.env.local`
-3. Set up webhook endpoint: `http://localhost:3000/api/webhooks/stripe`
-4. Listen for: `checkout.session.completed`, `checkout.session.expired`
-
-### Development
+### Install and run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000`.
 
-### Build
+## Environment variables
+
+Use names only. Do not commit values.
+
+### Public client variables
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_URL`
+
+### Server variables
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `INTERNAL_ADMIN_TOKEN`
+- `JOB_ALERT_UNSUBSCRIBE_SECRET`
+- `CRON_SECRET`
+- `ADMIN_BOOTSTRAP_PRIMARY_EMAIL`
+- `ADMIN_BOOTSTRAP_PRIMARY_PASSWORD`
+- `ADMIN_BOOTSTRAP_PARTNER_EMAIL`
+
+### Optional integrations
+
+- `GROQ_API_KEY`
+- `RESEND_API_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_STANDARD`
+- `STRIPE_PRICE_FEATURED`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_WHATSAPP_NUMBER`
+
+## Development workflow
 
 ```bash
+npm run lint
+npm test
 npm run build
 ```
 
-### Deploy
+All three gates must pass before deployment.
 
-1. Push to GitHub
-2. Connect repository to Vercel
-3. Add all environment variables in Vercel dashboard
-4. Deploy
+## Security notes
 
-## Project Structure
+- Do not commit secrets.
+- AI routes must remain protected.
+- Job descriptions must remain sanitized.
+- Unsubscribe links must remain token-only.
+- Logs must not include raw emails, tokens, secrets, or private candidate or employer data.
 
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── auth/               # Authentication pages
-│   ├── companies/          # Company directory & profiles
-│   ├── employer/           # Employer dashboard
-│   ├── jobs/               # Job listings & detail
-│   └── api/                # API routes (webhooks)
-├── components/
-│   ├── ui/                 # Design system primitives
-│   ├── layout/             # Header, footer, templates
-│   └── jobs/               # Job-specific components
-├── lib/
-│   ├── actions/            # Server actions
-│   ├── supabase/           # Supabase clients & types
-│   ├── constants.ts        # Brand constants
-│   ├── utils.ts            # Utility functions
-│   └── stripe.ts           # Stripe client
-└── styles/
-    └── globals.css         # Tailwind + brand tokens
-```
+## Documentation
 
-## License
-
-MIT
+- [Documentation style guide](docs/DOCUMENTATION_STYLE_GUIDE.md)
+- [Brand modernization execution plan](docs/plans/2026-06-04-brand-modernization-execution.md)
+- [Product and market roadmap](docs/plans/2026-05-23-job-board-market-roadmap.md)

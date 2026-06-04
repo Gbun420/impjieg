@@ -1,3 +1,6 @@
+> Status: Historical / Superseded
+> This document is retained for context. The current Impjieg brand source of truth is `docs/plans/2026-06-04-brand-modernization-execution.md`.
+
 # Admin & Aggregation Foundation Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
