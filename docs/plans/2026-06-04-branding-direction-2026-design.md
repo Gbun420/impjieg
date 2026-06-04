@@ -1,3 +1,6 @@
+> Status: Historical / Superseded
+> This document is retained for context. It has been superseded by `docs/plans/2026-06-04-brand-modernization-execution.md`.
+
 # Impjieg 2026 Branding Direction
 
 ## Goal
@@ -111,4 +114,3 @@ Recommended value pillars:
 - Canva/Business Wire, Canva Unveils 2026 Design Trends: The Year of "Imperfect by Design": https://www.businesswire.com/news/home/20251210696597/en/Canva-Unveils-2026-Design-Trends-The-Year-of-‘Imperfect-by-Design’
 - Creative Bloq, Texture, warmth and tactile rebellion: https://www.creativebloq.com/design/graphic-design/texture-warmth-and-tactile-rebellion-the-big-graphic-design-trends-for-2026
 - Stills, The Design Trend Report | 2026: https://www.stills.com/articles/design-trend-report-2026/
-
