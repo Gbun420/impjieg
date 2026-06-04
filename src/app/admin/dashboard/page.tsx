@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { adminLogout } from "../actions";
+import { adminConsoleNavItems } from "@/lib/admin-consoles";
 import { getAdminDashboardData } from "@/lib/admin-dashboard";
 import { hasValidAdminSession } from "@/lib/admin-session";
 import { daysAgo, formatDate, formatSalary } from "@/lib/utils";
@@ -115,6 +116,19 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {adminConsoleNavItems
+          .filter((item) => item.href !== "/admin/dashboard")
+          .map((item) => (
+            <Link key={item.href} href={item.href}>
+              <Button variant="outline" size="md" className="w-full">
+                {item.label}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          ))}
+      </section>
+
       {isDemoMode ? (
         <Card className="border-amber-300 bg-amber-50 p-4 text-amber-950">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -150,10 +164,10 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-foreground">
-                Additional admin consoles are hidden
+                Additional admin consoles are wired to live data
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Only the live overview is exposed right now. Other consoles stay out of navigation until they are wired to the real data model.
+                Use the shortcuts above to open jobs, employers, candidates, applications, payments, alerts, subscriptions, and the audit log.
               </p>
             </div>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
@@ -170,7 +184,7 @@ export default async function AdminDashboardPage() {
                 New listings and their current status
               </p>
             </div>
-            <Link href="/employer/jobs">
+            <Link href="/admin/jobs">
               <Button variant="ghost" size="sm">
                 View jobs
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
@@ -265,7 +279,7 @@ export default async function AdminDashboardPage() {
                 Recent candidates and their current pipeline status
               </p>
             </div>
-            <Link href="/employer/applications">
+            <Link href="/admin/applications">
               <Button variant="ghost" size="sm">
                 Review pipeline
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
