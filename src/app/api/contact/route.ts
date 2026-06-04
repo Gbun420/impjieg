@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { SITE } from "@/lib/constants";
+import { sendEmail } from "@/lib/email-sender";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name"),
@@ -22,40 +23,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (!resendApiKey) {
-    return NextResponse.json(
-      { error: "Contact email is not configured yet" },
-      { status: 503 }
-    );
-  }
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Impjieg Contact <notifications@impjieg.com>",
-      to: [SITE.email],
-      reply_to: parsed.data.email,
-      subject: `[Contact] ${parsed.data.subject}`,
-      text: [
-        `Name: ${parsed.data.name}`,
-        `Email: ${parsed.data.email}`,
-        `Subject: ${parsed.data.subject}`,
-        "",
-        parsed.data.message,
-      ].join("\n"),
-    }),
+  const result = await sendEmail({
+    from: "Impjieg Contact <onboarding@resend.dev>",
+    to: SITE.email,
+    replyTo: parsed.data.email,
+    subject: `[Contact] ${parsed.data.subject}`,
+    text: [
+      `Name: ${parsed.data.name}`,
+      `Email: ${parsed.data.email}`,
+      `Subject: ${parsed.data.subject}`,
+      "",
+      parsed.data.message,
+    ].join("\n"),
+    html: `
+      <h2>New Contact Message</h2>
+      <p><strong>Name:</strong> ${parsed.data.name}</p>
+      <p><strong>Email:</strong> ${parsed.data.email}</p>
+      <p><strong>Subject:</strong> ${parsed.data.subject}</p>
+      <h3>Message</h3>
+      <p>${parsed.data.message.replace(/\n/g, "<br>")}</p>
+    `,
   });
 
-  if (!response.ok) {
-    const error = await response.text().catch(() => "Failed to send contact message");
+  if (!result.success) {
     return NextResponse.json(
-      { error: error || "Failed to send contact message" },
-      { status: 502 }
+      { error: result.error || "Failed to send contact message" },
+      { status: result.category === "setup_failed" ? 503 : 502 }
     );
   }
 
