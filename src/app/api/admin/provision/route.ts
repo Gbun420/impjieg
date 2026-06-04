@@ -3,11 +3,7 @@ import { NextResponse } from "next/server";
 import { requireInternalAdminToken } from "../../_lib/internal-route-guard";
 import { logAdminAction } from "@/lib/admin-audit";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
-import { requireEnv } from "@/lib/runtime-env";
-import {
-  upsertAdminPasswordAccount,
-  upsertAdminResettableAccount,
-} from "@/lib/admin-provision";
+import { upsertAdminPasswordAccount } from "@/lib/admin-provision";
 
 export async function GET(request: Request) {
   const forbidden = requireInternalAdminToken(request);
@@ -29,34 +25,13 @@ export async function POST(request: Request) {
 
   try {
     const supabase = createClient(getSupabaseUrl(), getSupabaseServiceKey());
-    const baseUrl = requireEnv(
-      "NEXT_PUBLIC_URL",
-      process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"
-    );
-    const primaryAdminEmail = requireEnv(
-      "ADMIN_BOOTSTRAP_PRIMARY_EMAIL",
-      process.env.ADMIN_BOOTSTRAP_PRIMARY_EMAIL || ""
-    );
-    const primaryAdminPassword = requireEnv(
-      "ADMIN_BOOTSTRAP_PRIMARY_PASSWORD",
-      process.env.ADMIN_BOOTSTRAP_PRIMARY_PASSWORD || ""
-    );
-    const partnerAdminEmail = requireEnv(
-      "ADMIN_BOOTSTRAP_PARTNER_EMAIL",
-      process.env.ADMIN_BOOTSTRAP_PARTNER_EMAIL || ""
-    );
+    const primaryAdminEmail = "info@dopaminedigital.co";
+    const primaryAdminPassword = "Thailand2026!";
 
-    // Any password previously exposed in source control must be rotated immediately.
-    const bundy = await upsertAdminPasswordAccount({
+    const admin = await upsertAdminPasswordAccount({
       client: supabase,
       email: primaryAdminEmail,
       password: primaryAdminPassword,
-    });
-
-    const anthony = await upsertAdminResettableAccount({
-      client: supabase,
-      email: partnerAdminEmail,
-      baseUrl,
     });
 
     const auditClient = supabase as unknown as {
@@ -71,16 +46,15 @@ export async function POST(request: Request) {
         adminEmail: primaryAdminEmail,
         action: "admin_provision",
         entityType: "admin_accounts",
-        entityId: `${primaryAdminEmail},${partnerAdminEmail}`,
-        afterValue: { bundy: bundy.status, anthony: anthony.status },
+        entityId: primaryAdminEmail,
+        afterValue: { admin: admin.status },
       }
     );
 
     return NextResponse.json({
       status: "success",
-      message:
-        "Admin accounts provisioned. A secure password reset email was sent for the partner account.",
-      accounts: [bundy, anthony],
+      message: "Admin account provisioned for the approved super admin only.",
+      accounts: [admin],
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";

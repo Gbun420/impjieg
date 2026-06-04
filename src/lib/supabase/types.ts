@@ -460,6 +460,160 @@ export interface Database {
            completed_at?: string | null;
          };
        };
+       admin_commercial_grants: {
+         Row: {
+           id: string;
+           employer_id: string;
+           granted_by: string;
+           grant_type:
+             | "free_trial"
+             | "plan_access"
+             | "job_credit"
+             | "featured_credit"
+             | "boost_credit"
+             | "ai_screening_credit"
+             | "percent_discount"
+             | "fixed_discount"
+             | "custom_entitlement";
+           product_id: string | null;
+           entitlement_key: string | null;
+           plan_key: string | null;
+           credits_total: number | null;
+           credits_used: number;
+           discount_percent: number | null;
+           discount_amount_cents: number | null;
+           currency: string | null;
+           starts_at: string;
+           expires_at: string | null;
+           status: "active" | "expired" | "revoked" | "consumed";
+           reason: string;
+           internal_notes: string | null;
+           revoked_at: string | null;
+           revoked_by: string | null;
+           revoke_reason: string | null;
+           metadata: Json;
+           created_at: string;
+           updated_at: string;
+         };
+         Insert: {
+           id?: string;
+           employer_id: string;
+           granted_by: string;
+           grant_type:
+             | "free_trial"
+             | "plan_access"
+             | "job_credit"
+             | "featured_credit"
+             | "boost_credit"
+             | "ai_screening_credit"
+             | "percent_discount"
+             | "fixed_discount"
+             | "custom_entitlement";
+           product_id?: string | null;
+           entitlement_key?: string | null;
+           plan_key?: string | null;
+           credits_total?: number | null;
+           credits_used?: number;
+           discount_percent?: number | null;
+           discount_amount_cents?: number | null;
+           currency?: string | null;
+           starts_at?: string;
+           expires_at?: string | null;
+           status?: "active" | "expired" | "revoked" | "consumed";
+           reason: string;
+           internal_notes?: string | null;
+           revoked_at?: string | null;
+           revoked_by?: string | null;
+           revoke_reason?: string | null;
+           metadata?: Json;
+           created_at?: string;
+           updated_at?: string;
+         };
+         Update: {
+           id?: string;
+           employer_id?: string;
+           granted_by?: string;
+           grant_type?:
+             | "free_trial"
+             | "plan_access"
+             | "job_credit"
+             | "featured_credit"
+             | "boost_credit"
+             | "ai_screening_credit"
+             | "percent_discount"
+             | "fixed_discount"
+             | "custom_entitlement";
+           product_id?: string | null;
+           entitlement_key?: string | null;
+           plan_key?: string | null;
+           credits_total?: number | null;
+           credits_used?: number;
+           discount_percent?: number | null;
+           discount_amount_cents?: number | null;
+           currency?: string | null;
+           starts_at?: string;
+           expires_at?: string | null;
+           status?: "active" | "expired" | "revoked" | "consumed";
+           reason?: string;
+           internal_notes?: string | null;
+           revoked_at?: string | null;
+           revoked_by?: string | null;
+           revoke_reason?: string | null;
+           metadata?: Json;
+           created_at?: string;
+           updated_at?: string;
+         };
+       };
+       admin_commercial_grant_audit_logs: {
+         Row: {
+           id: string;
+           grant_id: string | null;
+           employer_id: string;
+           actor_id: string | null;
+           action:
+             | "grant_created"
+             | "grant_updated"
+             | "grant_revoked"
+             | "grant_expired"
+             | "grant_consumed"
+             | "credit_used"
+             | "discount_applied";
+           metadata: Json;
+           created_at: string;
+         };
+         Insert: {
+           id?: string;
+           grant_id?: string | null;
+           employer_id: string;
+           actor_id?: string | null;
+           action:
+             | "grant_created"
+             | "grant_updated"
+             | "grant_revoked"
+             | "grant_expired"
+             | "grant_consumed"
+             | "credit_used"
+             | "discount_applied";
+           metadata?: Json;
+           created_at?: string;
+         };
+         Update: {
+           id?: string;
+           grant_id?: string | null;
+           employer_id?: string;
+           actor_id?: string | null;
+           action?:
+             | "grant_created"
+             | "grant_updated"
+             | "grant_revoked"
+             | "grant_expired"
+             | "grant_consumed"
+             | "credit_used"
+             | "discount_applied";
+           metadata?: Json;
+           created_at?: string;
+         };
+       };
        candidate_profiles: {
         Row: {
           id: string;

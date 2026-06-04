@@ -1,6 +1,5 @@
 const SUPER_ADMIN_EMAILS = [
-  "bundyglenn@gmail.com",
-  "anthonymackaymt@gmail.com",
+  "info@dopaminedigital.co",
 ] as const;
 
 export function normalizeEmail(email: string) {
