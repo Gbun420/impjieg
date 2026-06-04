@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useCallback } from "react";
 import { updateApplicationStatus, sendCandidateEmail } from "@/lib/actions/applications";
 import { deriveApplicationInsights } from "@/lib/application-insights";
@@ -8,7 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
-import { Mail, Phone, FileText, Send, X, Search, AlertTriangle } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  FileText,
+  Send,
+  X,
+  Search,
+  AlertTriangle,
+  Briefcase,
+  ArrowRight,
+  Sparkles,
+  ArrowUpRight,
+} from "lucide-react";
 import type { Application, CandidateProfile, Json } from "@/lib/supabase/types";
 
 const COLUMNS = [
@@ -298,10 +311,12 @@ function KanbanColumn({
   column,
   applications,
   onDrop,
+  emptyHint,
 }: {
   column: (typeof COLUMNS)[number];
   applications: AppWithJob[];
   onDrop: (appId: string, newStatus: string) => void;
+  emptyHint: string;
 }) {
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -347,8 +362,10 @@ function KanbanColumn({
         ))}
 
         {applications.length === 0 && (
-          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground/50">
-            Drop here
+          <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/60 px-3 py-8 text-center text-xs text-muted-foreground">
+            <ArrowUpRight className="mb-2 h-4 w-4 text-primary/60" aria-hidden="true" />
+            <span className="font-medium text-foreground/80">Awaiting candidates</span>
+            <span className="mt-1 max-w-[12rem] leading-relaxed">{emptyHint}</span>
           </div>
         )}
       </div>
@@ -378,21 +395,66 @@ export default function ApplicationsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Application Pipeline
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Drag and drop candidates between stages
-          </p>
-        </div>
-        <div className="flex gap-2 text-sm text-muted-foreground">
-          <span>Total: {apps.length}</span>
-          <span>Stale new: {insights.staleNewApplications}</span>
-          <span>
-            Avg first action: {insights.averageFirstActionHours !== null ? `${insights.averageFirstActionHours}h` : "N/A"}
-          </span>
+      <div className="rounded-2xl border border-border/50 bg-card/60 p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl space-y-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+              Hiring pipeline
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              Application Pipeline
+            </h1>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Drag candidates between stages to track progress through your hiring pipeline.
+            </p>
+            {apps.length === 0 && (
+              <div className="mt-4 rounded-2xl border border-primary/15 bg-primary/[0.03] p-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Briefcase className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">No applications yet</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Post a job to start seeing candidates here, then move them through New,
+                      Reviewed, Shortlisted, Interview, Offered, Hired, and Rejected as your pipeline grows.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <Link href="/employer/post-job">
+                        <Button variant="primary" size="sm">
+                          Post a Job
+                        </Button>
+                      </Link>
+                      <Link href="/employer/jobs">
+                        <Button variant="outline" size="sm">
+                          View My Jobs
+                          <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3 lg:min-w-[22rem] lg:text-right">
+            <div className="rounded-xl border border-border/60 bg-background/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Total</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">{apps.length}</p>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Stale new</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">{insights.staleNewApplications}</p>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Avg first action</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
+                {insights.averageFirstActionHours !== null ? `${insights.averageFirstActionHours}h` : "N/A"}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -422,6 +484,7 @@ export default function ApplicationsPage({
             column={column}
             applications={filteredApps.filter((a) => a.status === column.id)}
             onDrop={handleDrop}
+            emptyHint="Applications will appear here after you post a live job."
           />
         ))}
       </div>
