@@ -149,7 +149,9 @@ export default async function AdminDashboardPage() {
         <Card className="border-dashed border-border/60 p-5 shadow-sm md:col-span-2 xl:col-span-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-medium text-foreground">Additional admin consoles are hidden</p>
+              <p className="text-sm font-medium text-foreground">
+                Additional admin consoles are hidden
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Only the live overview is exposed right now. Other consoles stay out of navigation until they are wired to the real data model.
               </p>
