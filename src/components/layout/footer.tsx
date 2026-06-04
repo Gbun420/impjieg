@@ -28,18 +28,18 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-              <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
+              <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
               <span className="flex flex-col leading-none">
                 <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
                   {SITE.name}
                 </span>
-                <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-                  Malta jobs
+                <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
+                  {SITE.tagline}
                 </span>
               </span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
-              {SITE.tagline}
+              Malta’s modern jobs marketplace for tech, digital, and iGaming talent.
             </p>
             <p className="mt-1.5 text-xs text-muted-foreground">
               Made in Malta
