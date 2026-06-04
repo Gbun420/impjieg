@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope, JetBrains_Mono } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
+import CookieConsentBanner from "@/components/cookie-consent-banner";
+import { SITE } from "@/lib/constants";
 
-const manrope = Manrope({
+const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
 });
 
-const fraunces = Fraunces({
+const spaceGrotesk = Space_Grotesk({
   variable: "--font-display-font",
   subsets: ["latin"],
   display: "swap",
@@ -23,44 +27,47 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Impjieg - Malta's transparent job board",
-    template: "%s | Impjieg",
+    default: `${SITE.name} - Malta's clearest careers platform`,
+    template: `%s | ${SITE.name}`,
   },
   description:
-    "Malta's transparent job board for verified salaries, fresh listings, and direct applications. Hire with clarity and reach candidates faster.",
+    SITE.tagline +
+    " Find verified salaries, trusted employers, and direct applications.",
   keywords: [
     "Malta jobs",
     "Malta job board",
+    "Malta tech jobs",
+    "Malta iGaming jobs",
+    "digital roles Malta",
     "jobs in Malta",
     "Malta careers",
-    "salary transparency",
     "Malta employment",
   ],
-  authors: [{ name: "Impjieg" }],
-  creator: "Impjieg",
-  publisher: "Impjieg",
+  authors: [{ name: SITE.name }],
+  creator: SITE.name,
+  publisher: SITE.name,
   openGraph: {
     type: "website",
     locale: "en_MT",
-    url: "https://impjieg.vercel.app",
-    siteName: "Impjieg",
-    title: "Impjieg - Malta's transparent job board",
+    url: SITE.url,
+    siteName: SITE.name,
+    title: `${SITE.name} - Malta's clearest careers platform`,
     description:
-      "Verified salaries, direct applications, and fresh listings for Malta's job market.",
+      "A clearer route to Malta's tech, iGaming, and digital careers.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Impjieg - Malta's transparent job board",
+        alt: `${SITE.name} - Malta's clearest careers platform`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Impjieg - Malta's transparent job board",
+    title: `${SITE.name} - Malta's clearest careers platform`,
     description:
-      "Verified salaries, direct applications, and fresh listings for Malta.",
+      "A clearer route to Malta's tech, iGaming, and digital careers.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -82,23 +89,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-icon.png" }],
   },
   manifest: "/manifest.json",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"
-  ),
+  metadataBase: new URL(SITE.url),
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F1E8" },
-    { media: "(prefers-color-scheme: dark)", color: "#07111D" },
+    { media: "(prefers-color-scheme: light)", color: "#F6EFE7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E1B2E" },
   ],
 };
-
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import CookieConsentBanner from "@/components/cookie-consent-banner";
 
 export default function RootLayout({
   children,
@@ -108,7 +109,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">

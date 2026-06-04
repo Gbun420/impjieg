@@ -1,6 +1,6 @@
 export const SITE = {
   name: "Impjieg",
-  tagline: "Malta's transparent job board.",
+  tagline: "Malta's clearest careers platform for tech, iGaming, and digital roles.",
   url: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
   email: "hello@impjieg.com",
 };

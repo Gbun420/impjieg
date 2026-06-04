@@ -32,12 +32,12 @@ async function StatsSection() {
     <div className="flex items-center justify-center gap-6 sm:gap-10 text-sm">
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">{count ?? 0}</p>
-        <p className="text-foreground/75 mt-0.5">Active jobs</p>
+        <p className="text-foreground/75 mt-0.5">Live roles</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">100%</p>
-        <p className="text-foreground/75 mt-0.5">Salary transparency</p>
+        <p className="text-foreground/75 mt-0.5">Pay visible</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
@@ -95,14 +95,14 @@ export default async function HomePage() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-6">
               <TrendingUp className="h-3.5 w-3.5" />
-              Transparent hiring for Malta
+              Clear hiring for Malta&apos;s digital economy
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Jobs in Malta,{" "}
-              <span className="text-gradient">with pay up front.</span>
+              Malta&apos;s tech, iGaming, and digital roles,{" "}
+              <span className="text-gradient">made clear.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Find verified salaries, fresh listings, and direct applications. No ghost jobs, no hidden pay.
+              Find verified salaries, trusted employers, and direct applications. No ghost jobs, no hidden pay.
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export default async function HomePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse by sector</h2>
-              <p className="text-sm text-muted-foreground mt-1">Find roles in the industries that move Malta</p>
+              <p className="text-sm text-muted-foreground mt-1">Find roles in the industries that power Malta&apos;s digital economy</p>
             </div>
             <Link href="/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               All sectors <ArrowRight className="inline h-3.5 w-3.5 ml-0.5" />
@@ -182,7 +182,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Why Impjieg</h2>
-            <p className="text-sm text-muted-foreground mt-1">Built around clarity, speed, and trust</p>
+            <p className="text-sm text-muted-foreground mt-1">Built around clarity, trust, and momentum</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-border bg-card p-6">

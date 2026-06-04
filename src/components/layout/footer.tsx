@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
+import { BrandLockup } from "@/components/layout/brand-lockup";
 
 const jobSeekerLinks = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -27,17 +28,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-              <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
-              <span className="flex flex-col leading-none">
-                <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
-                  {SITE.name}
-                </span>
-                <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-                  Malta jobs
-                </span>
-              </span>
-            </Link>
+            <BrandLockup />
             <p className="mt-3 text-sm text-muted-foreground">
               {SITE.tagline}
             </p>

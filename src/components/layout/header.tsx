@@ -6,11 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { logout } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
+import { BrandLockup } from "@/components/layout/brand-lockup";
 import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { SITE } from "@/lib/constants";
 
 const navLinks = [
   { label: "Jobs", href: "/jobs" },
@@ -93,21 +93,11 @@ export default function Header() {
   }
 
   if (isChecking) {
-      return (
-        <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
-            <span className="flex flex-col leading-none">
-              <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
-                {SITE.name}
-              </span>
-              <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-                Malta jobs
-              </span>
-            </span>
-          </Link>
-          <div className="h-8 w-20 rounded-lg bg-muted animate-pulse" />
+    return (
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <BrandLockup />
+          <div className="h-8 w-20 animate-pulse rounded-lg bg-muted" />
         </div>
       </header>
     );
@@ -116,17 +106,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-          <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0 dark:invert" aria-hidden="true" />
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
-              {SITE.name}
-            </span>
-            <span className="text-[0.62rem] uppercase tracking-[0.34em] text-muted-foreground">
-              Malta jobs
-            </span>
-          </span>
-        </Link>
+        <BrandLockup />
 
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (

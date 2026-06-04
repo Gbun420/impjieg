@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Learn more about Impjieg, Malta's transparent job board built for salary clarity, fresh listings, and direct applications.",
+    "Learn more about Impjieg, Malta's clearest careers platform for tech, iGaming, and digital roles.",
 };
 
 export default function AboutPage() {
@@ -16,7 +16,7 @@ export default function AboutPage() {
 
       <div className="prose prose-sm mt-6 max-w-none text-muted-foreground">
         <p>
-          {SITE.name} is Malta&apos;s transparent job board, built with a
+          {SITE.name} is Malta&apos;s clearest careers platform, built with a
           simple mission: make job hunting clearer, faster, and easier to trust.
         </p>
 

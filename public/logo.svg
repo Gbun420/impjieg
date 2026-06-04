@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
-  <g>
-    <rect x="4" y="4" width="32" height="32" rx="10" fill="#123B67"/>
-    <path d="M12 12L20 20L12 28" stroke="#F6F1E8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="44" y="27" font-family="Manrope, Inter, system-ui, sans-serif" font-weight="700" font-size="23" fill="#0B1220">impjieg</text>
-    <circle cx="176" cy="12" r="4" fill="#D96B4C"/>
-  </g>
-</svg>
