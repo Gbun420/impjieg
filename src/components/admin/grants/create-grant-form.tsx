@@ -21,6 +21,8 @@ type GrantTypeMeta = {
 };
 
 const DEFAULT_GRANT_TYPE: GrantType = GRANT_TYPES[0];
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function EmployerPicker({
   employers,
@@ -30,6 +32,8 @@ function EmployerPicker({
   const [query, setQuery] = useState("");
   const [selectedEmployer, setSelectedEmployer] =
     useState<AdminCommercialGrantEmployerOption | null>(null);
+  const normalizedQuery = query.trim();
+  const pastedEmployerId = UUID_PATTERN.test(normalizedQuery) ? normalizedQuery : "";
 
   const suggestions = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -53,7 +57,7 @@ function EmployerPicker({
     <div className="space-y-3">
       <Input
         label="Employer"
-        placeholder="Search by company name or paste a UUID"
+        placeholder="Search by company name or paste the employer UUID"
         value={query}
         onChange={(event) => {
           const nextValue = event.target.value;
@@ -78,9 +82,9 @@ function EmployerPicker({
         id="grant-employer-search"
         aria-describedby="grant-employer-help"
       />
-      <input type="hidden" name="employerId" value={selectedEmployer?.id ?? query.trim()} />
+      <input type="hidden" name="employerId" value={selectedEmployer?.id ?? pastedEmployerId} />
       <p id="grant-employer-help" className="text-xs leading-5 text-muted-foreground">
-        Search by company name, slug, or UUID. Or paste the employer UUID directly.
+        Search by company name, slug, or UUID. Select a suggestion or paste the employer UUID directly.
       </p>
 
       {selectedEmployer ? (
@@ -127,9 +131,12 @@ function EmployerPicker({
               </button>
             ))
           ) : (
-            <p className="px-1 py-2 text-sm text-muted-foreground">
-              No employers match that search.
-            </p>
+            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
+              <p>No employers match that search.</p>
+              <p className="mt-1 text-xs leading-5">
+                Paste an employer UUID if you already have it.
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -216,8 +223,16 @@ export function CreateGrantForm({
     setSuccess(null);
 
     const formData = new FormData(event.currentTarget);
-      const data = {
-      employerId: formData.get("employerId") as string,
+    const employerId = String(formData.get("employerId") ?? "").trim();
+
+    if (!UUID_PATTERN.test(employerId)) {
+      setError("Select an employer from the list or paste the employer UUID.");
+      setLoading(false);
+      return;
+    }
+
+    const data = {
+      employerId,
       grantType: formData.get("grantType") as GrantType,
       productId: (formData.get("productId") as string) || undefined,
       reason: formData.get("reason") as string,
@@ -333,12 +348,12 @@ export function CreateGrantForm({
             <Input
               name="productId"
               id="grant-product-id"
-              label="Product or plan"
-              placeholder="Optional identifier"
+              label="Product, plan, or checkout key"
+              placeholder="Optional key"
               aria-describedby="grant-product-id-help"
             />
             <p id="grant-product-id-help" className="text-xs leading-5 text-muted-foreground">
-              Optional. Use only when the grant applies to a specific product, plan, or checkout item.
+              Optional. Use the exact key only when the grant applies to a specific product, plan, or checkout item.
             </p>
 
             <EmployerPicker key={pickerResetKey} employers={employers} />
