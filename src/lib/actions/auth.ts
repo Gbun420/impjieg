@@ -7,7 +7,7 @@ import { signupWithAutoConfirm } from "./auth-signup";
 import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
 import { isSuperAdminEmail } from "@/lib/admin-access";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
-import { generateUniqueSlug } from "@/lib/unique-slug";
+import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
 import type { Database, Employer } from "@/lib/supabase/types";
 
@@ -175,37 +175,24 @@ export async function ensureEmployerProfile() {
 
   // Create profile lazily (auth.users is committed by now)
   const companyName = user.user_metadata?.companyName || "New Employer";
-  const slug = slugify(companyName);
   const employersTable = serviceSupabase.from(
     "employers"
   ) as unknown as EmployersMutationTable;
 
-  const slugExists = async (candidateSlug: string) => {
-    const { data, error } = await serviceSupabase
-      .from("employers")
-      .select("id")
-      .eq("slug", candidateSlug)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return Boolean(data);
-  };
-
-  const uniqueSlug = await generateUniqueSlug(slug, slugExists);
-
-  const { data: newProfile, error: profileError } = await employersTable
-    .insert([
-      {
-        user_id: user.id,
-        name: companyName,
-        slug: uniqueSlug,
-      },
-    ])
-    .select()
-    .single();
+  const { data: newProfile, error: profileError } = await insertWithUniqueSlugRetry({
+    baseSlug: slugify(companyName),
+    insert: async (slug) =>
+      employersTable
+        .insert([
+          {
+            user_id: user.id,
+            name: companyName,
+            slug,
+          },
+        ])
+        .select()
+        .single(),
+  });
 
   if (profileError) {
     return { error: profileError.message, profile: null };

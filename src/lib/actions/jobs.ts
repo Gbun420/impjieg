@@ -9,7 +9,7 @@ import { sanitizeJobDescription } from "@/lib/job-description";
 import { resolveEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/actions";
 import { consumeGrantCredit } from "@/lib/monetization/admin-grants/actions";
 import { validateSalaryRange } from "@/lib/compliance";
-import { generateUniqueSlug } from "@/lib/unique-slug";
+import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 
 type EmployerRef = Pick<Employer, "id">;
 type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
@@ -88,48 +88,38 @@ export async function createJob(formData: FormData) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  const jobSlug = await generateUniqueSlug(slugify(title), async (candidateSlug) => {
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("id")
-      .eq("slug", candidateSlug)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return Boolean(data);
-  });
-
   const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
 
-  const { data: job, error } = await jobsTable
-    .insert([
-      {
-        employer_id: typedEmployer.id,
-        title,
-        slug: jobSlug,
-        description: sanitizedDescription,
-        location,
-        sector,
-        job_type: jobType,
-        seniority: seniority || null,
-        remote_type: remoteType || null,
-        salary_min: salaryMin,
-        salary_max: salaryMax,
-        skills,
-        benefits,
-        visa_friendly: visaFriendly,
-        is_featured: listingType === "featured",
-        status: useCredit || listingType === "standard" ? "active" : "pending",
-        expires_at: expiresAt.toISOString(),
-        application_email: applicationEmail || null,
-        application_url: applicationUrl || null,
-      },
-    ])
-    .select()
-    .single();
+  const { data: job, error } = await insertWithUniqueSlugRetry({
+    baseSlug: slugify(title),
+    insert: async (slug) =>
+      jobsTable
+        .insert([
+          {
+            employer_id: typedEmployer.id,
+            title,
+            slug,
+            description: sanitizedDescription,
+            location,
+            sector,
+            job_type: jobType,
+            seniority: seniority || null,
+            remote_type: remoteType || null,
+            salary_min: salaryMin,
+            salary_max: salaryMax,
+            skills,
+            benefits,
+            visa_friendly: visaFriendly,
+            is_featured: listingType === "featured",
+            status: useCredit || listingType === "standard" ? "active" : "pending",
+            expires_at: expiresAt.toISOString(),
+            application_email: applicationEmail || null,
+            application_url: applicationUrl || null,
+          },
+        ])
+        .select()
+        .single(),
+  });
 
   if (error) {
     return { error: error.message };

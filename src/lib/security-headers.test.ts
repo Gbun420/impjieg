@@ -1,12 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import nextConfig, { securityHeaders } from "../../next.config";
+import { buildContentSecurityPolicy, buildSecurityHeaders } from "./security-headers";
 
-test("securityHeaders includes a content security policy", () => {
-  assert.equal(typeof nextConfig.headers, "function");
-  const headerSource = securityHeaders[0];
-  const csp = headerSource.headers.find((header) => header.key === "Content-Security-Policy");
+test("buildContentSecurityPolicy removes unsafe-inline and includes a nonce", () => {
+  const csp = buildContentSecurityPolicy({ nonce: "abc123", isDev: false });
 
-  assert.ok(csp);
-  assert.match(csp?.value ?? "", /default-src 'self'/);
+  assert.match(csp, /script-src 'self' 'nonce-abc123' 'strict-dynamic'/);
+  assert.match(csp, /style-src 'self' 'nonce-abc123'/);
+  assert.doesNotMatch(csp, /unsafe-inline/);
+});
+
+test("buildSecurityHeaders includes the expected hardening headers", () => {
+  const headers = buildSecurityHeaders({ nonce: "abc123", isDev: false });
+
+  assert.equal(headers["X-Frame-Options"], "DENY");
+  assert.equal(headers["X-Content-Type-Options"], "nosniff");
+  assert.ok(headers["Content-Security-Policy"]);
 });

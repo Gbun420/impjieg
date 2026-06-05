@@ -2,43 +2,41 @@ import { updateSession } from "@/lib/supabase/middleware";
 import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
+import { buildSecurityHeaders } from "@/lib/security-headers";
 
 export async function middleware(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const isDev = process.env.NODE_ENV === "development";
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set(
+    "Content-Security-Policy",
+    buildSecurityHeaders({ nonce, isDev })["Content-Security-Policy"]
+  );
+
   const response = hasSupabasePublicEnv()
-    ? await updateSession(request).catch((error) => {
+    ? await updateSession(request, requestHeaders).catch((error) => {
         console.error(
           "Middleware session update failed:",
           error instanceof Error ? error.message : String(error)
         );
-        return NextResponse.next({ request });
+        return NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
       })
-    : NextResponse.next({ request });
+    : NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
 
-  const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https:",
-    "font-src 'self' data: https://frontend-cdn.perplexity.ai https://vercel.live",
-    "connect-src 'self' https://*.supabase.co https://*.vercel.app",
-    "media-src 'self'",
-    "object-src 'none'",
-    "frame-src 'self' https://vercel.live",
-    "frame-ancestors 'self'",
-    "base-uri 'self'",
-    "form-action 'self'",
-  ].join("; ");
+  const hardeningHeaders = buildSecurityHeaders({ nonce, isDev });
 
-  response.headers.set("Content-Security-Policy", csp);
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
-  );
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
+  Object.entries(hardeningHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
 
   return response;
 }

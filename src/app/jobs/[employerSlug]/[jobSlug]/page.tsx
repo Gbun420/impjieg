@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import Script from "next/script";
+import { headers } from "next/headers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -74,7 +76,8 @@ export async function generateMetadata({
   };
 }
 
-function JobPostingSchema({ job }: { job: JobWithEmployer }) {
+async function JobPostingSchema({ job }: { job: JobWithEmployer }) {
+  const nonce = (await headers()).get("x-nonce");
   const schema = {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
@@ -115,8 +118,10 @@ function JobPostingSchema({ job }: { job: JobWithEmployer }) {
   };
 
   return (
-    <script
+    <Script
+      id={`job-posting-jsonld-${job.slug}`}
       type="application/ld+json"
+      nonce={nonce ?? undefined}
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
