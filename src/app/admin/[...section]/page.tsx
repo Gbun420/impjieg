@@ -8,6 +8,7 @@ import {
 } from "@/lib/admin-consoles";
 import { hasValidAdminSession } from "@/lib/admin-session";
 import { listAllCommercialGrants } from "@/lib/monetization/admin-grants/actions";
+import type { AdminCommercialGrantRow } from "@/lib/monetization/admin-grants/types";
 
 export default async function AdminSectionPage({
   params,
@@ -25,10 +26,18 @@ export default async function AdminSectionPage({
     redirect("/admin/dashboard");
   }
 
-  const [data, grants] = await Promise.all([
-    getAdminConsoleData(),
-    section === "commercial-grants" ? listAllCommercialGrants() : Promise.resolve([]),
-  ]);
+  const data = await getAdminConsoleData();
+  let grants: AdminCommercialGrantRow[] = [];
+  let grantsLoadError: string | null = null;
+
+  if (section === "commercial-grants") {
+    try {
+      grants = await listAllCommercialGrants();
+    } catch (error) {
+      grants = [];
+      grantsLoadError = error instanceof Error ? error.message : "Failed to load commercial grants";
+    }
+  }
   const meta = getAdminConsoleSectionMeta(section);
 
   return (
@@ -38,7 +47,11 @@ export default async function AdminSectionPage({
       activePath={`/admin/${section}`}
       eyebrow={meta.eyebrow}
     >
-      <AdminConsoleSectionView section={section} data={data} extra={{ grants }} />
+      <AdminConsoleSectionView
+        section={section}
+        data={data}
+        extra={{ grants, grantsLoadError }}
+      />
     </AdminSectionShell>
   );
 }

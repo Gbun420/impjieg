@@ -481,11 +481,28 @@ function AuditLogConsole({ data }: { data: AdminConsoleData }) {
   );
 }
 
-function CommercialGrantsConsole({ grants }: { grants: AdminCommercialGrantRow[] }) {
+function CommercialGrantsConsole({
+  grants,
+  loadError,
+}: {
+  grants: AdminCommercialGrantRow[];
+  loadError?: string | null;
+}) {
   const activeGrants = grants.filter((g) => g.status === "active").length;
 
   return (
     <div className="space-y-6">
+      {loadError ? (
+        <Card className="border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-sm">
+          <p className="text-sm font-semibold">Commercial grants data is temporarily unavailable</p>
+          <p className="mt-1 text-sm">
+            The console could not load the live grants table, so the list is hidden until the
+            underlying data source is restored.
+          </p>
+          <p className="mt-2 text-xs text-amber-900/80">{loadError}</p>
+        </Card>
+      ) : null}
+
       <SummaryGrid
         metrics={[
           { label: "Total grants", value: grants.length, note: "Recorded commercial grants" },
@@ -519,6 +536,7 @@ export function AdminConsoleSectionView({
   data: AdminConsoleData;
   extra?: {
     grants?: AdminCommercialGrantRow[];
+    grantsLoadError?: string | null;
   };
 }) {
   const meta = getAdminConsoleSectionMeta(section);
@@ -548,7 +566,12 @@ export function AdminConsoleSectionView({
       {section === "payments" ? <PaymentsConsole data={data} /> : null}
       {section === "alerts" ? <AlertsConsole data={data} /> : null}
       {section === "subscriptions" ? <SubscriptionsConsole data={data} /> : null}
-      {section === "commercial-grants" ? <CommercialGrantsConsole grants={extra?.grants ?? []} /> : null}
+      {section === "commercial-grants" ? (
+        <CommercialGrantsConsole
+          grants={extra?.grants ?? []}
+          loadError={extra?.grantsLoadError ?? null}
+        />
+      ) : null}
       {section === "audit-log" ? <AuditLogConsole data={data} /> : null}
     </div>
   );
