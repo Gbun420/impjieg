@@ -168,6 +168,7 @@ export default function SearchFilters() {
   }
 
   const sectorOptions = [{ value: "", label: "All sectors" }, ...SECTORS.map((value) => ({ value, label: value }))];
+  const filterButtonLabel = showFilters ? "Hide filters" : "Show filters";
 
   return (
     <div className="space-y-4">
@@ -208,7 +209,7 @@ export default function SearchFilters() {
                 onClick={() => setShowFilters((value) => !value)}
               >
                 <SlidersHorizontal className="mr-1.5 h-4 w-4" />
-                Filters
+                {filterButtonLabel}
               </Button>
               {hasActiveFilters && (
                 <Button type="button" variant="ghost" onClick={clearFilters}>
@@ -225,6 +226,12 @@ export default function SearchFilters() {
         id="job-filters-panel"
         className={`${showFilters ? "block" : "hidden"} lg:block space-y-5 rounded-[1.75rem] border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-5`}
       >
+        <div className="flex items-center justify-between gap-3 lg:hidden">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Filter options</p>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
+            Hide filters
+          </Button>
+        </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <Select
             label="Sector"

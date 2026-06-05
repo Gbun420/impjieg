@@ -49,6 +49,15 @@ const COMPARISON = [
   { feature: "Google for Jobs schema", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
 ];
 
+const COMPARISON_COLUMNS = [
+  { key: "impjieg", label: "Impjieg", featured: true },
+  { key: "keepmeposted", label: "KeepMePosted", featured: false },
+  { key: "jobsinmalta", label: "JobsinMalta", featured: false },
+  { key: "jobhound", label: "Jobhound", featured: false },
+] as const;
+
+const MOBILE_COMPARISON_ROWS = COMPARISON.slice(0, 5);
+
 const DECISION_GUIDE = [
   {
     title: "Occasional hiring",
@@ -457,7 +466,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-border/50">
+        <div className="mt-8 hidden overflow-x-auto rounded-2xl border border-border/50 lg:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
@@ -480,6 +489,39 @@ export default function PricingPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="mt-8 grid gap-3 lg:hidden">
+          {COMPARISON_COLUMNS.map((column) => (
+            <Card
+              key={column.key}
+              className={`p-4 ${column.featured ? "border-primary/20 bg-primary/5" : "border-border/60 bg-surface"}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{column.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {column.featured ? "Our current live product" : "Competitor comparison baseline"}
+                  </p>
+                </div>
+                {column.featured ? (
+                  <Badge variant="default">Impjieg</Badge>
+                ) : (
+                  <Badge variant="secondary">Competitor</Badge>
+                )}
+              </div>
+              <dl className="mt-4 space-y-3">
+                {MOBILE_COMPARISON_ROWS.map((row) => (
+                  <div key={row.feature} className="flex items-start justify-between gap-4 border-t border-border/40 pt-3 first:border-t-0 first:pt-0">
+                    <dt className="min-w-0 flex-1 text-sm text-muted-foreground">{row.feature}</dt>
+                    <dd className="shrink-0 text-right text-sm font-medium text-foreground">
+                      <CheckCell value={row[column.key]} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+          ))}
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
