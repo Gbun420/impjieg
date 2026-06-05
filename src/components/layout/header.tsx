@@ -19,11 +19,17 @@ const navLinks = [
   { label: "Pricing", href: "/pricing" },
 ];
 
-export default function Header() {
+export default function Header({
+  initialAuthState,
+}: {
+  initialAuthState: {
+    isLoggedIn: boolean;
+    isEmployer: boolean;
+  };
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isEmployer, setIsEmployer] = useState(false);
-  const [isChecking, setIsChecking] = useState(hasSupabasePublicEnv());
+  const [isLoggedIn, setIsLoggedIn] = useState(initialAuthState.isLoggedIn);
+  const [isEmployer, setIsEmployer] = useState(initialAuthState.isEmployer);
   const { theme, toggleTheme } = useTheme();
   const hydrated = useHydrated();
   const router = useRouter();
@@ -37,6 +43,16 @@ export default function Header() {
 
     const supabase = createClient();
 
+    const syncEmployerState = async (userId: string) => {
+      const { data: employer } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      setIsEmployer(Boolean(employer));
+    };
+
     const checkAuth = async () => {
       try {
         const {
@@ -45,18 +61,11 @@ export default function Header() {
         setIsLoggedIn(!!user);
 
         if (user) {
-          const { data: employer } = await supabase
-            .from("employers")
-            .select("id")
-            .eq("user_id", user.id)
-            .single();
-          setIsEmployer(!!employer);
+          await syncEmployerState(user.id);
         }
       } catch {
         setIsLoggedIn(false);
         setIsEmployer(false);
-      } finally {
-        setIsChecking(false);
       }
     };
 
@@ -71,15 +80,13 @@ export default function Header() {
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         setIsLoggedIn(!!session?.user);
         if (session?.user) {
-          supabase
-            .from("employers")
-            .select("id")
-            .eq("user_id", session.user.id)
-            .single()
-            .then(({ data }) => setIsEmployer(!!data));
+          syncEmployerState(session.user.id).catch(() => setIsEmployer(false));
         }
       } else if (event === "INITIAL_SESSION") {
         setIsLoggedIn(!!session?.user);
+        if (session?.user) {
+          syncEmployerState(session.user.id).catch(() => setIsEmployer(false));
+        }
       }
     });
 
@@ -93,27 +100,6 @@ export default function Header() {
     setIsLoggedIn(false);
     router.push("/");
     router.refresh();
-  }
-
-  if (isChecking) {
-      return (
-        <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
-            <span className="flex flex-col leading-none">
-              <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
-                {SITE.name}
-              </span>
-              <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
-                {SITE.tagline}
-              </span>
-            </span>
-          </Link>
-          <div className="h-8 w-20 rounded-lg bg-muted animate-pulse" />
-        </div>
-      </header>
-    );
   }
 
   if (isAdminRoute) {
