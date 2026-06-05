@@ -5,6 +5,7 @@ import { Briefcase, Building2, FileText, Bell, CreditCard, Users, ArrowRight } f
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { AdminDataErrorState } from "@/components/admin/admin-data-error-state";
 import {
   adminConsoleSections,
   getAdminConsoleSectionMeta,
@@ -94,6 +95,26 @@ export default async function AdminDashboardPage() {
     redirect("/admin/login");
   }
 
+  let dashboardData;
+  try {
+    dashboardData = await getAdminDashboardData();
+  } catch (error) {
+    console.error(
+      "Admin dashboard data load failed:",
+      error instanceof Error ? error.message : String(error)
+    );
+    return (
+      <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        <AdminDataErrorState
+          title="Admin dashboard data is temporarily unavailable"
+          description="The admin shell is working, but one of the live dashboard queries failed while the page was loading. Refresh the page or try again from the dashboard shortcut."
+          routeLabel="Admin dashboard"
+          retryHref="/admin/dashboard"
+        />
+      </div>
+    );
+  }
+
   const {
     stats,
     recentJobs,
@@ -105,7 +126,7 @@ export default async function AdminDashboardPage() {
     serviceStatus,
     formattedAt,
     summary,
-  } = await getAdminDashboardData();
+  } = dashboardData;
   const isDemoMode = serviceStatus.some((item) => item.value === "demo mode");
   const consoleShortcuts = adminConsoleSections
     .filter((item) => item.slug !== "dashboard")

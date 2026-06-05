@@ -8,6 +8,7 @@ import type { Database, Employer, Job } from "@/lib/supabase/types";
 import { sanitizeJobDescription } from "@/lib/job-description";
 import { resolveEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/actions";
 import { consumeGrantCredit } from "@/lib/monetization/admin-grants/actions";
+import { validateSalaryRange } from "@/lib/compliance";
 
 type EmployerRef = Pick<Employer, "id">;
 type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
@@ -70,6 +71,11 @@ export async function createJob(formData: FormData) {
   const applicationUrl = formData.get("applicationUrl") as string;
   const listingType = formData.get("listingType") as string;
   const sanitizedDescription = sanitizeJobDescription(description);
+  const salaryValidationError = validateSalaryRange(salaryMin, salaryMax);
+
+  if (salaryValidationError) {
+    return { error: salaryValidationError };
+  }
 
   // Check for available commercial grants/credits
   const entitlements = await resolveEmployerCommercialEntitlements(typedEmployer.id).catch(() => null);

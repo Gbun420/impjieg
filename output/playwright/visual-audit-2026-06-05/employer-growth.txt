@@ -1,0 +1,7 @@
+{
+  "url": "https://impjieg.vercel.app/employer-growth",
+  "status": 200,
+  "title": "Impjieg — Malta’s modern jobs marketplace",
+  "errors": [],
+  "bodySnippet": "Impjieg\nTech, digital, and iGaming jobs in Malta.\nJobs\nCompanies\nPricing\nSign in\nPost a Job\nImpjieg\nTech, digital, and iGaming jobs in Malta.\nSecure sign in\nCandidate dashboard\n\nWORKSPACE ACCESS\n\nWelcome back\n\nSign in to manage your candidate, employer, or admin workspace without losing your intended destination.\n\nEmployer tools\n\nPost jobs, review applicants, and manage billing.\n\nCandidate workspace\n\nTrack applications, alerts, and saved jobs.\n\nAdmin access\n\nUse the internal admin login when you need console access.\n\nEmail\nPassword\nForgot password?\nSign In\n\nDon't have an account? Sign up or admin sign in\n\nImpjieg\nTech, digital, and iGaming jobs in Malta.\n\nJobs in Malta’s tech, digital, and iGaming sectors.\n\nMade in Malta\nJOB SEEKERS\nBrowse Jobs\nSalary Calculator\nJob Alerts\nCompanies\nEMPLOYERS\nPost a Job\nPricing\nEmployer Sign in\nCOMPANY\nAbout\nContact\nPrivacy\nTerms\n\n© 2026 Impjieg. All rights reserved.\n\nA project by Mack Media, built by Dopamine Digital\n\nWe use cookies to enhance your experience. Some are essential; others help us improve the site and deliver relevant content.\n\nRead our Privacy Policy and Cookie Policy.\n\nReject All\nCustomize\nAccept All"
+}

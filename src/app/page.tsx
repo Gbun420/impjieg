@@ -5,6 +5,7 @@ import SearchFilters from "@/components/jobs/search-filters";
 import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deriveEmployerComplianceSummary } from "@/lib/compliance";
 import {
   Banknote,
   Clock,
@@ -22,27 +23,33 @@ export const dynamic = "force-dynamic";
 
 async function StatsSection() {
   const supabase = await createClient();
-  const { count } = await supabase
+  const { data: jobs } = await supabase
     .from("jobs")
-    .select("*", { count: "exact", head: true })
+    .select("status, salary_min, salary_max, expires_at")
     .eq("status", "active")
     .gte("expires_at", new Date().toISOString());
+
+  const salaryCoverage = deriveEmployerComplianceSummary((jobs || []) as Array<{
+    status: "active";
+    salary_min: number | null;
+    salary_max: number | null;
+  }>);
 
   return (
     <div className="flex items-center justify-center gap-6 sm:gap-10 text-sm">
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl font-bold text-foreground">{count ?? 0}</p>
+        <p className="text-2xl sm:text-3xl font-bold text-foreground">{salaryCoverage.activeJobs}</p>
         <p className="text-foreground/75 mt-0.5">Active jobs</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl font-bold text-foreground">100%</p>
-        <p className="text-foreground/75 mt-0.5">Salary transparency</p>
+        <p className="text-2xl sm:text-3xl font-bold text-foreground">{salaryCoverage.salaryCoveragePercent}%</p>
+        <p className="text-foreground/75 mt-0.5">Listings with salary ranges</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
         <p className="text-2xl sm:text-3xl font-bold text-foreground">30d</p>
-        <p className="text-foreground/75 mt-0.5">Fresh listings</p>
+        <p className="text-foreground/75 mt-0.5">30-day expiry</p>
       </div>
     </div>
   );
@@ -57,27 +64,33 @@ async function LatestJobs() {
     .gte("expires_at", new Date().toISOString())
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(12);
 
   if (!jobs || jobs.length === 0) {
     return null;
   }
 
   const typedJobs = jobs as unknown as JobWithEmployer[];
+  const featuredJobs = typedJobs.filter((job) => job.is_featured);
+  const standardJobs = typedJobs.filter((job) => !job.is_featured);
+  const displayJobs = [
+    ...featuredJobs.slice(0, 3),
+    ...standardJobs.slice(0, 2),
+  ].slice(0, 5);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Latest Jobs</h2>
-          <p className="text-sm text-muted-foreground mt-1">Fresh opportunities added daily</p>
+          <p className="text-sm text-muted-foreground mt-1">Fresh opportunities updated regularly</p>
         </div>
         <Link href="/jobs" className="group flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
           View all <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </div>
       <div className="space-y-3">
-        {typedJobs.map((job) => (
+        {displayJobs.map((job) => (
           <JobCard key={job.id} job={job} />
         ))}
       </div>
@@ -95,18 +108,24 @@ export default async function HomePage() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-6">
               <TrendingUp className="h-3.5 w-3.5" />
-              Malta&apos;s modern jobs marketplace
+              Made in Malta
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Malta&apos;s modern jobs marketplace for{" "}
               <span className="text-gradient">tech, digital, and iGaming talent.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Find better roles faster, with clear work-mode tags, salary signals, and employers that actually hire.
+              Find better roles faster with clear work-mode tags, salary ranges, and employers that actually hire.
             </p>
           </div>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up stagger-2">
+          <div className="mx-auto mt-8 max-w-xl animate-fade-in-up stagger-2">
+            <Suspense fallback={<Skeleton className="mx-auto h-10 w-full" />}>
+              <SearchFilters />
+            </Suspense>
+          </div>
+
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up stagger-2">
             <Link href="/jobs">
               <Button variant="primary" size="lg">
                 Find Jobs
@@ -117,12 +136,6 @@ export default async function HomePage() {
                 Post a Job
               </Button>
             </Link>
-          </div>
-
-          <div className="mx-auto mt-8 max-w-xl animate-fade-in-up stagger-2">
-            <Suspense fallback={<Skeleton className="mx-auto h-10 w-full" />}>
-              <SearchFilters />
-            </Suspense>
           </div>
 
           <div className="mt-10 animate-fade-in-up stagger-3">
@@ -149,7 +162,7 @@ export default async function HomePage() {
             <div className="hidden sm:block h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
-              <span>Fresh daily</span>
+              <span>Regularly updated</span>
             </div>
           </div>
         </div>

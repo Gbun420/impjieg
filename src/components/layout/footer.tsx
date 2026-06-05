@@ -39,11 +39,11 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
-              Malta’s modern jobs marketplace for tech, digital, and iGaming talent.
+              Jobs in Malta’s tech, digital, and iGaming sectors.
             </p>
-            <p className="mt-1.5 text-xs text-muted-foreground">
+            <span className="mt-1.5 inline-flex rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium tracking-[0.14em] text-muted-foreground">
               Made in Malta
-            </p>
+            </span>
           </div>
 
           <div>

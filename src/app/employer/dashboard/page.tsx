@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureEmployerProfile } from "@/lib/actions/auth";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import { deriveApplicationInsights } from "@/lib/application-insights";
+import { deriveEmployerComplianceSummary } from "@/lib/compliance";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -56,6 +57,7 @@ export default async function EmployerDashboardPage() {
 
   const typedJobs = (jobs || []) as Job[];
   const activeJobs = typedJobs.filter((j) => j.status === "active");
+  const salaryCoverage = deriveEmployerComplianceSummary(typedJobs);
   const totalViews = typedJobs.reduce((sum, j) => sum + (j.views || 0), 0);
   const totalApplications = typedJobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
   const avgApplicationRate = totalViews > 0 ? ((totalApplications / totalViews) * 100).toFixed(1) : "0";
@@ -67,6 +69,14 @@ export default async function EmployerDashboardPage() {
   const topJobs = [...typedJobs]
     .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 3);
+  const salaryCoverageLabel =
+    salaryCoverage.activeJobs === 0
+      ? "No active jobs"
+      : salaryCoverage.status === "green"
+        ? "On track"
+        : salaryCoverage.status === "amber"
+          ? "Needs attention"
+          : "Missing ranges";
 
   return (
     <div className="space-y-8">
@@ -136,6 +146,84 @@ export default async function EmployerDashboardPage() {
           </p>
         </Card>
       </div>
+
+      <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
+        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] p-5">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Salary coverage
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">
+                Active jobs with a complete salary range
+              </h2>
+            </div>
+            <Badge
+              variant={
+                salaryCoverage.activeJobs === 0
+                  ? "secondary"
+                  : salaryCoverage.status === "green"
+                  ? "success"
+                  : salaryCoverage.status === "amber"
+                    ? "warning"
+                    : "error"
+              }
+              className="self-start sm:self-auto"
+            >
+              {salaryCoverageLabel}
+            </Badge>
+          </div>
+        </div>
+        <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              label: "Active jobs",
+              value: salaryCoverage.activeJobs,
+              note: "Jobs currently live",
+            },
+            {
+              label: "With salary range",
+              value: salaryCoverage.compliantActiveJobs,
+              note: "Live jobs ready to publish",
+            },
+            {
+              label: "Missing salary range",
+              value: salaryCoverage.missingSalaryJobs,
+              note: "Active jobs still need a range",
+            },
+            {
+              label: "Coverage",
+              value: `${salaryCoverage.salaryCoveragePercent}%`,
+              note: "Based on active jobs only",
+            },
+          ].map((item) => (
+            <div key={item.label} className="rounded-2xl border border-border/60 bg-background/70 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{item.label}</p>
+              <p className="mt-2 text-2xl font-semibold text-foreground">{item.value}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{item.note}</p>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-border/60 px-5 py-4">
+          <p className="text-sm text-muted-foreground">
+            {salaryCoverage.activeJobs === 0
+              ? "Add your first active job to start tracking salary coverage."
+              : "This check is based on live jobs with both salary fields completed. It does not certify legal compliance."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link href="/employer/jobs">
+              <Button variant="outline" size="sm">
+                Review active jobs
+              </Button>
+            </Link>
+            <Link href="/employer/post-job">
+              <Button variant="primary" size="sm">
+                Post a new job
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">

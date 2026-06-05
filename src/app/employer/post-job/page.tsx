@@ -344,19 +344,30 @@ export default function PostJobPage() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-semibold text-foreground">Salary</h2>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg font-semibold text-foreground">Salary range (required)</h2>
+            <p className="text-sm text-muted-foreground">
+              The job cannot be published without both values. Keep the range realistic and ordered from minimum to maximum.
+            </p>
+          </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Input
-              label="Minimum Salary (EUR)"
+              label="Minimum salary (EUR)"
               name="salaryMin"
               type="number"
               placeholder="30000"
+              min={1}
+              step="1"
+              required
             />
             <Input
-              label="Maximum Salary (EUR)"
+              label="Maximum salary (EUR)"
               name="salaryMax"
               type="number"
               placeholder="45000"
+              min={1}
+              step="1"
+              required
             />
           </div>
         </Card>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AdminSectionShell } from "@/components/admin/admin-section-shell";
 import { AdminConsoleSectionView } from "@/components/admin/admin-console-section-view";
+import { AdminDataErrorState } from "@/components/admin/admin-data-error-state";
 import {
   getAdminConsoleData,
   getAdminConsoleSectionMeta,
@@ -32,7 +33,32 @@ export default async function AdminSectionPage({
     redirect("/admin/dashboard");
   }
 
-  const data = await getAdminConsoleData();
+  const meta = getAdminConsoleSectionMeta(section);
+
+  let data;
+  try {
+    data = await getAdminConsoleData();
+  } catch (error) {
+    console.error(
+      `Admin section data load failed for ${section}:`,
+      error instanceof Error ? error.message : String(error)
+    );
+    return (
+      <AdminSectionShell
+        title={meta.title}
+        description={meta.description}
+        activePath={`/admin/${section}`}
+        eyebrow={meta.eyebrow}
+      >
+        <AdminDataErrorState
+          title={`${meta.title} data is temporarily unavailable`}
+          description="The admin shell loaded, but one of the live queries needed for this section failed. Refresh the page or return to the dashboard."
+          routeLabel={meta.eyebrow}
+          retryHref={`/admin/${section}`}
+        />
+      </AdminSectionShell>
+    );
+  }
   let grants: AdminCommercialGrantRow[] = [];
   let grantsLoadError: string | null = null;
   let employers: AdminCommercialGrantEmployerOption[] = [];
@@ -48,8 +74,6 @@ export default async function AdminSectionPage({
       grantsLoadError = error instanceof Error ? error.message : "Failed to load commercial grants";
     }
   }
-  const meta = getAdminConsoleSectionMeta(section);
-
   return (
     <AdminSectionShell
       title={meta.title}

@@ -1,8 +1,18 @@
 import { updateSession } from "@/lib/supabase/middleware";
+import { hasSupabasePublicEnv } from "@/lib/supabase/env";
+import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const response = await updateSession(request);
+  const response = hasSupabasePublicEnv()
+    ? await updateSession(request).catch((error) => {
+        console.error(
+          "Middleware session update failed:",
+          error instanceof Error ? error.message : String(error)
+        );
+        return NextResponse.next({ request });
+      })
+    : NextResponse.next({ request });
 
   const csp = [
     "default-src 'self'",

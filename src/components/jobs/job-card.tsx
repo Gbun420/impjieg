@@ -18,7 +18,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
 
   return (
     <article
-      className={`group rounded-[1.5rem] border p-4 sm:p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-md ${
+      className={`group relative rounded-[1.5rem] border p-4 sm:p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-md ${
         job.is_featured
           ? "border-primary/30 bg-[linear-gradient(180deg,rgba(30,99,255,0.04),rgba(20,199,183,0.02))]"
           : "border-border bg-card hover:bg-card-hover"
@@ -40,7 +40,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                   loading="lazy"
                 />
               ) : (
-                <span className="text-base sm:text-lg font-semibold text-muted-foreground">
+                <span className="text-base sm:text-lg font-semibold uppercase text-muted-foreground">
                   {job.employers.name.charAt(0)}
                 </span>
               )}
@@ -80,9 +80,9 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
               <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5 shrink-0" />
-                  {daysAgo(job.created_at)}
+                  Posted {daysAgo(job.created_at)}
                 </span>
-                {job.is_featured ? <span className="font-medium text-primary">Priority placement</span> : null}
+                {job.is_featured ? <span className="font-medium text-primary">Featured listing</span> : null}
               </div>
             </div>
           </div>

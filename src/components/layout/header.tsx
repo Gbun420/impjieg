@@ -127,7 +127,8 @@ export default function Header({
               <button
                 onClick={toggleTheme}
                 className="hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors hover:bg-muted md:flex"
-                aria-label="Toggle theme"
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                aria-pressed={theme === "dark"}
               >
                 {theme === "dark" ? (
                   <Sun className="h-4 w-4" />
@@ -180,7 +181,8 @@ export default function Header({
             <button
               onClick={toggleTheme}
               className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
-              aria-label="Toggle theme"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-pressed={theme === "dark"}
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />

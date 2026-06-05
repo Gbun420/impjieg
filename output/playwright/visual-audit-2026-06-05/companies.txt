@@ -1,0 +1,7 @@
+{
+  "url": "https://impjieg.vercel.app/companies",
+  "status": 200,
+  "title": "Companies | Impjieg",
+  "errors": [],
+  "bodySnippet": "Impjieg\nTech, digital, and iGaming jobs in Malta.\nJobs\nCompanies\nPricing\nSign in\nPost a Job\nCompanies\nA\nAzure Hospitality\n\nSt. Julian's\n\n1 open role\nB\nBetsson Group\n\nTa' Xbiex\n\n1 open role\nB\nBuildRight Construction\n\nMosta\n\n1 open role\nC\nCamilleri & Associates\n\nValletta\n\n1 open role\nC\nCatena Media\n\nBirkirkara\n\n1 open role\nE\nEduPrime Academy\n\nBirkirkara\n\n1 open role\nE\nEvolution Gaming\n\nSt. Julian's\n\n1 open role\nF\nFinanceFlow Malta\n\nValletta\n\n1 open role\nK\nKindred Group\n\nSliema\n\n1 open role\nM\nMalta Freeport Terminals\n\nMarsa\n\n1 open role\nM\nMater Dei Health Partners\n\nMsida\n\n1 open role\nM\nMidsea Books\n\nValletta\n\n1 open role\nP\nPulse Marketing Malta\n\nSliema\n\n1 open role\nS\nSunny Shores Realty\n\nSliema\n\n1 open role\nT\nTechMalta\n\nMsida\n\n1 open role\nImpjieg\nTech, digital, and iGaming jobs in Malta.\n\nJobs in Malta’s tech, digital, and iGaming sectors.\n\nMade in Malta\nJOB SEEKERS\nBrowse Jobs\nSalary Calculator\nJob Alerts\nCompanies\nEMPLOYERS\nPost a Job\nPricing\nEmployer Sign in\nCOMPANY\nAbout\nContact\nPrivacy\nTerms\n\n© 2026 Impjieg. All rights reserved.\n\nA project by Mack Media, built by Dopamine Digital\n\nWe use cookies to enhance your experience. Some are essential; others help us improve the site and deliver relevant content.\n\nRead our Privacy Policy and Cookie Policy.\n\nReject All\nCustomize\nAccept All"
+}
