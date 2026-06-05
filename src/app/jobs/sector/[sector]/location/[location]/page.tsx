@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -189,10 +190,12 @@ export default async function SectorLocationPage({
                           : "bg-muted/50"
                       }`}>
                         {job.employers?.logo_url ? (
-                          <img
+                          <Image
                             src={job.employers.logo_url}
                             alt={job.employers.name}
-                            className="h-8 w-8 rounded-lg object-cover"
+                            width={32}
+                            height={32}
+                            className="rounded-lg object-cover"
                           />
                         ) : (
                           <span className="text-lg font-bold text-muted-foreground">

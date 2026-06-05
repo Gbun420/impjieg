@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -62,10 +63,12 @@ export default async function CompaniesPage() {
                 <div className="flex items-start gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-secondary/20 transition-all">
                     {employer.logo_url ? (
-                      <img
+                      <Image
                         src={employer.logo_url}
                         alt={employer.name}
-                        className="h-8 w-8 rounded-lg object-cover"
+                        width={32}
+                        height={32}
+                        className="rounded-lg object-cover"
                       />
                     ) : (
                       <span className="text-lg font-bold text-muted-foreground group-hover:text-primary transition-colors">

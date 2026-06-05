@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import type { CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { requireEnv } from "@/lib/runtime-env";
+import { createClient } from "@/lib/supabase/server";
 
 export const ADMIN_SESSION_COOKIE = "impjieg_admin_session";
 const ADMIN_SESSION_MESSAGE = "impjieg-admin-session";
@@ -37,7 +38,19 @@ export async function hasValidAdminSession(cookieStore?: CookieStore) {
     return false;
   }
 
-  return timingSafeEquals(session, getAdminSessionValue());
+  if (!timingSafeEquals(session, getAdminSessionValue())) {
+    return false;
+  }
+
+  // Double check that we have a valid Supabase session
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    return !!user;
+  } catch (error) {
+    console.error("Failed to verify Supabase session in admin check:", error);
+    return false;
+  }
 }
 
 export async function setAdminSession(cookieStore?: CookieStore) {

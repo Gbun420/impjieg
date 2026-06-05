@@ -13,3 +13,4 @@ end;
 $$;
 
 grant execute on function increment_job_applications_count(uuid) to authenticated;
+grant execute on function increment_job_applications_count(uuid) to anon;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SITE } from "@/lib/constants";
 
 export default async function AuthLayout({
@@ -12,7 +13,7 @@ export default async function AuthLayout({
       <div className="relative w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-10 w-10" aria-hidden="true" />
+            <Image src="/logo-icon.svg" alt="" width={40} height={40} aria-hidden="true" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-lg font-semibold tracking-[-0.03em] text-foreground">
                 {SITE.name}

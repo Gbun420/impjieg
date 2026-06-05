@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -233,15 +234,6 @@ export default function SettingsPage() {
     response_time_days: responseTimeDays ? parseInt(responseTimeDays, 10) : null,
   });
 
-  const logoFallback = `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-      <rect width="128" height="128" rx="24" fill="#f3f4f6"/>
-      <text x="64" y="76" font-family="Arial, sans-serif" font-size="52" font-weight="700" text-anchor="middle" fill="#6b7280">${
-        name?.charAt(0)?.toUpperCase() || "L"
-      }</text>
-    </svg>`
-  )}`;
-
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Company Profile</h1>
@@ -260,8 +252,8 @@ export default function SettingsPage() {
 
       <Card className="overflow-hidden">
         {coverImageUrl && (
-          <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20">
-            <img src={coverImageUrl} alt="" className="h-full w-full object-cover" />
+          <div className="relative h-32 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20">
+            <Image src={coverImageUrl} alt="" fill className="object-cover" />
           </div>
         )}
         <div className="p-6">
@@ -356,15 +348,14 @@ export default function SettingsPage() {
                 </span>
               </div>
               <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-muted/20 p-3">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-background">
+                <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-background">
                   {logoUrl ? (
-                    <img
+                    <Image
                       src={logoUrl}
                       alt="Logo preview"
-                      className="h-full w-full object-cover"
-                      onError={(event) => {
-                        event.currentTarget.src = logoFallback;
-                      }}
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <span className="text-lg font-semibold text-muted-foreground">

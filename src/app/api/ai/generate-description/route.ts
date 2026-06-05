@@ -1,29 +1,71 @@
 import { NextResponse } from "next/server";
 import { sanitizeJobDescription } from "@/lib/job-description";
 import { createClient } from "@/lib/supabase/server";
+import {
+  AiSecurityError,
+  buildAiRateLimitKey,
+  ensureLengthWithinLimit,
+  enforceAiRateLimit,
+  normalizePromptText,
+  readJsonBodyWithLimit,
+  type AiAuthenticatedUser,
+} from "@/lib/ai-security";
+import { z } from "zod";
+
+const generateDescriptionBodySchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  sector: z.string().trim().max(100).optional().nullable(),
+  jobType: z.string().trim().max(100).optional().nullable(),
+  seniority: z.string().trim().max(100).optional().nullable(),
+  location: z.string().trim().max(100).optional().nullable(),
+  description: z.string().trim().max(4000).optional().nullable(),
+  skills: z.string().trim().max(1000).optional().nullable(),
+  benefits: z.string().trim().max(1000).optional().nullable(),
+});
+
+const MAX_GEN_DESC_BODY_BYTES = 16_384;
+const MAX_GEN_DESC_PROMPT_CHARS = 8_000;
+const GEN_DESC_RATE_LIMIT = 5;
+const GEN_DESC_RATE_LIMIT_WINDOW_MS = 60_000;
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const { title, sector, jobType, seniority, location, description, skills, benefits } = await request.json();
+    const aiUser: AiAuthenticatedUser = { id: user.id, email: user.email };
 
-  if (!title) {
-    return NextResponse.json({ error: "Job title is required" }, { status: 400 });
-  }
+    enforceAiRateLimit({
+      key: buildAiRateLimitKey("generate-description", aiUser, request),
+      limit: GEN_DESC_RATE_LIMIT,
+      windowMs: GEN_DESC_RATE_LIMIT_WINDOW_MS,
+    });
 
-  const groqApiKey = process.env.GROQ_API_KEY;
-  if (!groqApiKey) {
-    return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
-  }
+    const body = await readJsonBodyWithLimit<unknown>({
+      request,
+      maxBytes: MAX_GEN_DESC_BODY_BYTES,
+    });
 
-  const prompt = `Generate a professional job description for the following role:
+    const payload = generateDescriptionBodySchema.safeParse(body);
+
+    if (!payload.success) {
+      return NextResponse.json({ error: "Invalid job description data" }, { status: 400 });
+    }
+
+    const { title, sector, jobType, seniority, location, description, skills, benefits } = payload.data;
+
+    const groqApiKey = process.env.GROQ_API_KEY;
+    if (!groqApiKey) {
+      return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
+    }
+
+    const prompt = `Generate a professional job description for the following role:
 
 Job Title: ${title}
 Sector: ${sector || "General"}
@@ -47,7 +89,12 @@ Only return plain text.
 
 IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focus on skills and competencies, not personal characteristics.`;
 
-  try {
+    ensureLengthWithinLimit(
+      normalizePromptText(prompt),
+      MAX_GEN_DESC_PROMPT_CHARS,
+      "Job description input is too large."
+    );
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -72,7 +119,7 @@ IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focu
 
     if (!response.ok) {
       console.error("Groq API error:", data);
-      return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
+      return NextResponse.json({ error: "Failed to generate description" }, { status: 502 });
     }
 
     const generatedDescription = sanitizeJobDescription(
@@ -81,6 +128,10 @@ IMPORTANT: Use inclusive, gender-neutral language. Avoid age-related terms. Focu
 
     return NextResponse.json({ description: generatedDescription });
   } catch (error) {
+    if (error instanceof AiSecurityError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
     console.error("AI generation error:", error);
     return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
   }

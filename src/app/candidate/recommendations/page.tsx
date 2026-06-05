@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { analyzeJobMatchWithAI } from "@/lib/ai-match.service";
 
@@ -179,10 +180,12 @@ export default async function RecommendationsPage() {
                       : "bg-muted/50"
                   }`}>
                     {job.employers?.logo_url ? (
-                      <img
+                      <Image
                         src={job.employers.logo_url}
                         alt={job.employers.name}
-                        className="h-8 w-8 rounded-lg object-cover"
+                        width={32}
+                        height={32}
+                        className="rounded-lg object-cover"
                       />
                     ) : (
                       <span className="text-lg font-bold text-muted-foreground">

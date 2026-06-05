@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -461,10 +462,12 @@ export default async function JobDetailPage({
                 <div className="mt-3 flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted">
                     {j.employers.logo_url ? (
-                      <img
+                      <Image
                         src={j.employers.logo_url}
                         alt={j.employers.name}
-                        className="h-6 w-6 rounded-lg object-cover"
+                        width={24}
+                        height={24}
+                        className="rounded-lg object-cover"
                       />
                     ) : (
                       <span className="text-lg font-semibold text-muted-foreground">

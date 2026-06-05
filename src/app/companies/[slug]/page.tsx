@@ -3,6 +3,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -112,11 +113,13 @@ export default async function CompanyProfilePage({
 
       <Card className="overflow-hidden border-primary/20">
         {emp.cover_image_url && (
-          <div className="h-40 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20 sm:h-48">
-            <img
+          <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-secondary/20 sm:h-48">
+            <Image
               src={emp.cover_image_url}
               alt=""
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              priority
             />
           </div>
         )}
@@ -128,10 +131,12 @@ export default async function CompanyProfilePage({
                 : "bg-muted/50"
             }`}>
               {emp.logo_url ? (
-                <img
+                <Image
                   src={emp.logo_url}
                   alt={emp.name}
-                  className="h-10 w-10 rounded-xl object-cover"
+                  width={40}
+                  height={40}
+                  className="rounded-xl object-cover"
                 />
               ) : (
                 <span className="text-2xl font-bold text-muted-foreground">

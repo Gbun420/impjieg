@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Banknote, ShieldCheck } from "lucide-react";
@@ -33,11 +34,12 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 : "bg-muted"
             }`}>
               {job.employers.logo_url ? (
-                <img
+                <Image
                   src={job.employers.logo_url}
                   alt={job.employers.name}
+                  width={32}
+                  height={32}
                   className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg object-cover"
-                  loading="lazy"
                 />
               ) : (
                 <span className="text-base sm:text-lg font-semibold uppercase text-muted-foreground">

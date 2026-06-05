@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { logout } from "@/lib/actions/auth";
@@ -107,7 +108,7 @@ export default function Header({
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
+            <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
                 {SITE.name}
@@ -153,7 +154,7 @@ export default function Header({
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-          <img src="/logo-icon.svg" alt="" className="h-8 w-8 shrink-0" aria-hidden="true" />
+          <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
           <span className="flex flex-col leading-none">
             <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
               {SITE.name}

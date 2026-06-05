@@ -53,6 +53,13 @@ export async function POST(request: Request) {
   ]);
 
   if (error) {
+    const errorCode = "code" in error ? (error as { code: string }).code : null;
+    if (errorCode === "23505" || error.message.includes("duplicate key value")) {
+      return NextResponse.json(
+        { error: "You are already subscribed with this email" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

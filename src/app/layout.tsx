@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Sora, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/header";
@@ -7,6 +8,18 @@ import CookieConsentBanner from "@/components/cookie-consent-banner";
 import { SITE } from "@/lib/constants";
 import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -107,7 +120,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased"
+      className={`h-full antialiased ${sora.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
