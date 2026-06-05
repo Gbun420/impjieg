@@ -6,11 +6,12 @@ type SecurityHeadersOptions = {
 export function buildContentSecurityPolicy({ nonce, isDev = false }: SecurityHeadersOptions) {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}'`,
-    "img-src 'self' data: blob: https:",
-    "font-src 'self' data: https://frontend-cdn.perplexity.ai https://vercel.live",
-    "connect-src 'self' https://*.supabase.co https://*.vercel.app",
+    `script-src 'self' 'nonce-${nonce}' https://vercel.live${isDev ? " 'unsafe-eval'" : ""}`,
+    `style-src 'self' 'nonce-${nonce}' https://vercel.live`,
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self' data: blob: https: https://vercel.live https://vercel.com",
+    "font-src 'self' data: https://frontend-cdn.perplexity.ai https://vercel.live https://assets.vercel.com",
+    "connect-src 'self' https://*.supabase.co https://*.vercel.app https://vercel.live wss://ws-us3.pusher.com",
     "media-src 'self'",
     "object-src 'none'",
     "frame-src 'self' https://vercel.live",
