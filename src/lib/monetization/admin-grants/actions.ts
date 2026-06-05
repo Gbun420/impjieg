@@ -96,7 +96,9 @@ function getCommercialGrantsTable(
 export async function listCommercialGrantEmployers(
   limit = 50
 ): Promise<AdminCommercialGrantEmployerOption[]> {
-  await assertAdminUser();
+  if (!(await hasValidAdminSession())) {
+    throw new AuthorizationError("Admin session required");
+  }
   const client = createAdminGrantsServiceClient();
   const { data, error } = await client
     .from("employers")
@@ -351,7 +353,9 @@ export async function listAllCommercialGrants(filters: {
   status?: (typeof GRANT_STATUSES)[number];
   grantType?: string;
 } = {}) {
-  await assertAdminUser();
+  if (!(await hasValidAdminSession())) {
+    throw new AuthorizationError("Admin session required");
+  }
   const client = createAdminGrantsServiceClient();
   const grantsTable = getCommercialGrantsTable(client);
   let query = grantsTable.select("*").order("created_at", { ascending: false }) as unknown as CommercialGrantFilterQuery;
