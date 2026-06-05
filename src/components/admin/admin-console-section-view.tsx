@@ -14,7 +14,10 @@ import {
 import { daysAgo, formatDate, formatSalary } from "@/lib/utils";
 import { GrantsList } from "./grants/grants-list";
 import { CreateGrantForm } from "./grants/create-grant-form";
-import type { AdminCommercialGrantRow } from "@/lib/monetization/admin-grants/types";
+import type {
+  AdminCommercialGrantEmployerOption,
+  AdminCommercialGrantRow,
+} from "@/lib/monetization/admin-grants/types";
 
 type SummaryMetric = {
   label: string;
@@ -484,9 +487,11 @@ function AuditLogConsole({ data }: { data: AdminConsoleData }) {
 function CommercialGrantsConsole({
   grants,
   loadError,
+  employers,
 }: {
   grants: AdminCommercialGrantRow[];
   loadError?: string | null;
+  employers: AdminCommercialGrantEmployerOption[];
 }) {
   const activeGrants = grants.filter((g) => g.status === "active").length;
 
@@ -519,7 +524,7 @@ function CommercialGrantsConsole({
         </div>
 
         <div className="space-y-6">
-          <CreateGrantForm />
+          <CreateGrantForm employers={employers} />
         </div>
       </div>
     </div>
@@ -536,6 +541,7 @@ export function AdminConsoleSectionView({
   extra?: {
     grants?: AdminCommercialGrantRow[];
     grantsLoadError?: string | null;
+    employers?: AdminCommercialGrantEmployerOption[];
   };
 }) {
   const meta = getAdminConsoleSectionMeta(section);
@@ -569,6 +575,7 @@ export function AdminConsoleSectionView({
         <CommercialGrantsConsole
           grants={extra?.grants ?? []}
           loadError={extra?.grantsLoadError ?? null}
+          employers={extra?.employers ?? []}
         />
       ) : null}
       {section === "audit-log" ? <AuditLogConsole data={data} /> : null}

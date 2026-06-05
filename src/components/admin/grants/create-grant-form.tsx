@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createAdminCommercialGrant } from "@/lib/monetization/admin-grants/actions";
 import { GRANT_TYPES } from "@/lib/monetization/admin-grants/constants";
 import { ShieldCheck } from "lucide-react";
+import type { AdminCommercialGrantEmployerOption } from "@/lib/monetization/admin-grants/types";
 
 type GrantType = (typeof GRANT_TYPES)[number];
 
@@ -20,6 +21,121 @@ type GrantTypeMeta = {
 };
 
 const DEFAULT_GRANT_TYPE: GrantType = GRANT_TYPES[0];
+
+function EmployerPicker({
+  employers,
+}: {
+  employers: AdminCommercialGrantEmployerOption[];
+}) {
+  const [query, setQuery] = useState("");
+  const [selectedEmployer, setSelectedEmployer] =
+    useState<AdminCommercialGrantEmployerOption | null>(null);
+
+  const suggestions = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+
+    if (!normalized) {
+      return employers.slice(0, 6);
+    }
+
+    return employers
+      .filter((employer) =>
+        [employer.name, employer.slug, employer.id].some((part) =>
+          part.toLowerCase().includes(normalized)
+        )
+      )
+      .slice(0, 8);
+  }, [employers, query]);
+
+  const hasSuggestions = suggestions.length > 0;
+
+  return (
+    <div className="space-y-3">
+      <Input
+        label="Employer"
+        placeholder="Search by company name or paste a UUID"
+        value={query}
+        onChange={(event) => {
+          const nextValue = event.target.value;
+          setQuery(nextValue);
+
+          const normalized = nextValue.trim().toLowerCase();
+          if (!normalized) {
+            setSelectedEmployer(null);
+            return;
+          }
+
+          const exactMatch = employers.find(
+            (employer) =>
+              employer.id.toLowerCase() === normalized ||
+              employer.name.toLowerCase() === normalized ||
+              employer.slug.toLowerCase() === normalized
+          );
+
+          setSelectedEmployer(exactMatch ?? null);
+        }}
+        autoComplete="off"
+        id="grant-employer-search"
+        aria-describedby="grant-employer-help"
+      />
+      <input type="hidden" name="employerId" value={selectedEmployer?.id ?? query.trim()} />
+      <p id="grant-employer-help" className="text-xs leading-5 text-muted-foreground">
+        Search by company name, slug, or UUID. Or paste the employer UUID directly.
+      </p>
+
+      {selectedEmployer ? (
+        <div className="flex items-start justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground">
+              {selectedEmployer.name}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {selectedEmployer.slug} · {selectedEmployer.id}
+            </p>
+          </div>
+          <Badge variant="success">Selected</Badge>
+        </div>
+      ) : null}
+
+      <div className="rounded-2xl border border-border/60 bg-background/80 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Suggestions
+        </p>
+        <div className="mt-3 space-y-2">
+          {hasSuggestions ? (
+            suggestions.map((employer) => (
+              <button
+                key={employer.id}
+                type="button"
+                onClick={() => {
+                  setSelectedEmployer(employer);
+                  setQuery(`${employer.name} · ${employer.slug}`);
+                }}
+                className="flex w-full items-start justify-between gap-3 rounded-xl border border-border/60 bg-surface px-3 py-3 text-left transition-colors hover:border-primary/30 hover:bg-primary/5"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-medium text-foreground">
+                    {employer.name}
+                  </span>
+                  <span className="mt-1 block truncate text-xs text-muted-foreground">
+                    {employer.slug}
+                  </span>
+                </span>
+                <span className="max-w-[120px] truncate font-mono text-[11px] text-muted-foreground">
+                  {employer.id}
+                </span>
+              </button>
+            ))
+          ) : (
+            <p className="px-1 py-2 text-sm text-muted-foreground">
+              No employers match that search.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const grantTypeMeta: Record<GrantType, GrantTypeMeta> = {
   free_trial: {
@@ -78,13 +194,18 @@ const grantTypeMeta: Record<GrantType, GrantTypeMeta> = {
   },
 };
 
-export function CreateGrantForm() {
+export function CreateGrantForm({
+  employers,
+}: {
+  employers: AdminCommercialGrantEmployerOption[];
+}) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [selectedGrantType, setSelectedGrantType] =
     useState<GrantType>(DEFAULT_GRANT_TYPE);
+  const [pickerResetKey, setPickerResetKey] = useState(0);
 
   const meta = grantTypeMeta[selectedGrantType];
 
@@ -95,7 +216,7 @@ export function CreateGrantForm() {
     setSuccess(null);
 
     const formData = new FormData(event.currentTarget);
-    const data = {
+      const data = {
       employerId: formData.get("employerId") as string,
       grantType: formData.get("grantType") as GrantType,
       productId: (formData.get("productId") as string) || undefined,
@@ -123,6 +244,7 @@ export function CreateGrantForm() {
     try {
       await createAdminCommercialGrant(data);
       formRef.current?.reset();
+      setPickerResetKey((current) => current + 1);
       setSelectedGrantType(DEFAULT_GRANT_TYPE);
       setSuccess("Grant created successfully.");
     } catch (err: unknown) {
@@ -134,6 +256,7 @@ export function CreateGrantForm() {
 
   const resetForm = () => {
     formRef.current?.reset();
+    setPickerResetKey((current) => current + 1);
     setSelectedGrantType(DEFAULT_GRANT_TYPE);
     setError(null);
     setSuccess(null);
@@ -208,18 +331,6 @@ export function CreateGrantForm() {
 
           <div className="space-y-4">
             <Input
-              name="employerId"
-              id="grant-employer-id"
-              label="Employer"
-              required
-              placeholder="Search or paste the employer ID"
-              aria-describedby="grant-employer-id-help"
-            />
-            <p id="grant-employer-id-help" className="text-xs leading-5 text-muted-foreground">
-              Search or paste the employer ID. Use the UUID from the employer record.
-            </p>
-
-            <Input
               name="productId"
               id="grant-product-id"
               label="Product or plan"
@@ -229,6 +340,8 @@ export function CreateGrantForm() {
             <p id="grant-product-id-help" className="text-xs leading-5 text-muted-foreground">
               Optional. Use only when the grant applies to a specific product, plan, or checkout item.
             </p>
+
+            <EmployerPicker key={pickerResetKey} employers={employers} />
           </div>
         </section>
 

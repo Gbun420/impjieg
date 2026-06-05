@@ -23,6 +23,7 @@ import {
 import type {
   AdminCommercialGrantRow,
   AdminCommercialGrantInsert,
+  AdminCommercialGrantEmployerOption,
   EmployerVisibleCommercialGrant,
   ResolvedCommercialDiscount,
 } from "./types";
@@ -90,6 +91,24 @@ function getCommercialGrantsTable(
   client = createAdminGrantsServiceClient()
 ): AdminCommercialGrantsTable {
   return client.from("admin_commercial_grants") as unknown as AdminCommercialGrantsTable;
+}
+
+export async function listCommercialGrantEmployers(
+  limit = 50
+): Promise<AdminCommercialGrantEmployerOption[]> {
+  await assertAdminUser();
+  const client = createAdminGrantsServiceClient();
+  const { data, error } = await client
+    .from("employers")
+    .select("id, name, slug")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as AdminCommercialGrantEmployerOption[];
 }
 
 export async function buildAdminCommercialGrantInsertRow(

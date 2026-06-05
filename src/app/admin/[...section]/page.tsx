@@ -7,8 +7,14 @@ import {
   resolveAdminConsoleSection,
 } from "@/lib/admin-consoles";
 import { hasValidAdminSession } from "@/lib/admin-session";
-import { listAllCommercialGrants } from "@/lib/monetization/admin-grants/actions";
-import type { AdminCommercialGrantRow } from "@/lib/monetization/admin-grants/types";
+import {
+  listAllCommercialGrants,
+  listCommercialGrantEmployers,
+} from "@/lib/monetization/admin-grants/actions";
+import type {
+  AdminCommercialGrantEmployerOption,
+  AdminCommercialGrantRow,
+} from "@/lib/monetization/admin-grants/types";
 
 export default async function AdminSectionPage({
   params,
@@ -29,10 +35,14 @@ export default async function AdminSectionPage({
   const data = await getAdminConsoleData();
   let grants: AdminCommercialGrantRow[] = [];
   let grantsLoadError: string | null = null;
+  let employers: AdminCommercialGrantEmployerOption[] = [];
 
   if (section === "commercial-grants") {
     try {
-      grants = await listAllCommercialGrants();
+      [grants, employers] = await Promise.all([
+        listAllCommercialGrants(),
+        listCommercialGrantEmployers(80),
+      ]);
     } catch (error) {
       grants = [];
       grantsLoadError = error instanceof Error ? error.message : "Failed to load commercial grants";
@@ -50,7 +60,7 @@ export default async function AdminSectionPage({
       <AdminConsoleSectionView
         section={section}
         data={data}
-        extra={{ grants, grantsLoadError }}
+        extra={{ grants, grantsLoadError, employers }}
       />
     </AdminSectionShell>
   );

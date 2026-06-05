@@ -1,4 +1,5 @@
 import type { Database } from "@/lib/supabase/types";
+import type { Employer } from "@/lib/supabase/types";
 
 export type AdminCommercialGrantRow =
   Database["public"]["Tables"]["admin_commercial_grants"]["Row"];
@@ -73,3 +74,8 @@ export type ResolvedEmployerCommercialEntitlements = {
   }>;
   sourceGrantIds: string[];
 };
+
+export type AdminCommercialGrantEmployerOption = Pick<
+  Employer,
+  "id" | "name" | "slug"
+>;
