@@ -9,6 +9,8 @@ import {
 } from "@/lib/monetization/admin-grants/actions";
 import { GRANT_TYPES } from "@/lib/monetization/admin-grants/constants";
 
+type GrantType = (typeof GRANT_TYPES)[number];
+
 export function CreateGrantForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export function CreateGrantForm() {
     const formData = new FormData(event.currentTarget);
     const data = {
       employerId: formData.get("employerId") as string,
-      grantType: formData.get("grantType") as any,
+      grantType: formData.get("grantType") as GrantType,
       reason: formData.get("reason") as string,
       creditsTotal: formData.get("creditsTotal") ? parseInt(formData.get("creditsTotal") as string) : undefined,
       discountPercent: formData.get("discountPercent") ? parseInt(formData.get("discountPercent") as string) : undefined,
@@ -35,8 +37,8 @@ export function CreateGrantForm() {
       await createAdminCommercialGrant(data);
       (event.target as HTMLFormElement).reset();
       alert("Grant created successfully!");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create grant");
     } finally {
       setLoading(false);
     }

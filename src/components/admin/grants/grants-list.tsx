@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { daysAgo, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import type { AdminCommercialGrantRow } from "@/lib/monetization/admin-grants/types";
 import { revokeAdminCommercialGrant } from "@/lib/monetization/admin-grants/actions";
 
@@ -17,8 +17,8 @@ export function GrantsList({ grants }: { grants: AdminCommercialGrantRow[] }) {
     setRevokingId(grantId);
     try {
       await revokeAdminCommercialGrant(grantId, "Manually revoked via admin console");
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : "Failed to revoke grant");
     } finally {
       setRevokingId(null);
     }

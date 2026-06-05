@@ -30,10 +30,11 @@ export async function GET(request: Request) {
       message: `Commercial grants maintenance completed. Expired ${expiredCount} grants.`,
       expiredCount,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Monetization maintenance error:", error);
+    const message = error instanceof Error ? error.message : "Maintenance failed";
     return NextResponse.json(
-      { error: error.message || "Maintenance failed" },
+      { error: message },
       { status: 500 }
     );
   }
