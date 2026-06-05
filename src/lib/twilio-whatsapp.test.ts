@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatWhatsAppPhone, sendWhatsAppMessage } from "./twilio-whatsapp";
+import {
+  buildImpjiegWhatsAppApplicationMessage,
+  formatWhatsAppPhone,
+  sendWhatsAppMessage,
+} from "./twilio-whatsapp";
 
 test("formatWhatsAppPhone preserves international numbers", () => {
   assert.equal(formatWhatsAppPhone("+35699112233"), "+35699112233");
@@ -61,4 +65,20 @@ test("sendWhatsAppMessage posts to Twilio with formatted payload", async () => {
     messageId: "SM123",
     status: "queued",
   });
+});
+
+test("buildImpjiegWhatsAppApplicationMessage includes branded copy and dashboard link", () => {
+  const message = buildImpjiegWhatsAppApplicationMessage({
+    applicationId: "app_123",
+    candidateName: "Jane Doe",
+    jobTitle: "Product Engineer",
+    dashboardUrl: "https://impjieg.vercel.app/employer/applications",
+  });
+
+  assert.match(message, /Impjieg/);
+  assert.match(message, /Malta's modern jobs marketplace/);
+  assert.match(message, /Candidate: Jane Doe/);
+  assert.match(message, /Role: Product Engineer/);
+  assert.match(message, /Application ID: app_123/);
+  assert.match(message, /https:\/\/impjieg\.vercel\.app\/employer\/applications/);
 });

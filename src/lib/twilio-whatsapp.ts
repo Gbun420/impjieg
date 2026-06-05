@@ -1,3 +1,5 @@
+import { SITE } from "@/lib/constants";
+
 type EnvLike = Record<string, string | undefined>;
 
 type SendWhatsAppInput = {
@@ -35,6 +37,33 @@ function getRequiredConfig(env: EnvLike) {
 export function formatWhatsAppPhone(phoneNumber: string) {
   const trimmed = phoneNumber.trim();
   return trimmed.startsWith("+") ? trimmed : `+${trimmed}`;
+}
+
+export function buildImpjiegWhatsAppApplicationMessage({
+  applicationId,
+  candidateName,
+  jobTitle,
+  dashboardUrl = `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/applications`,
+}: {
+  applicationId: string;
+  candidateName: string;
+  jobTitle: string;
+  dashboardUrl?: string;
+}) {
+  return [
+    `🔔 ${SITE.name}`,
+    SITE.tagline,
+    "",
+    "New application received",
+    `• Candidate: ${candidateName}`,
+    `• Role: ${jobTitle}`,
+    `• Application ID: ${applicationId}`,
+    "",
+    "Open your employer dashboard:",
+    dashboardUrl,
+    "",
+    "Impjieg · Malta tech, digital, and iGaming hiring",
+  ].join("\n");
 }
 
 export async function sendWhatsAppMessage({

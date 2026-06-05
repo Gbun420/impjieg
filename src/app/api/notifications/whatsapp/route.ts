@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireInternalAdminToken } from "../../_lib/internal-route-guard";
-import { sendWhatsAppMessage } from "@/lib/twilio-whatsapp";
+import {
+  buildImpjiegWhatsAppApplicationMessage,
+  sendWhatsAppMessage,
+} from "@/lib/twilio-whatsapp";
 
 import { z } from "zod";
 
@@ -31,8 +34,13 @@ export async function POST(request: Request) {
   }
 
   const { applicationId, candidateName, jobTitle, employerPhone } = parsed.data;
-
-  const message = `🔔 New Application on Impjieg\n\nApplication ID: ${applicationId}\n${candidateName} has applied for: ${jobTitle}\n\nLog in to your dashboard to review: https://impjieg.vercel.app/employer/applications`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/applications`;
+  const message = buildImpjiegWhatsAppApplicationMessage({
+    applicationId,
+    candidateName,
+    jobTitle,
+    dashboardUrl,
+  });
 
   try {
     const result = await sendWhatsAppMessage({

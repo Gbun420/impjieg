@@ -14,6 +14,26 @@ export type EmailSendResult =
   | { success: true; messageId: string }
   | { success: false; error: string; category: "setup_failed" | "provider_failed" | "invalid_input" };
 
+const DEV_RESEND_FROM = "Impjieg <onboarding@resend.dev>";
+
+function resolveResendFromAddress(from?: string) {
+  const explicitFrom = from?.trim();
+  if (explicitFrom) {
+    return explicitFrom;
+  }
+
+  const configuredFrom = process.env.RESEND_FROM_EMAIL?.trim();
+  if (configuredFrom) {
+    return configuredFrom;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return DEV_RESEND_FROM;
+  }
+
+  return null;
+}
+
 /**
  * Server-only utility to send emails via Resend.
  * Does not expose API keys to the client.
@@ -24,6 +44,16 @@ export async function sendEmail(options: EmailSendOptions): Promise<EmailSendRes
     if (!resendApiKey) {
       console.warn("email_sender_setup_failed: Missing RESEND_API_KEY");
       return { success: false, error: "Email provider not configured", category: "setup_failed" };
+    }
+
+    const from = resolveResendFromAddress(options.from);
+    if (!from) {
+      console.warn("email_sender_setup_failed: Missing RESEND_FROM_EMAIL");
+      return {
+        success: false,
+        error: "Email sender not configured. Set RESEND_FROM_EMAIL to a verified sender.",
+        category: "setup_failed",
+      };
     }
 
     const recipients = Array.isArray(options.to) ? options.to : [options.to];
@@ -40,7 +70,7 @@ export async function sendEmail(options: EmailSendOptions): Promise<EmailSendRes
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: options.from || "Impjieg <onboarding@resend.dev>",
+        from,
         to,
         subject: options.subject,
         html: options.html,

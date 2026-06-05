@@ -24,7 +24,6 @@ export async function POST(request: Request) {
   }
 
   const result = await sendEmail({
-    from: "Impjieg Contact <onboarding@resend.dev>",
     to: SITE.email,
     replyTo: parsed.data.email,
     subject: `[Contact] ${parsed.data.subject}`,
