@@ -493,13 +493,12 @@ function CommercialGrantsConsole({
   return (
     <div className="space-y-6">
       {loadError ? (
-        <Card className="border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-sm">
-          <p className="text-sm font-semibold">Commercial grants data is temporarily unavailable</p>
-          <p className="mt-1 text-sm">
-            The console could not load the live grants table, so the list is hidden until the
-            underlying data source is restored.
+        <Card className="border-amber-300 bg-amber-50 p-5 text-amber-950 shadow-sm">
+          <p className="text-sm font-semibold">Commercial grants table is unavailable</p>
+          <p className="mt-1 text-sm leading-6">
+            The live grants table could not be loaded. Grants will appear here once the data source is restored.
           </p>
-          <p className="mt-2 text-xs text-amber-900/80">{loadError}</p>
+          <p className="mt-2 text-xs leading-5 text-amber-900/80">{loadError}</p>
         </Card>
       ) : null}
 
@@ -512,9 +511,9 @@ function CommercialGrantsConsole({
         ]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_460px] xl:items-start">
         <div className="space-y-6">
-          <Panel title="Commercial grants" description="Live manual entitlements and trial states">
+          <Panel title="Commercial grants" description="Live grants, usage, and revocation actions.">
             <GrantsList grants={grants} />
           </Panel>
         </div>
