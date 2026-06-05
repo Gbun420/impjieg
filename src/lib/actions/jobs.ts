@@ -9,6 +9,7 @@ import { sanitizeJobDescription } from "@/lib/job-description";
 import { resolveEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/actions";
 import { consumeGrantCredit } from "@/lib/monetization/admin-grants/actions";
 import { validateSalaryRange } from "@/lib/compliance";
+import { generateUniqueSlug } from "@/lib/unique-slug";
 
 type EmployerRef = Pick<Employer, "id">;
 type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"];
@@ -87,7 +88,19 @@ export async function createJob(formData: FormData) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  const jobSlug = `${slugify(title)}-${Math.random().toString(36).substring(2, 6)}`;
+  const jobSlug = await generateUniqueSlug(slugify(title), async (candidateSlug) => {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("id")
+      .eq("slug", candidateSlug)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return Boolean(data);
+  });
 
   const jobsTable = supabase.from("jobs") as unknown as JobsMutationTable;
 

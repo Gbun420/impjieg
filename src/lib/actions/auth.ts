@@ -7,6 +7,8 @@ import { signupWithAutoConfirm } from "./auth-signup";
 import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
 import { isSuperAdminEmail } from "@/lib/admin-access";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { generateUniqueSlug } from "@/lib/unique-slug";
+import { validatePasswordPolicy } from "@/lib/password-policy";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -41,8 +43,9 @@ export async function signup(formData: FormData) {
     return { error: "All fields are required" };
   }
 
-  if (data.password.length < 6) {
-    return { error: "Password must be at least 6 characters" };
+  const passwordError = validatePasswordPolicy(data.password);
+  if (passwordError) {
+    return { error: passwordError };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -177,12 +180,28 @@ export async function ensureEmployerProfile() {
     "employers"
   ) as unknown as EmployersMutationTable;
 
+  const slugExists = async (candidateSlug: string) => {
+    const { data, error } = await serviceSupabase
+      .from("employers")
+      .select("id")
+      .eq("slug", candidateSlug)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return Boolean(data);
+  };
+
+  const uniqueSlug = await generateUniqueSlug(slug, slugExists);
+
   const { data: newProfile, error: profileError } = await employersTable
     .insert([
       {
         user_id: user.id,
         name: companyName,
-        slug: `${slug}-${Math.random().toString(36).substring(2, 6)}`,
+        slug: uniqueSlug,
       },
     ])
     .select()

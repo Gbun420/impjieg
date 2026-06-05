@@ -222,10 +222,12 @@ export default async function JobDetailPage({
                     : "bg-muted"
                 }`}>
                   {j.employers.logo_url ? (
-                    <img
+                    <Image
                       src={j.employers.logo_url}
                       alt={j.employers.name}
-                      className="h-9 w-9 rounded-lg object-cover"
+                      width={36}
+                      height={36}
+                      className="rounded-lg object-cover"
                     />
                   ) : (
                     <span className="text-xl font-semibold text-muted-foreground">

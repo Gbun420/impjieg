@@ -16,11 +16,18 @@ declare
 begin
   if new.raw_user_meta_data->>'accountType' = 'employer' then
     v_name := coalesce(new.raw_user_meta_data->>'companyName', 'New Employer');
-    v_slug := lower(regexp_replace(v_name, '[^a-zA-Z0-9]+', '-', 'g'));
-    if v_slug = '' then
-      v_slug := 'employer';
-    end if;
-    v_slug := v_slug || '-' || substr(md5(random()::text || clock_timestamp()::text), 1, 4);
+    loop
+      v_slug := lower(regexp_replace(v_name, '[^a-zA-Z0-9]+', '-', 'g'));
+      if v_slug = '' then
+        v_slug := 'employer';
+      end if;
+      v_slug := v_slug || '-' || substr(md5(random()::text || clock_timestamp()::text), 1, 4);
+      exit when not exists (
+        select 1
+        from public.employers
+        where slug = v_slug
+      );
+    end loop;
 
     insert into public.employers (user_id, name, slug)
     values (new.id, v_name, v_slug);
