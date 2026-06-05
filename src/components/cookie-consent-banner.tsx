@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { useCookieConsent, type CookieCategory } from "@/hooks/use-cookie-consent";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -40,52 +39,8 @@ export default function CookieConsentBanner() {
     useCookieConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [localConsent, setLocalConsent] = useState(consent);
-  const bannerRef = useRef<HTMLDivElement | null>(null);
   const hydrated = useHydrated();
-  const pathname = usePathname();
-  const isAppPage =
-    pathname.startsWith("/candidate") ||
-    pathname.startsWith("/employer") ||
-    pathname === "/saved-jobs" ||
-    pathname.startsWith("/admin");
   const hidden = !hydrated || hasConsented;
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    if (hidden || isAppPage) {
-      document.body.style.removeProperty("--cookie-banner-space");
-      return;
-    }
-
-    const updateSpace = () => {
-      const bannerHeight = bannerRef.current?.offsetHeight ?? 0;
-      const extraGap = window.innerWidth < 640 ? 16 : 24;
-      document.body.style.setProperty(
-        "--cookie-banner-space",
-        `${bannerHeight + extraGap}px`
-      );
-    };
-
-    updateSpace();
-
-    const resizeObserver =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(updateSpace)
-        : null;
-
-    if (resizeObserver && bannerRef.current) {
-      resizeObserver.observe(bannerRef.current);
-    }
-
-    window.addEventListener("resize", updateSpace);
-
-    return () => {
-      resizeObserver?.disconnect();
-      window.removeEventListener("resize", updateSpace);
-      document.body.style.removeProperty("--cookie-banner-space");
-    };
-  }, [hidden, isAppPage, showDetails]);
 
   if (hidden) return null;
 
@@ -100,12 +55,7 @@ export default function CookieConsentBanner() {
 
   return (
     <div
-      ref={bannerRef}
-      className={
-        isAppPage
-          ? "z-30 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-          : "fixed inset-x-0 bottom-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-      }
+      className="z-30 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
     >
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         {!showDetails ? (

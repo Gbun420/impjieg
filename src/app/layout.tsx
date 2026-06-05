@@ -113,7 +113,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <ThemeProvider>
           <Header initialAuthState={{ isLoggedIn: Boolean(user), isEmployer }} />
-          <main className="flex-1 pb-[var(--cookie-banner-space,0px)]">
+          <main className="flex-1">
             {children}
           </main>
           <Footer />
