@@ -267,7 +267,7 @@ function countStatus<T extends { status: string }>(rows: T[], status: string) {
 
 async function safeCountQuery(
   label: string,
-  query: Promise<{ count: number | null; error: { message: string } | null }>
+  query: PromiseLike<{ count: number | null; error: { message: string } | null }>
 ) {
   try {
     const result = await query;
@@ -288,7 +288,7 @@ async function safeCountQuery(
 
 async function safeRowsQuery<T>(
   label: string,
-  query: Promise<{ data: T[] | null; error: { message: string } | null }>
+  query: PromiseLike<{ data: T[] | null; error: { message: string } | null }>
 ) {
   try {
     const result = await query;
@@ -463,28 +463,28 @@ export async function getAdminDashboardData() {
   const stats = [
     {
       label: "Total Jobs",
-      value: jobsCount.count ?? 0,
-      note: `${activeJobsCount.count ?? 0} active · ${featuredJobsCount.count ?? 0} featured`,
+      value: jobsCount,
+      note: `${activeJobsCount} active · ${featuredJobsCount} featured`,
     },
     {
       label: "Employers",
-      value: employersCount.count ?? 0,
-      note: `${verifiedEmployersCount.count ?? 0} verified`,
+      value: employersCount,
+      note: `${verifiedEmployersCount} verified`,
     },
     {
       label: "Applications",
-      value: applicationsCount.count ?? 0,
+      value: applicationsCount,
       note: `${countStatus(recentApplications, "applied")} new in the latest page`,
     },
     {
       label: "Job Alerts",
-      value: alertsCount.count ?? 0,
-      note: `${activeAlertsCount.count ?? 0} active alerts`,
+      value: alertsCount,
+      note: `${activeAlertsCount} active alerts`,
     },
     {
       label: "Subscriptions",
-      value: subscriptionsCount.count ?? 0,
-      note: `${activeSubscriptionsCount.count ?? 0} active plans`,
+      value: subscriptionsCount,
+      note: `${activeSubscriptionsCount} active plans`,
     },
     {
       label: "Revenue",
@@ -494,8 +494,8 @@ export async function getAdminDashboardData() {
   ] as const;
 
   const alertStats = {
-    total: alertsCount.count ?? 0,
-    active: activeAlertsCount.count ?? 0,
+    total: alertsCount,
+    active: activeAlertsCount,
   };
 
   return {
@@ -508,18 +508,18 @@ export async function getAdminDashboardData() {
     recentSubscriptions,
     alertStats,
     summary: {
-      jobs: jobsCount.count ?? 0,
-      activeJobs: activeJobsCount.count ?? 0,
-      featuredJobs: featuredJobsCount.count ?? 0,
-      employers: employersCount.count ?? 0,
-      verifiedEmployers: verifiedEmployersCount.count ?? 0,
-      applications: applicationsCount.count ?? 0,
-      alerts: alertsCount.count ?? 0,
-      activeAlerts: activeAlertsCount.count ?? 0,
-      subscriptions: subscriptionsCount.count ?? 0,
-      activeSubscriptions: activeSubscriptionsCount.count ?? 0,
-      payments: paymentsCount.count ?? 0,
-      pendingPayments: pendingPaymentsCount.count ?? 0,
+      jobs: jobsCount,
+      activeJobs: activeJobsCount,
+      featuredJobs: featuredJobsCount,
+      employers: employersCount,
+      verifiedEmployers: verifiedEmployersCount,
+      applications: applicationsCount,
+      alerts: alertsCount,
+      activeAlerts: activeAlertsCount,
+      subscriptions: subscriptionsCount,
+      activeSubscriptions: activeSubscriptionsCount,
+      payments: paymentsCount,
+      pendingPayments: pendingPaymentsCount,
       totalRevenue,
       paidRevenue,
     },

@@ -179,6 +179,27 @@ function createAdminServiceClient() {
   );
 }
 
+async function safeRowsQuery<T>(
+  label: string,
+  query: PromiseLike<{ data: T[] | null; error: { message: string } | null }>
+) {
+  try {
+    const result = await query;
+    if (result.error) {
+      console.error(`Admin console ${label} query failed:`, result.error.message);
+      return [] as T[];
+    }
+
+    return (result.data ?? []) as T[];
+  } catch (error) {
+    console.error(
+      `Admin console ${label} query threw:`,
+      error instanceof Error ? error.message : String(error)
+    );
+    return [] as T[];
+  }
+}
+
 function sumAmount(rows: LatestPayment[]) {
   return rows.reduce((total, row) => total + row.amount, 0);
 }
@@ -465,39 +486,45 @@ export async function getAdminConsoleData() {
   }
 
   const supabase = createAdminServiceClient();
-
   const [
-    candidateProfilesResult,
-    candidateApplicationsResult,
-    candidateAlertsResult,
-    auditLogsResult,
+    candidateProfiles,
+    candidateApplications,
+    candidateAlerts,
+    auditLogs,
   ] = await Promise.all([
-    supabase
-      .from("candidate_profiles")
-      .select("*")
-      .order("updated_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("candidate_applications")
-      .select("*, jobs(title, slug, status), employers(name, slug)")
-      .order("applied_at", { ascending: false })
-      .limit(8),
-    supabase
-      .from("candidate_alerts")
-      .select("*")
-      .order("updated_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("admin_audit_logs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(12),
+    safeRowsQuery<LatestCandidateProfile>(
+      "candidate profiles",
+      supabase
+        .from("candidate_profiles")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<LatestCandidateApplication>(
+      "candidate applications",
+      supabase
+        .from("candidate_applications")
+        .select("*, jobs(title, slug, status), employers(name, slug)")
+        .order("applied_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestCandidateAlert>(
+      "candidate alerts",
+      supabase
+        .from("candidate_alerts")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<AdminAuditRow>(
+      "admin audit logs",
+      supabase
+        .from("admin_audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(12)
+    ),
   ]);
-
-  const candidateProfiles = (candidateProfilesResult.data || []) as LatestCandidateProfile[];
-  const candidateApplications = (candidateApplicationsResult.data || []) as LatestCandidateApplication[];
-  const candidateAlerts = (candidateAlertsResult.data || []) as LatestCandidateAlert[];
-  const auditLogs = (auditLogsResult.data || []) as AdminAuditRow[];
 
   return {
     ...dashboard,
