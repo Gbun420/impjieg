@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { updateApplicationStatus, sendCandidateEmail } from "@/lib/actions/applications";
 import { deriveApplicationInsights } from "@/lib/application-insights";
 import { filterApplications } from "@/lib/application-filters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { formatDate } from "@/lib/utils";
+import { SCREENING_UPSELLS } from "@/lib/constants";
 import {
   Mail,
   Phone,
@@ -21,6 +24,7 @@ import {
   ArrowRight,
   Sparkles,
   ArrowUpRight,
+  ShieldCheck,
 } from "lucide-react";
 import type { Application, CandidateProfile, Json } from "@/lib/supabase/types";
 
@@ -61,6 +65,27 @@ const EMAIL_TEMPLATES = [
   },
 ];
 
+const SCREENING_SERVICE_OPTIONS = [
+  {
+    value: "skillsAssessment",
+    label: SCREENING_UPSELLS.skillsAssessment.label,
+    description: "Technical validation for shortlist decisions.",
+    price: `€${SCREENING_UPSELLS.skillsAssessment.price}`,
+  },
+  {
+    value: "backgroundCheck",
+    label: SCREENING_UPSELLS.backgroundCheck.label,
+    description: "Use for final-stage hires where trust checks matter.",
+    price: `€${SCREENING_UPSELLS.backgroundCheck.price}`,
+  },
+  {
+    value: "referenceCheck",
+    label: SCREENING_UPSELLS.referenceCheck.label,
+    description: "Verify previous performance and credibility.",
+    price: `€${SCREENING_UPSELLS.referenceCheck.price}`,
+  },
+] as const;
+
 type AppWithJob = Application & {
   jobs: { title: string } | null;
   candidateProfile?: Pick<
@@ -75,6 +100,13 @@ type AppWithJob = Application & {
   } | null;
   recruiterNotes?: string | null;
   scorecardData?: Json | null;
+  screeningServices?: Array<{
+    application_id: string;
+    service_type: (typeof SCREENING_SERVICE_OPTIONS)[number]["value"];
+    status: "pending" | "completed" | "failed";
+    purchased_at: string;
+    completed_at: string | null;
+  }>;
 };
 
 function EmailModal({
@@ -191,7 +223,79 @@ function EmailModal({
 }
 
 function ApplicationCard({ app }: { app: AppWithJob }) {
+  const router = useRouter();
   const [showEmail, setShowEmail] = useState(false);
+  const [screeningOpen, setScreeningOpen] = useState(false);
+  const [screeningType, setScreeningType] = useState<(typeof SCREENING_SERVICE_OPTIONS)[number]["value"]>(
+    "skillsAssessment"
+  );
+  const [screeningLoading, setScreeningLoading] = useState(false);
+  const [screeningMessage, setScreeningMessage] = useState<string | null>(null);
+  const [screeningError, setScreeningError] = useState<string | null>(null);
+  const screeningServices = app.screeningServices ?? [];
+  const selectedService =
+    SCREENING_SERVICE_OPTIONS.find((option) => option.value === screeningType) ??
+    SCREENING_SERVICE_OPTIONS[0];
+  const hasBlockingService = screeningServices.some(
+    (service) =>
+      service.service_type === screeningType &&
+      (service.status === "pending" || service.status === "completed")
+  );
+
+  const handleScreeningCheckout = async () => {
+    setScreeningLoading(true);
+    setScreeningError(null);
+    setScreeningMessage(null);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          applicationId: app.id,
+          serviceType: screeningType,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to start screening checkout");
+      }
+
+      if (data?.free) {
+        setScreeningMessage(data.message || "Screening request created using your credit.");
+        setScreeningOpen(false);
+        router.refresh();
+        return;
+      }
+
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
+      }
+
+      throw new Error("Checkout did not return a redirect URL");
+    } catch (error) {
+      setScreeningError(error instanceof Error ? error.message : "Failed to start screening checkout");
+    } finally {
+      setScreeningLoading(false);
+    }
+  };
+
+  const renderStatusBadge = (status: "pending" | "completed" | "failed") => {
+    if (status === "completed") {
+      return <Badge variant="success">Completed</Badge>;
+    }
+
+    if (status === "failed") {
+      return <Badge variant="error">Failed</Badge>;
+    }
+
+    return <Badge variant="warning">Pending</Badge>;
+  };
 
   return (
     <>
@@ -277,6 +381,104 @@ function ApplicationCard({ app }: { app: AppWithJob }) {
             </p>
           </div>
         )}
+
+        <div className="mt-2 rounded-xl border border-border/60 bg-background/70 p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Screening
+              </p>
+              <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+                Attach a candidate-specific screening order to this application.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant={screeningOpen ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setScreeningOpen((value) => !value)}
+              className="shrink-0"
+            >
+              <ShieldCheck className="mr-1.5 h-4 w-4" />
+              {screeningOpen ? "Close" : "Order screening"}
+            </Button>
+          </div>
+
+          {screeningServices.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {screeningServices.map((service) => {
+                const serviceLabel =
+                  SCREENING_SERVICE_OPTIONS.find((option) => option.value === service.service_type)?.label ??
+                  service.service_type;
+
+                return (
+                  <span
+                    key={`${service.application_id}-${service.service_type}-${service.purchased_at}`}
+                    className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1 text-[11px] font-medium text-foreground"
+                  >
+                    {serviceLabel}
+                    {renderStatusBadge(service.status)}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {screeningOpen && (
+            <div className="mt-4 space-y-3">
+              <Select
+                label="Check type"
+                value={screeningType}
+                onChange={(event) =>
+                  setScreeningType(event.target.value as (typeof SCREENING_SERVICE_OPTIONS)[number]["value"])
+                }
+                options={SCREENING_SERVICE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: `${option.label} · ${option.price}`,
+                }))}
+              />
+
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3">
+                <p className="text-sm font-semibold text-foreground">{selectedService.label}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{selectedService.description}</p>
+                <p className="mt-2 text-xs font-medium text-foreground">{selectedService.price} per application</p>
+              </div>
+
+              {hasBlockingService && (
+                <div className="rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm text-foreground">
+                  This application already has an active {selectedService.label.toLowerCase()} order.
+                </div>
+              )}
+
+              {screeningMessage && (
+                <div className="rounded-xl border border-success/20 bg-success/10 p-3 text-sm text-success">
+                  {screeningMessage}
+                </div>
+              )}
+
+              {screeningError && (
+                <div className="rounded-xl border border-error/20 bg-error/10 p-3 text-sm text-error">
+                  {screeningError}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                className="w-full"
+                onClick={handleScreeningCheckout}
+                disabled={screeningLoading || hasBlockingService}
+                isLoading={screeningLoading}
+              >
+                Continue to checkout
+              </Button>
+              <p className="text-[11px] leading-5 text-muted-foreground">
+                Screening stays attached to this application so the order remains linked to the candidate record.
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="mt-2 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">

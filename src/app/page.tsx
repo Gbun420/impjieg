@@ -172,7 +172,7 @@ export default async function HomePage() {
               <Link
                 key={sector}
                 href={`/jobs?sector=${encodeURIComponent(sector)}`}
-                className="group rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-border-hover hover:bg-card-hover transition-all"
+                className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-border-hover hover:bg-card-hover hover:shadow-sm"
               >
                 {sector}
               </Link>
@@ -183,7 +183,7 @@ export default async function HomePage() {
 
       {/* Latest Jobs */}
       <section className="border-t border-border py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LatestJobs />
           </Suspense>

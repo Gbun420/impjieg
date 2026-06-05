@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
-      const { paymentId, jobId, listingType } = metadata;
+      const { paymentId, jobId, listingType, serviceType, applicationId, employerId } = metadata;
 
       if (paymentId) {
         await supabase
@@ -70,13 +70,44 @@ export async function POST(request: Request) {
           .eq("id", jobId);
       }
 
+      if (serviceType && applicationId && employerId) {
+        const { data: existingService } = await supabase
+          .from("screening_services")
+          .select("id, status")
+          .eq("application_id", applicationId)
+          .eq("service_type", serviceType)
+          .in("status", ["pending", "completed"])
+          .maybeSingle();
+
+        if (existingService) {
+          await supabase
+            .from("screening_services")
+            .update({ status: "pending" })
+            .eq("id", existingService.id);
+        } else {
+          await supabase
+            .from("screening_services")
+            .insert([
+              {
+                employer_id: employerId,
+                application_id: applicationId,
+                service_type: serviceType,
+                status: "pending",
+                result: null,
+                purchased_at: session.created ? new Date(session.created * 1000).toISOString() : new Date().toISOString(),
+                completed_at: null,
+              },
+            ]);
+        }
+      }
+
       break;
     }
 
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
-      const { paymentId } = metadata;
+      const { paymentId, serviceType, applicationId } = metadata;
 
       if (paymentId) {
         await supabase
@@ -85,13 +116,30 @@ export async function POST(request: Request) {
           .eq("id", paymentId);
       }
 
+      if (serviceType && applicationId) {
+        const { data: existingService } = await supabase
+          .from("screening_services")
+          .select("id")
+          .eq("application_id", applicationId)
+          .eq("service_type", serviceType)
+          .eq("status", "pending")
+          .maybeSingle();
+
+        if (existingService) {
+          await supabase
+            .from("screening_services")
+            .update({ status: "failed" })
+            .eq("id", existingService.id);
+        }
+      }
+
       break;
     }
 
     case "payment_intent.payment_failed": {
       const intent = event.data.object as Stripe.PaymentIntent;
       const metadata = intent.metadata || {};
-      const { paymentId, jobId } = metadata;
+      const { paymentId, jobId, serviceType, applicationId } = metadata;
 
       if (paymentId) {
         await supabase
@@ -105,6 +153,23 @@ export async function POST(request: Request) {
           .from("jobs")
           .update({ status: "draft" })
           .eq("id", jobId);
+      }
+
+      if (serviceType && applicationId) {
+        const { data: existingService } = await supabase
+          .from("screening_services")
+          .select("id")
+          .eq("application_id", applicationId)
+          .eq("service_type", serviceType)
+          .eq("status", "pending")
+          .maybeSingle();
+
+        if (existingService) {
+          await supabase
+            .from("screening_services")
+            .update({ status: "failed" })
+            .eq("id", existingService.id);
+        }
       }
 
       break;

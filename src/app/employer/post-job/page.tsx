@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createJob } from "@/lib/actions/jobs";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,8 +17,9 @@ import {
   SENIORITY_LEVELS,
   REMOTE_OPTIONS,
   PRICING,
+  PROMOTION_BUNDLES,
 } from "@/lib/constants";
-import { Sparkles, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Sparkles, ShieldCheck, AlertTriangle, CheckCircle2, Megaphone } from "lucide-react";
 
 export default function PostJobPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +33,7 @@ export default function PostJobPage() {
     overallScore: number;
     summary: string;
   } | null>(null);
+  const featuredBoostPrice = PROMOTION_BUNDLES.featuredBoost.price;
 
   useEffect(() => {
     getEmployerEntitlements().then(setEntitlements);
@@ -137,6 +140,65 @@ export default function PostJobPage() {
       )}
 
       <form action={handleSubmit} className="space-y-8">
+        {entitlements && (
+          <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+            <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] px-6 py-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Commercial upsells
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">
+                Recommended next steps
+              </h2>
+            </div>
+            <div className="grid gap-4 p-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-foreground">Featured Boost</p>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Stronger placement for one role when you need replies faster.
+                </p>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="font-mono text-lg font-bold text-foreground">€{featuredBoostPrice}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const hidden = document.querySelector('[name="bundleType"]') as HTMLInputElement | null;
+                      if (hidden) {
+                        hidden.value = "featuredBoost";
+                        hidden.form?.requestSubmit();
+                      }
+                    }}
+                  >
+                    Add boost
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-foreground">Bulk credits</p>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Best if you are planning multiple hires and want to avoid paying per listing.
+                </p>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">See pricing</span>
+                  <Link href="/pricing">
+                    <Button type="button" variant="outline" size="sm">
+                      Open pricing
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">

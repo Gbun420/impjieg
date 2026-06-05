@@ -4,11 +4,11 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PRICING } from "@/lib/constants";
+import { PRICING, PROMOTION_BUNDLES } from "@/lib/constants";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import { selectBestCommercialDiscount } from "@/lib/monetization/admin-grants/resolver";
 import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
-import { Tag, CheckCircle2 } from "lucide-react";
+import { Tag } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +39,7 @@ export default function CheckoutPage({
 
   const finalAmountCents = bestDiscount ? bestDiscount.discountedTotalCents : originalAmountCents;
   const finalPrice = finalAmountCents / 100;
+  const featuredBoostPrice = PROMOTION_BUNDLES.featuredBoost.price;
 
   useEffect(() => {
     if (!jobId) {
@@ -88,10 +89,18 @@ export default function CheckoutPage({
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-8 py-10">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">
-        Checkout
-      </h1>
+    <div className="mx-auto max-w-xl space-y-8 py-10">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          Employer checkout
+        </p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Review your posting before payment
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Confirm the listing type, see any grant-driven savings, and continue when the total looks right.
+        </p>
+      </div>
 
       {error && (
         <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
@@ -99,43 +108,55 @@ export default function CheckoutPage({
         </div>
       )}
 
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-foreground">
-          Order Summary
-        </h2>
-        <div className="mt-4 space-y-3">
+      <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] px-6 py-5">
+          <h2 className="text-lg font-semibold text-foreground">
+            Order summary
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {pricing.label} listing · {pricing.description}
+          </p>
+        </div>
+        <div className="space-y-4 p-6">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{pricing.label} Listing</span>
+            <span className="text-muted-foreground">Base price</span>
             <span className={`font-mono text-lg font-bold ${bestDiscount ? "line-through text-muted-foreground" : "text-foreground"}`}>
               €{pricing.price}
             </span>
           </div>
-          
-          {bestDiscount && (
-            <div className="flex items-center justify-between text-success">
-              <span className="flex items-center gap-1.5">
-                <Tag className="h-4 w-4" />
-                Commercial Discount
-              </span>
-              <span className="font-mono text-lg font-bold">
-                -€{bestDiscount.discountCents / 100}
-              </span>
-            </div>
-          )}
 
-          <p className="text-sm text-muted-foreground">{pricing.description}</p>
-          
-          {bestDiscount && (
-            <div className="rounded-lg bg-success/5 p-3 flex items-start gap-2.5 border border-success/20">
-              <CheckCircle2 className="h-4 w-4 text-success mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-success uppercase tracking-wider">Discount Applied</p>
-                <p className="text-xs text-success/80">{bestDiscount.discount?.reason}</p>
+          {bestDiscount ? (
+            <>
+              <div className="flex items-center justify-between text-success">
+                <span className="flex items-center gap-1.5">
+                  <Tag className="h-4 w-4" />
+                  Applied grant
+                </span>
+                <span className="font-mono text-lg font-bold">
+                  -€{bestDiscount.discountCents / 100}
+                </span>
               </div>
-            </div>
-          )}
+              <div className="rounded-2xl border border-success/20 bg-success/5 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-success">
+                  Savings applied
+                </p>
+                <p className="mt-1 text-sm leading-6 text-success/90">
+                  {bestDiscount.discount?.reason}
+                </p>
+              </div>
+            </>
+          ) : null}
 
-          <div className="border-t border-border/50 pt-3">
+          <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              What you get
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              A live posting on Impjieg with direct candidate applications and the visibility level you selected.
+            </p>
+          </div>
+
+          <div className="border-t border-border/50 pt-4">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-foreground">Total</span>
               <span className="font-mono text-xl font-bold text-foreground">
@@ -146,6 +167,38 @@ export default function CheckoutPage({
         </div>
       </Card>
 
+      {listingType === "standard" ? (
+        <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+          <div className="border-b border-border/60 bg-muted/20 px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Optional add-on
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-foreground">
+              Add visibility before you pay
+            </h2>
+          </div>
+          <div className="p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Featured Boost</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  Stronger placement for one role when you need replies faster.
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-mono text-xl font-bold text-foreground">€{featuredBoostPrice}</p>
+                <p className="text-xs text-muted-foreground">Optional add-on</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button type="button" variant="outline" className="w-full">
+                Add from pricing
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : null}
+
       <Button
         variant="primary"
         size="lg"
@@ -153,7 +206,13 @@ export default function CheckoutPage({
         onClick={handleCheckout}
         isLoading={isLoading}
       >
-        {isLoading ? "Redirecting to Stripe..." : `Pay €${finalPrice}`}
+        {finalPrice === 0
+          ? isLoading
+            ? "Opening grant flow..."
+            : "Continue free"
+          : isLoading
+            ? "Redirecting to Stripe..."
+            : `Pay €${finalPrice}`}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">

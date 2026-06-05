@@ -207,70 +207,77 @@ export default async function JobDetailPage({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Header */}
-          <div>
-            <div className="flex items-start gap-4">
-              <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${
-                j.is_featured
-                  ? "bg-primary/10 ring-1 ring-primary/10"
-                  : "bg-muted"
-              }`}>
-                {j.employers.logo_url ? (
-                  <img
-                    src={j.employers.logo_url}
-                    alt={j.employers.name}
-                    className="h-9 w-9 rounded-lg object-cover"
-                  />
-                ) : (
-                  <span className="text-xl font-semibold text-muted-foreground">
-                    {j.employers.name.charAt(0)}
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                        {j.title}
-                      </h1>
-                      {j.is_featured && <Badge variant="default">Featured</Badge>}
-                    </div>
-                    <Link
-                      href={`/companies/${j.employers.slug}`}
-                      className="mt-1 text-base text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {j.employers.name}
-                    </Link>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-                    <SaveJobButton
-                      jobId={j.id}
-                      saved={isSaved}
-                      authenticated={!!user}
-                      redirectTo={`/jobs/${j.employers.slug}/${j.slug}`}
+          <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
+            <div className={`h-1 w-full ${
+              j.is_featured
+                ? "bg-[linear-gradient(90deg,rgba(30,99,255,0.95)_0%,rgba(20,199,183,0.95)_100%)]"
+                : "bg-border/60"
+            }`} />
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
+                  j.is_featured
+                    ? "bg-primary/10 ring-1 ring-primary/10"
+                    : "bg-muted"
+                }`}>
+                  {j.employers.logo_url ? (
+                    <img
+                      src={j.employers.logo_url}
+                      alt={j.employers.name}
+                      className="h-9 w-9 rounded-lg object-cover"
                     />
-                    <ShareJobButton title={j.title} />
-                  </div>
+                  ) : (
+                    <span className="text-xl font-semibold text-muted-foreground">
+                      {j.employers.name.charAt(0)}
+                    </span>
+                  )}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 shrink-0" />
-                    {j.location}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Briefcase className="h-4 w-4 shrink-0" />
-                    {j.job_type}
-                  </span>
-                  {j.remote_type && <Badge>{j.remote_type}</Badge>}
-                  {j.visa_friendly && <Badge variant="accent">Visa Friendly</Badge>}
-                  <span className="flex items-center gap-1.5">
-                    <Eye className="h-4 w-4 shrink-0" />
-                    {j.views} views
-                  </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                          {j.title}
+                        </h1>
+                        {j.is_featured ? <Badge variant="default">Featured</Badge> : null}
+                      </div>
+                      <Link
+                        href={`/companies/${j.employers.slug}`}
+                        className="mt-1 text-base text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {j.employers.name}
+                      </Link>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+                      <SaveJobButton
+                        jobId={j.id}
+                        saved={isSaved}
+                        authenticated={!!user}
+                        redirectTo={`/jobs/${j.employers.slug}/${j.slug}`}
+                      />
+                      <ShareJobButton title={j.title} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/20 px-2.5 py-1">
+                      <MapPin className="h-4 w-4 shrink-0" />
+                      {j.location}
+                    </span>
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/20 px-2.5 py-1">
+                      <Briefcase className="h-4 w-4 shrink-0" />
+                      {j.job_type}
+                    </span>
+                    {j.remote_type ? <Badge>{j.remote_type}</Badge> : null}
+                    {j.visa_friendly ? <Badge variant="accent">Visa friendly</Badge> : null}
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/20 px-2.5 py-1">
+                      <Eye className="h-4 w-4 shrink-0" />
+                      {j.views} views
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Salary */}
           {salaryText && (
@@ -407,20 +414,22 @@ export default async function JobDetailPage({
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-20 space-y-4">
-            <Card>
-              <div className="p-5">
+            <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
+              <div className="border-b border-border/60 bg-muted/20 p-5">
                 <h2 className="text-base font-semibold text-foreground">
                   Apply for this role
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Apply directly through Impjieg.
                 </p>
-                <div className="mt-4">
+              </div>
+              <div className="p-5">
+                <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
                   <ApplyForm jobId={j.id} employerId={j.employer_id} jobTitle={j.title} />
                 </div>
                 {(j.application_url || j.application_email) && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-3">Or apply directly:</p>
+                  <div className="mt-4 border-t border-border pt-4">
+                    <p className="mb-3 text-xs text-muted-foreground">Or apply directly:</p>
                     <div className="flex flex-wrap gap-2">
                       {j.application_url && (
                         <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
@@ -444,18 +453,18 @@ export default async function JobDetailPage({
             </Card>
 
             {/* Company card */}
-            <Card>
+            <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                   About the Company
                 </h3>
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted">
                     {j.employers.logo_url ? (
                       <img
                         src={j.employers.logo_url}
                         alt={j.employers.name}
-                        className="h-6 w-6 rounded-md object-cover"
+                        className="h-6 w-6 rounded-lg object-cover"
                       />
                     ) : (
                       <span className="text-lg font-semibold text-muted-foreground">

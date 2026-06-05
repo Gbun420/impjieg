@@ -15,11 +15,18 @@ export default async function CheckoutSuccessPage({
   const sessionId = params.session_id;
 
   let verified = false;
+  let serviceLabel: string | null = null;
+  let isScreeningOrder = false;
 
   if (sessionId) {
     try {
       const session = await getStripe().checkout.sessions.retrieve(sessionId);
       verified = session.status === "complete" && session.payment_status === "paid";
+      const metadata = session.metadata || {};
+      if (metadata.serviceType) {
+        isScreeningOrder = true;
+        serviceLabel = metadata.serviceLabel || "Screening order";
+      }
     } catch (error) {
       console.error("Failed to verify checkout session:", error);
     }
@@ -40,18 +47,28 @@ export default async function CheckoutSuccessPage({
           )}
         </div>
         <h1 className="mt-5 text-2xl font-bold tracking-tight text-foreground">
-          {verified ? "Payment Successful" : "Payment pending verification"}
+          {isScreeningOrder
+            ? verified
+              ? "Screening order confirmed"
+              : "Screening order pending verification"
+            : verified
+              ? "Payment Successful"
+              : "Payment pending verification"}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          {verified
-            ? "Your job listing is now active and visible to job seekers."
-            : "We couldn't verify this checkout session yet. Return to your dashboard to confirm the listing status."}
+          {isScreeningOrder
+            ? verified
+              ? `${serviceLabel} is now attached to the application and will appear in your pipeline.`
+              : "We couldn't verify this screening checkout yet. Return to your applications to confirm the order status."
+            : verified
+              ? "Your job listing is now active and visible to job seekers."
+              : "We couldn't verify this checkout session yet. Return to your dashboard to confirm the listing status."}
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link href="/employer/dashboard" className="flex-1">
+          <Link href={isScreeningOrder ? "/employer/applications" : "/employer/dashboard"} className="flex-1">
             <Button variant={verified ? "outline" : "primary"} className="w-full">
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
+              {isScreeningOrder ? "Applications" : "Dashboard"}
             </Button>
           </Link>
           <Link href="/employer/post-job" className="flex-1">

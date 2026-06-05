@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { ensureEmployerProfile } from "@/lib/actions/auth";
+import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import { deriveApplicationInsights } from "@/lib/application-insights";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -9,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ArrowRight, Zap } from "lucide-react";
-import { daysAgo, daysUntil } from "@/lib/utils";
+import { daysAgo, daysUntil, formatDate } from "@/lib/utils";
 import type { Application, Employer, Job } from "@/lib/supabase/types";
 
 export default async function EmployerDashboardPage() {
@@ -39,6 +40,7 @@ export default async function EmployerDashboardPage() {
   }
 
   const employer = profile as Employer;
+  const entitlements = await getEmployerEntitlements().catch(() => null);
 
   const { data: jobs } = await supabase
     .from("jobs")
@@ -134,6 +136,115 @@ export default async function EmployerDashboardPage() {
           </p>
         </Card>
       </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
+          <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Commercial entitlements
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-foreground">
+                  Available credits and discounts
+                </h2>
+              </div>
+              <Badge variant="info">Live</Badge>
+            </div>
+          </div>
+          <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: "Job credits", value: entitlements?.credits.job.remaining ?? 0, note: "Standard posts" },
+              { label: "Featured credits", value: entitlements?.credits.featured.remaining ?? 0, note: "Premium visibility" },
+              { label: "Boost credits", value: entitlements?.credits.boost.remaining ?? 0, note: "Promotion boosts" },
+              { label: "Discounts", value: entitlements?.discounts.length ?? 0, note: "Checkout savings" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-border/60 bg-background/70 p-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{item.label}</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground">{item.value}</p>
+                <p className="mt-2 text-xs text-muted-foreground">{item.note}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            Next best action
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-foreground">
+            Keep hiring without reopening checkout
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Use any available credits on your next job, or review pricing if you need more visibility.
+          </p>
+          <div className="mt-4 flex flex-col gap-2">
+            <Link href="/employer/post-job">
+              <Button variant="primary" className="w-full">
+                Post a new job
+              </Button>
+            </Link>
+            <Link href="/pricing">
+              <Button variant="outline" className="w-full">
+                Review pricing
+              </Button>
+            </Link>
+          </div>
+          {entitlements?.activePlan ? (
+            <div className="mt-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Active plan
+              </p>
+              <p className="mt-1 text-sm font-medium text-foreground">
+                {entitlements.activePlan.planKey ?? "Commercial plan access"}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Expires {entitlements.activePlan.expiresAt ? formatDate(entitlements.activePlan.expiresAt) : "when the grant ends"}
+              </p>
+            </div>
+          ) : null}
+        </Card>
+      </div>
+
+      <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,rgba(14,23,45,0.98),rgba(23,37,76,0.94)_55%,rgba(12,17,29,0.98))] p-6 text-white shadow-lg sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl">
+            <Badge variant="info" className="border-white/10 bg-white/10 text-white">
+              SEO-led growth
+            </Badge>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight">
+              Turn hiring searches into inbound employer leads.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-white/76 sm:text-base">
+              Use SEO, employer page optimisation, and iGaming content clusters to pull employers into Impjieg before they are ready to post.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:min-w-[220px]">
+            <Link href="/employer-growth">
+              <Button variant="primary" className="w-full">
+                Open growth sprint
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/pricing">
+              <Button variant="outline" className="w-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+                Review pricing
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {[
+            "Rank employer pages for Malta hiring demand",
+            "Capture more inbound employer enquiries",
+            "Bundle SEO with paid listing upgrades",
+          ].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-sm leading-6 text-white/82">{item}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="p-5">

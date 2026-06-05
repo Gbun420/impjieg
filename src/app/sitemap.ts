@@ -24,6 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/jobs",
       "/companies",
       "/pricing",
+      "/employer-growth",
       "/about",
       "/contact",
       "/salary-calculator",

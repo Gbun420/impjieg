@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
-import { SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES } from "@/lib/constants";
+import {
+  SUBSCRIPTION_PLANS,
+  CREDIT_PACKS,
+  PROMOTION_BUNDLES,
+  SCREENING_UPSELLS,
+} from "@/lib/constants";
 import type { Database } from "@/lib/supabase/types";
+import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { resolveEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/actions";
 import { selectBestCommercialDiscount } from "@/lib/monetization/admin-grants/resolver";
+import { consumeGrantCredit } from "@/lib/monetization/admin-grants/actions";
 
 import { z } from "zod";
 
 const checkoutSchema = z.object({
   jobId: z.string().optional().nullable(),
+  applicationId: z.string().optional().nullable(),
   listingType: z.string().optional().nullable(), // Allow standard/featured
   planType: z.string().optional().nullable(),
   packType: z.string().optional().nullable(),
@@ -19,6 +28,7 @@ const checkoutSchema = z.object({
 });
 
 type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"];
+type ScreeningServiceInsert = Database["public"]["Tables"]["screening_services"]["Insert"];
 type PaymentsMutationTable = {
   insert(values: PaymentInsert[]): {
     select(): {
@@ -32,6 +42,17 @@ type PaymentsMutationTable = {
     eq(column: "id", value: string): Promise<unknown>;
   };
 };
+type FreePaymentsMutationTable = {
+  insert(values: PaymentInsert[]): Promise<{
+    error: { message: string } | null;
+  }>;
+};
+type ScreeningServicesMutationTable = {
+  insert(values: ScreeningServiceInsert[]): Promise<{
+    error: { message: string } | null;
+  }>;
+};
+type ScreeningServiceType = keyof typeof SCREENING_UPSELLS;
 
 export async function POST(request: Request) {
   try {
@@ -48,7 +69,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const { jobId, listingType, planType, packType, bundleType, serviceType, billingCycle } = parsed.data;
+    const {
+      jobId,
+      applicationId,
+      listingType,
+      planType,
+      packType,
+      bundleType,
+      serviceType,
+      billingCycle,
+    } = parsed.data;
 
     const supabase = await createClient();
     const {
@@ -69,8 +99,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Employer profile not found" }, { status: 404 });
     }
 
+    const serviceSupabase = createServiceClient<Database>(
+      getSupabaseUrl(),
+      getSupabaseServiceKey()
+    );
+
     let amount: number;
-    let priceId: string;
+    let priceId: string | null = null;
+    let checkoutLineItem:
+      | {
+          price: string;
+          quantity: number;
+        }
+      | {
+          price_data: {
+            currency: string;
+            unit_amount: number;
+            product_data: {
+              name: string;
+              description?: string;
+            };
+          };
+          quantity: number;
+      }
+      | null = null;
+    let screeningApplicationId: string | null = null;
+    let screeningServiceType: ScreeningServiceType | null = null;
     const metadata: Record<string, string> = {
       employerId: employer.id,
     };
@@ -147,15 +201,49 @@ export async function POST(request: Request) {
     }
     // Handle screening service payments
     else if (serviceType) {
-      // For screening services, we need an application ID, not a job ID
-      // This is a simplification - in reality, you'd pass applicationId
-      return NextResponse.json({ error: "Service type requires application ID" }, { status: 400 });
+      if (!applicationId) {
+        return NextResponse.json({ error: "Service type requires application ID" }, { status: 400 });
+      }
+      screeningApplicationId = applicationId;
+
+      const service = SCREENING_UPSELLS[serviceType as keyof typeof SCREENING_UPSELLS];
+      if (!service) {
+        return NextResponse.json({ error: "Invalid service type" }, { status: 400 });
+      }
+      screeningServiceType = serviceType as ScreeningServiceType;
+
+      const { data: application, error: applicationError } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("id", screeningApplicationId)
+        .eq("employer_id", employer.id)
+        .single();
+
+      if (applicationError || !application) {
+        return NextResponse.json({ error: "Application not found" }, { status: 404 });
+      }
+
+      amount = service.price * 100;
+      checkoutLineItem = {
+        price_data: {
+          currency: "eur",
+          unit_amount: amount,
+          product_data: {
+            name: `Screening: ${service.label}`,
+            description: service.description,
+          },
+        },
+        quantity: 1,
+      };
+      metadata.applicationId = applicationId;
+      metadata.serviceType = screeningServiceType;
+      metadata.serviceLabel = service.label;
     }
     else {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
-    if (!priceId) {
+    if (!priceId && !checkoutLineItem) {
       return NextResponse.json({ error: "Price configuration missing" }, { status: 500 });
     }
 
@@ -166,9 +254,73 @@ export async function POST(request: Request) {
       : null;
     
     const finalAmountCents = bestDiscount ? bestDiscount.discountedTotalCents : amount;
+    const screeningCreditGrantId =
+      serviceType && entitlements?.credits.aiScreening.remaining
+        ? entitlements.credits.aiScreening.sourceGrantIds[0] ?? null
+        : null;
+    const isFreeScreeningOrder = Boolean(serviceType) && (screeningCreditGrantId || finalAmountCents === 0);
+
+    if (serviceType && isFreeScreeningOrder) {
+      if (!screeningApplicationId || !screeningServiceType) {
+        return NextResponse.json({ error: "Application not found" }, { status: 404 });
+      }
+
+      if (screeningCreditGrantId) {
+        await consumeGrantCredit({
+          grantId: screeningCreditGrantId,
+          context: {
+            applicationId: screeningApplicationId,
+            serviceType: screeningServiceType,
+            action: "screening_order",
+          },
+        });
+      }
+
+      const screeningServicesTable =
+        serviceSupabase.from("screening_services") as unknown as ScreeningServicesMutationTable;
+      const { error: screeningError } = await screeningServicesTable
+        .insert([
+          {
+            employer_id: employer.id,
+            application_id: screeningApplicationId,
+            service_type: screeningServiceType,
+            status: "pending",
+            result: null,
+            purchased_at: new Date().toISOString(),
+            completed_at: null,
+          },
+        ]);
+
+      if (screeningError) {
+        return NextResponse.json({ error: screeningError.message }, { status: 500 });
+      }
+
+      const freePaymentsTable = serviceSupabase.from("payments") as unknown as FreePaymentsMutationTable;
+      const { error: paymentError } = await freePaymentsTable
+        .insert([
+          {
+            employer_id: employer.id,
+            job_id: null,
+            amount: 0,
+            currency: "eur",
+            status: "completed",
+            listing_type: screeningServiceType,
+          },
+        ]);
+
+      if (paymentError) {
+        return NextResponse.json({ error: paymentError.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        free: true,
+        message: `${metadata.serviceLabel} ordered using your available credit.`,
+        url: `${process.env.NEXT_PUBLIC_URL}/employer/applications?screening=ordered`,
+      });
+    }
 
     // Create a payment record first
-    const paymentsTable = supabase.from("payments") as unknown as PaymentsMutationTable;
+    const paymentsTable = serviceSupabase.from("payments") as unknown as PaymentsMutationTable;
 
     const { data: payment, error: paymentError } = await paymentsTable
       .insert([
@@ -196,8 +348,8 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
-        {
-          price: priceId,
+        checkoutLineItem ?? {
+          price: priceId as string,
           quantity: 1,
         },
       ],
@@ -208,9 +360,11 @@ export async function POST(request: Request) {
       // or use manual price overrides.
       // Here we just pass the info to success/metadata.
       success_url: `${process.env.NEXT_PUBLIC_URL}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: jobId
-        ? `${process.env.NEXT_PUBLIC_URL}/employer/jobs/${jobId}`
-        : `${process.env.NEXT_PUBLIC_URL}/employer/dashboard`,
+      cancel_url: serviceType
+        ? `${process.env.NEXT_PUBLIC_URL}/employer/applications`
+        : jobId
+          ? `${process.env.NEXT_PUBLIC_URL}/employer/jobs/${jobId}`
+          : `${process.env.NEXT_PUBLIC_URL}/employer/dashboard`,
       metadata: {
         ...metadata,
         paymentId: payment.id,

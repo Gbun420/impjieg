@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Search, SlidersHorizontal, X } from "lucide-react";
@@ -168,40 +169,42 @@ export default function SearchFilters() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-        <div className="flex-1 space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Search jobs</label>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Search jobs by title, company, or description"
-              placeholder="Search by keyword, title, company, or skill"
-              className="pl-9"
-            />
+      <Card className="overflow-hidden border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm sm:p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+          <div className="flex-1 space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Search roles</label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Search jobs by title, company, or description"
+                placeholder="Search by role, company, or skill"
+                className="pl-9"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 lg:justify-end">
+            <Button
+              type="button"
+              variant={showFilters || hasActiveFilters ? "secondary" : "outline"}
+              onClick={() => setShowFilters((value) => !value)}
+            >
+              <SlidersHorizontal className="mr-1.5 h-4 w-4" />
+              Filters
+            </Button>
+            {hasActiveFilters && (
+              <Button type="button" variant="ghost" onClick={clearFilters}>
+                <X className="mr-1.5 h-4 w-4" />
+                Clear
+              </Button>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant={showFilters || hasActiveFilters ? "secondary" : "outline"}
-            onClick={() => setShowFilters((value) => !value)}
-          >
-            <SlidersHorizontal className="mr-1.5 h-4 w-4" />
-            Filters
-          </Button>
-          {hasActiveFilters && (
-            <Button type="button" variant="ghost" onClick={clearFilters}>
-              <X className="mr-1.5 h-4 w-4" />
-              Clear
-            </Button>
-          )}
-        </div>
-      </div>
+      </Card>
 
       {showFilters && (
-        <div className="space-y-5 rounded-2xl border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm">
+        <div className="space-y-5 rounded-[1.75rem] border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-5">
           <div className="grid gap-4 lg:grid-cols-2">
             <Select
               label="Sector"

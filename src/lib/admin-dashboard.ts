@@ -265,6 +265,48 @@ function countStatus<T extends { status: string }>(rows: T[], status: string) {
   return rows.filter((row) => row.status === status).length;
 }
 
+async function safeCountQuery(
+  label: string,
+  query: Promise<{ count: number | null; error: { message: string } | null }>
+) {
+  try {
+    const result = await query;
+    if (result.error) {
+      console.error(`Admin dashboard ${label} query failed:`, result.error.message);
+      return 0;
+    }
+
+    return result.count ?? 0;
+  } catch (error) {
+    console.error(
+      `Admin dashboard ${label} query threw:`,
+      error instanceof Error ? error.message : String(error)
+    );
+    return 0;
+  }
+}
+
+async function safeRowsQuery<T>(
+  label: string,
+  query: Promise<{ data: T[] | null; error: { message: string } | null }>
+) {
+  try {
+    const result = await query;
+    if (result.error) {
+      console.error(`Admin dashboard ${label} query failed:`, result.error.message);
+      return [] as T[];
+    }
+
+    return (result.data ?? []) as T[];
+  } catch (error) {
+    console.error(
+      `Admin dashboard ${label} query threw:`,
+      error instanceof Error ? error.message : String(error)
+    );
+    return [] as T[];
+  }
+}
+
 export async function getAdminDashboardData() {
   const isDemoSupabase =
     process.env.NEXT_PUBLIC_SUPABASE_URL === "https://dev.supabase.co" ||
@@ -298,87 +340,117 @@ export async function getAdminDashboardData() {
     activeSubscriptionsCount,
     paymentsCount,
     pendingPaymentsCount,
-    recentJobsResult,
-    recentApplicationsResult,
-    recentEmployersResult,
-    recentAlertsResult,
-    recentSubscriptionsResult,
-    allPaymentsResult,
+    recentJobs,
+    recentApplications,
+    recentEmployers,
+    recentAlerts,
+    recentSubscriptions,
+    allPayments,
   ] = await Promise.all([
-    supabase.from("jobs").select("id", { count: "exact", head: true }),
-    supabase
-      .from("jobs")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "active"),
-    supabase
-      .from("jobs")
-      .select("id", { count: "exact", head: true })
-      .eq("is_featured", true),
-    supabase.from("employers").select("id", { count: "exact", head: true }),
-    supabase
-      .from("employers")
-      .select("id", { count: "exact", head: true })
-      .eq("is_verified", true),
-    supabase
-      .from("applications")
-      .select("id", { count: "exact", head: true }),
-    supabase
-      .from("job_alerts")
-      .select("id", { count: "exact", head: true }),
-    supabase
-      .from("job_alerts")
-      .select("id", { count: "exact", head: true })
-      .eq("is_active", true),
-    supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true }),
-    supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "active"),
-    supabase.from("payments").select("id", { count: "exact", head: true }),
-    supabase
-      .from("payments")
-      .select("id", { count: "exact", head: true })
-      .neq("status", "succeeded"),
-    supabase
-      .from("jobs")
-      .select("*, employers(name, slug)")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("applications")
-      .select("*, jobs(title, slug, status), employers(name, slug)")
-      .order("created_at", { ascending: false })
-      .limit(8),
-    supabase
-      .from("employers")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("job_alerts")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("subscriptions")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("payments")
-      .select("amount,status,listing_type,created_at")
-      .order("created_at", { ascending: false }),
+    safeCountQuery("jobs", supabase.from("jobs").select("id", { count: "exact", head: true })),
+    safeCountQuery(
+      "active jobs",
+      supabase
+        .from("jobs")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active")
+    ),
+    safeCountQuery(
+      "featured jobs",
+      supabase
+        .from("jobs")
+        .select("id", { count: "exact", head: true })
+        .eq("is_featured", true)
+    ),
+    safeCountQuery("employers", supabase.from("employers").select("id", { count: "exact", head: true })),
+    safeCountQuery(
+      "verified employers",
+      supabase
+        .from("employers")
+        .select("id", { count: "exact", head: true })
+        .eq("is_verified", true)
+    ),
+    safeCountQuery(
+      "applications",
+      supabase.from("applications").select("id", { count: "exact", head: true })
+    ),
+    safeCountQuery("job alerts", supabase.from("job_alerts").select("id", { count: "exact", head: true })),
+    safeCountQuery(
+      "active job alerts",
+      supabase
+        .from("job_alerts")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true)
+    ),
+    safeCountQuery(
+      "subscriptions",
+      supabase.from("subscriptions").select("id", { count: "exact", head: true })
+    ),
+    safeCountQuery(
+      "active subscriptions",
+      supabase
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active")
+    ),
+    safeCountQuery("payments", supabase.from("payments").select("id", { count: "exact", head: true })),
+    safeCountQuery(
+      "pending payments",
+      supabase
+        .from("payments")
+        .select("id", { count: "exact", head: true })
+        .neq("status", "succeeded")
+    ),
+    safeRowsQuery<LatestJob>(
+      "recent jobs",
+      supabase
+        .from("jobs")
+        .select("*, employers(name, slug)")
+        .order("created_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<LatestApplication>(
+      "recent applications",
+      supabase
+        .from("applications")
+        .select("*, jobs(title, slug, status), employers(name, slug)")
+        .order("created_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestEmployer>(
+      "recent employers",
+      supabase
+        .from("employers")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<JobAlertRow>(
+      "recent job alerts",
+      supabase
+        .from("job_alerts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<SubscriptionRow>(
+      "recent subscriptions",
+      supabase
+        .from("subscriptions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(6)
+    ),
+    safeRowsQuery<PaymentRow>(
+      "all payments",
+      supabase
+        .from("payments")
+        .select("amount,status,listing_type,created_at")
+        .order("created_at", { ascending: false })
+    ),
   ]);
 
-  const recentJobs = (recentJobsResult.data || []) as LatestJob[];
-  const recentApplications = (recentApplicationsResult.data || []) as LatestApplication[];
-  const recentEmployers = (recentEmployersResult.data || []) as LatestEmployer[];
-  const allPayments = (allPaymentsResult.data || []) as PaymentRow[];
   const recentPayments = allPayments.slice(0, 8);
-  const recentAlerts = (recentAlertsResult.data || []) as JobAlertRow[];
-  const recentSubscriptions = (recentSubscriptionsResult.data || []) as SubscriptionRow[];
 
   const totalRevenue = sumAmount(allPayments);
 

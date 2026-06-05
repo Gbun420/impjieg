@@ -18,6 +18,14 @@ type CandidateProfileRef = Pick<
   "user_id" | "full_name" | "headline" | "skills" | "experience_years" | "sectors" | "job_types" | "remote_preference" | "desired_salary_min"
 >;
 
+type ScreeningServiceRef = {
+  application_id: string;
+  service_type: "backgroundCheck" | "skillsAssessment" | "referenceCheck";
+  status: "pending" | "completed" | "failed";
+  purchased_at: string;
+  completed_at: string | null;
+};
+
 export default async function ApplicationsPage() {
   const supabase = await createClient();
   const {
@@ -62,6 +70,7 @@ export default async function ApplicationsPage() {
     matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
     recruiterNotes: app.recruiter_notes,
     scorecardData: app.scorecard_data,
+    screeningServices: [] as ScreeningServiceRef[],
   }));
 
   const applicationIds = typedApps.map((app) => app.id);
@@ -85,6 +94,18 @@ export default async function ApplicationsPage() {
 
     const userIds = [...new Set(applicationMap.values())];
 
+    const { data: screeningServices } = await serviceSupabase
+      .from("screening_services")
+      .select("application_id, service_type, status, purchased_at, completed_at")
+      .in("application_id", applicationIds);
+
+    const screeningServiceMap = new Map<string, ScreeningServiceRef[]>();
+    for (const service of (screeningServices || []) as ScreeningServiceRef[]) {
+      const servicesForApplication = screeningServiceMap.get(service.application_id) ?? [];
+      servicesForApplication.push(service);
+      screeningServiceMap.set(service.application_id, servicesForApplication);
+    }
+
     if (userIds.length > 0) {
       const { data: candidateProfiles } = await serviceSupabase
         .from("candidate_profiles")
@@ -105,9 +126,28 @@ export default async function ApplicationsPage() {
           matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
           recruiterNotes: app.recruiter_notes,
           scorecardData: app.scorecard_data,
+          screeningServices: screeningServiceMap.get(app.id) ?? [],
         };
       });
+    } else {
+      enrichedApps = typedApps.map((app) => ({
+        ...app,
+        candidateProfile: null,
+        matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
+        recruiterNotes: app.recruiter_notes,
+        scorecardData: app.scorecard_data,
+        screeningServices: screeningServiceMap.get(app.id) ?? [],
+      }));
     }
+  } else {
+    enrichedApps = typedApps.map((app) => ({
+      ...app,
+      candidateProfile: null,
+      matchSummary: normalizeApplicationScorecardData(app.scorecard_data),
+      recruiterNotes: app.recruiter_notes,
+      scorecardData: app.scorecard_data,
+      screeningServices: [],
+    }));
   }
 
   return <ApplicationPipeline applications={enrichedApps} />;
