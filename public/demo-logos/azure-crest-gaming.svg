@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" role="img" aria-label="Azure Crest Gaming">
+  <defs>
+    <linearGradient id="azure-crest-gaming-gradient" x1="24" y1="24" x2="136" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0D47A1" />
+      <stop offset="1" stop-color="#11C5B7" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="36" fill="#0B1220" />
+  <path d="M40 102C52 78 70 61 96 52" stroke="url(#azure-crest-gaming-gradient)" stroke-width="12" stroke-linecap="round" />
+  <path d="M45 104L70 78L88 96" stroke="#F5F8FC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="108" cy="46" r="12" fill="#FFB020" />
+  <circle cx="118" cy="62" r="5" fill="#F5F8FC" fill-opacity="0.9" />
+</svg>

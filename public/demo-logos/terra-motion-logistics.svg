@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" role="img" aria-label="Terra Motion Logistics">
+  <defs>
+    <linearGradient id="terra-motion-logistics-gradient" x1="24" y1="24" x2="136" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16A34A" />
+      <stop offset="1" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="36" fill="#10201A" />
+  <path d="M42 104H86L102 72H118" stroke="url(#terra-motion-logistics-gradient)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M102 72L116 58" stroke="#F5F8FC" stroke-width="9" stroke-linecap="round" />
+  <circle cx="58" cy="116" r="12" fill="#F5F8FC" />
+  <circle cx="106" cy="116" r="12" fill="#F5F8FC" />
+</svg>
