@@ -28,21 +28,29 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
       <div className="flex items-start justify-between gap-3">
         <Link href={`/jobs/${job.employers.slug}/${job.slug}`} className="min-w-0 flex-1">
           <div className="flex items-start gap-3 sm:gap-4">
-            <div className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl transition-all ${
+            <div
+              className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl transition-all ${
               job.is_featured
                 ? "bg-primary/10 ring-1 ring-primary/10"
                 : "bg-muted"
-            }`}>
+            }`}
+              role="img"
+              aria-label={
+                job.employers.logo_url
+                  ? `${job.employers.name} logo`
+                  : `${job.employers.name} logo placeholder`
+              }
+            >
               {job.employers.logo_url ? (
                 <Image
                   src={job.employers.logo_url}
-                  alt={job.employers.name}
+                  alt={`${job.employers.name} logo`}
                   width={32}
                   height={32}
                   className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg object-cover"
                 />
               ) : (
-                <span className="text-base sm:text-lg font-semibold uppercase text-muted-foreground">
+                <span aria-hidden="true" className="text-base sm:text-lg font-semibold uppercase text-muted-foreground">
                   {job.employers.name.charAt(0)}
                 </span>
               )}

@@ -184,21 +184,29 @@ export default async function SectorLocationPage({
                       : "hover:border-primary/20"
                   }`}>
                     <div className="flex items-start gap-4">
-                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                        job.is_featured
-                          ? "bg-gradient-to-br from-primary/20 to-secondary/20"
-                          : "bg-muted/50"
-                      }`}>
+                      <div
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
+                          job.is_featured
+                            ? "bg-gradient-to-br from-primary/20 to-secondary/20"
+                            : "bg-muted/50"
+                        }`}
+                        role="img"
+                        aria-label={
+                          job.employers?.logo_url
+                            ? `${job.employers?.name} logo`
+                            : `${job.employers?.name} logo placeholder`
+                        }
+                      >
                         {job.employers?.logo_url ? (
                           <Image
                             src={job.employers.logo_url}
-                            alt={job.employers.name}
+                            alt={`${job.employers.name} logo`}
                             width={32}
                             height={32}
                             className="rounded-lg object-cover"
                           />
                         ) : (
-                          <span className="text-lg font-bold text-muted-foreground">
+                          <span aria-hidden="true" className="text-lg font-bold text-muted-foreground">
                             {job.employers?.name?.charAt(0)}
                           </span>
                         )}

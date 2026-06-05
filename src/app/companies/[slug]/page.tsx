@@ -125,21 +125,29 @@ export default async function CompanyProfilePage({
         )}
         <div className="p-6 sm:p-8">
           <div className="flex items-start gap-5">
-            <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${
+            <div
+              className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${
               emp.cover_image_url
                 ? "-mt-12 border-4 border-background bg-background shadow-lg"
                 : "bg-muted/50"
-            }`}>
+            }`}
+              role="img"
+              aria-label={
+                emp.logo_url
+                  ? `${emp.name} logo`
+                  : `${emp.name} logo placeholder`
+              }
+            >
               {emp.logo_url ? (
                 <Image
                   src={emp.logo_url}
-                  alt={emp.name}
+                  alt={`${emp.name} logo`}
                   width={40}
                   height={40}
                   className="rounded-xl object-cover"
                 />
               ) : (
-                <span className="text-2xl font-bold text-muted-foreground">
+                <span aria-hidden="true" className="text-2xl font-bold text-muted-foreground">
                   {emp.name.charAt(0)}
                 </span>
               )}

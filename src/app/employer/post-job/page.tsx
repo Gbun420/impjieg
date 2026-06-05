@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createJob } from "@/lib/actions/jobs";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
@@ -34,10 +34,17 @@ export default function PostJobPage() {
     summary: string;
   } | null>(null);
   const featuredBoostPrice = PROMOTION_BUNDLES.featuredBoost.price;
+  const errorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     getEmployerEntitlements().then(setEntitlements);
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [error]);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -134,7 +141,12 @@ export default function PostJobPage() {
       <h1 className="text-2xl font-bold tracking-tight text-foreground">Post a Job</h1>
 
       {error && (
-        <div className="rounded-xl bg-error/10 p-4 text-sm text-error">
+        <div
+          ref={errorRef}
+          role="alert"
+          aria-live="polite"
+          className="rounded-xl bg-error/10 p-4 text-sm text-error"
+        >
           {error}
         </div>
       )}

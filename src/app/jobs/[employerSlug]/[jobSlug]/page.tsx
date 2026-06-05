@@ -216,21 +216,29 @@ export default async function JobDetailPage({
             }`} />
             <div className="p-6">
               <div className="flex items-start gap-4">
-                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
-                  j.is_featured
-                    ? "bg-primary/10 ring-1 ring-primary/10"
-                    : "bg-muted"
-                }`}>
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
+                    j.is_featured
+                      ? "bg-primary/10 ring-1 ring-primary/10"
+                      : "bg-muted"
+                  }`}
+                  role="img"
+                  aria-label={
+                    j.employers.logo_url
+                      ? `${j.employers.name} logo`
+                      : `${j.employers.name} logo placeholder`
+                  }
+                >
                   {j.employers.logo_url ? (
                     <Image
                       src={j.employers.logo_url}
-                      alt={j.employers.name}
+                      alt={`${j.employers.name} logo`}
                       width={36}
                       height={36}
                       className="rounded-lg object-cover"
                     />
                   ) : (
-                    <span className="text-xl font-semibold text-muted-foreground">
+                    <span aria-hidden="true" className="text-xl font-semibold text-muted-foreground">
                       {j.employers.name.charAt(0)}
                     </span>
                   )}
@@ -462,17 +470,25 @@ export default async function JobDetailPage({
                   About the Company
                 </h3>
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-muted"
+                    role="img"
+                    aria-label={
+                      j.employers.logo_url
+                        ? `${j.employers.name} logo`
+                        : `${j.employers.name} logo placeholder`
+                    }
+                  >
                     {j.employers.logo_url ? (
                       <Image
                         src={j.employers.logo_url}
-                        alt={j.employers.name}
+                        alt={`${j.employers.name} logo`}
                         width={24}
                         height={24}
                         className="rounded-lg object-cover"
                       />
                     ) : (
-                      <span className="text-lg font-semibold text-muted-foreground">
+                      <span aria-hidden="true" className="text-lg font-semibold text-muted-foreground">
                         {j.employers.name.charAt(0)}
                       </span>
                     )}

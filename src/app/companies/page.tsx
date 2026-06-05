@@ -61,17 +61,25 @@ export default async function CompaniesPage() {
             <Link key={employer.id} href={`/companies/${employer.slug}`}>
               <Card className="group h-full p-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-secondary/20 transition-all">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-secondary/20 transition-all"
+                    role="img"
+                    aria-label={
+                      employer.logo_url
+                        ? `${employer.name} logo`
+                        : `${employer.name} logo placeholder`
+                    }
+                  >
                     {employer.logo_url ? (
                       <Image
                         src={employer.logo_url}
-                        alt={employer.name}
+                        alt={`${employer.name} logo`}
                         width={32}
                         height={32}
                         className="rounded-lg object-cover"
                       />
                     ) : (
-                      <span className="text-lg font-bold text-muted-foreground group-hover:text-primary transition-colors">
+                      <span aria-hidden="true" className="text-lg font-bold text-muted-foreground group-hover:text-primary transition-colors">
                         {employer.name.charAt(0)}
                       </span>
                     )}

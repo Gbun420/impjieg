@@ -37,7 +37,7 @@ export const securityHeaders = [
       },
     ],
   },
-] as const;
+];
 
 const nextConfig: NextConfig = {
   images: {
