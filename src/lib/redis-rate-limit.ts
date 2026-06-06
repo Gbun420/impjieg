@@ -36,37 +36,31 @@ export async function enforceRateLimitRedis({
   }
 
   const windowSec = Math.ceil(windowMs / 1000);
-  const luaScript = `
-    local current = redis.call("GET", KEYS[1])
-    if current == false then
-      redis.call("SET", KEYS[1], 1, "EX", ARGV[1])
-      return {1, ARGV[2] - 1}
-    end
-    if tonumber(current) >= tonumber(ARGV[2]) then
-      local ttl = redis.call("TTL", KEYS[1])
-      return {0, 0, ttl}
-    end
-    local incr = redis.call("INCR", KEYS[1])
-    if tonumber(incr) == 1 then
-      redis.call("EXPIRE", KEYS[1], ARGV[1])
-    end
-    local ttl = redis.call("TTL", KEYS[1])
-    return {1, ARGV[2] - incr, ttl}
-  `;
 
   try {
-    const result = await client.eval(
-      luaScript,
-      1,
-      key,
-      windowSec.toString(),
-      limit.toString()
-    ) as [number, number, number];
+    const current = await client.get<string>(key);
 
-    const [success, remaining, ttl] = result;
+    if (!current) {
+      await client.set(key, 1, { ex: windowSec });
+      return { success: true, remaining: limit - 1, resetAt: now + windowSec * 1000, limit };
+    }
+
+    const count = parseInt(current, 10);
+
+    if (count >= limit) {
+      const ttl = await client.ttl(key);
+      return { success: false, remaining: 0, resetAt: now + ttl * 1000, limit };
+    }
+
+    const newCount = await client.incr(key);
+    if (newCount === 1) {
+      await client.expire(key, windowSec);
+    }
+    const ttl = await client.ttl(key);
+
     return {
-      success: success === 1,
-      remaining: Math.max(0, remaining),
+      success: true,
+      remaining: Math.max(0, limit - newCount),
       resetAt: now + ttl * 1000,
       limit,
     };
