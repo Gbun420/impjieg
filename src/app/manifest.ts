@@ -3,7 +3,7 @@ import { SITE } from "@/lib/constants";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: SITE.title,
+    name: SITE.name,
     short_name: "Impjieg",
     description: SITE.description,
     start_url: "/",

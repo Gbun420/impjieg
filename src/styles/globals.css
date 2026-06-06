@@ -3,49 +3,55 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* Fonts */
   --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-display-font: "Sora", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-jetbrains-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
-  --color-brand-ink: #0B1220;
-  --color-surface-dark: #121A2B;
-  --color-harbor-night: #08111F;
+  --font-display: "Sora", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
+
+  /* Dark-Ink Mediterranean-Tech Palette */
+  --color-ink: #0B1220;
+  --color-ink-light: #121A2B;
+  --color-harbor: #08111F;
   --color-limestone: #F7F4EC;
-  --color-brand-blue: #1E63FF;
-  --color-signal-teal: #14C7B7;
-  --color-performance-amber: #FFB020;
-  --color-coral-spark: #FF6B57;
-  --color-fog: #F5F8FC;
+  --color-cerulean: #1E63FF;
+  --color-lagoon: #14C7B7;
+  --color-saffron: #FFB020;
+  --color-coral: #FF6B57;
+  --color-mist: #F5F8FC;
   --color-surface: #FFFFFF;
   --color-slate: #334155;
   --color-muted: #64748B;
-  --color-success: #12B76A;
-  --color-danger: #E5484D;
+  --color-emerald: #12B76A;
+  --color-rose: #E5484D;
   --color-border: #DBE4F0;
 
+  /* Semantic Tokens */
   color-scheme: light;
-  --background: var(--color-fog);
-  --foreground: var(--color-brand-ink);
-  --primary: var(--color-brand-blue);
+  --background: var(--color-mist);
+  --foreground: var(--color-ink);
+  --primary: var(--color-cerulean);
   --primary-foreground: #FFFFFF;
   --primary-hover: #174FD1;
-  --secondary: var(--color-signal-teal);
-  --secondary-foreground: var(--color-brand-ink);
-  --accent: var(--color-performance-amber);
-  --accent-foreground: var(--color-brand-ink);
+  --secondary: var(--color-lagoon);
+  --secondary-foreground: var(--color-ink);
+  --accent: var(--color-saffron);
+  --accent-foreground: var(--color-ink);
   --muted: #EAF0F6;
   --muted-foreground: var(--color-muted);
   --card: var(--color-surface);
-  --card-foreground: var(--color-brand-ink);
+  --card-foreground: var(--color-ink);
   --card-hover: #F0F6FC;
   --border: var(--color-border);
   --border-hover: #B8C6D8;
-  --ring: var(--color-brand-blue);
-  --success: var(--color-success);
+  --ring: var(--color-cerulean);
+  --success: var(--color-emerald);
   --success-foreground: #FFFFFF;
-  --warning: var(--color-performance-amber);
-  --warning-foreground: var(--color-brand-ink);
-  --error: var(--color-danger);
+  --warning: var(--color-saffron);
+  --warning-foreground: var(--color-ink);
+  --error: var(--color-rose);
   --error-foreground: #FFFFFF;
+
+  /* Radius */
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
@@ -56,29 +62,29 @@
 
 .dark {
   color-scheme: dark;
-  --background: var(--color-brand-ink);
+  --background: var(--color-ink);
   --foreground: #F8FAFC;
   --primary: #7AA8FF;
-  --primary-foreground: var(--color-brand-ink);
+  --primary-foreground: var(--color-ink);
   --primary-hover: #95B8FF;
   --secondary: #46D1BE;
-  --secondary-foreground: var(--color-brand-ink);
+  --secondary-foreground: var(--color-ink);
   --accent: #FFBF66;
-  --accent-foreground: var(--color-brand-ink);
+  --accent-foreground: var(--color-ink);
   --muted: #142235;
   --muted-foreground: #A7B8C9;
-  --card: var(--color-surface-dark);
+  --card: var(--color-ink-light);
   --card-foreground: #F8FAFC;
   --card-hover: #17253A;
   --border: #22334A;
   --border-hover: #36506D;
   --ring: #7AA8FF;
   --success: #3CCF95;
-  --success-foreground: var(--color-brand-ink);
+  --success-foreground: var(--color-ink);
   --warning: #FFCA66;
-  --warning-foreground: var(--color-brand-ink);
+  --warning-foreground: var(--color-ink);
   --error: #FF7A6C;
-  --error-foreground: var(--color-brand-ink);
+  --error-foreground: var(--color-ink);
 }
 
 @theme inline {
@@ -107,8 +113,8 @@
   --color-error: var(--error);
   --color-error-foreground: var(--error-foreground);
   --font-sans: var(--font-body);
-  --font-display: var(--font-display-font);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);

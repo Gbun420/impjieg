@@ -15,6 +15,9 @@ import {
   TrendingUp,
   Users,
   CheckCircle2,
+  Sparkles,
+  Target,
+  Zap,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
@@ -44,20 +47,20 @@ async function StatsSection() {
   }>);
 
   return (
-    <div className="flex items-center justify-center gap-6 text-sm text-current sm:gap-10">
+    <div className="flex items-center justify-center gap-6 text-sm text-foreground sm:gap-10">
       <div className="text-center">
-        <p className="text-2xl font-bold text-current sm:text-3xl">{salaryCoverage.activeJobs}</p>
-        <p className="mt-0.5 text-current/70">Active jobs</p>
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">{salaryCoverage.activeJobs}</p>
+        <p className="mt-0.5 text-muted-foreground">Active jobs</p>
       </div>
-      <div className="h-8 w-px bg-current/20" />
+      <div className="h-8 w-px bg-border" />
       <div className="text-center">
-        <p className="text-2xl font-bold text-current sm:text-3xl">{salaryCoverage.salaryCoveragePercent}%</p>
-        <p className="mt-0.5 text-current/70">Salary coverage</p>
+        <p className="text-2xl font-bold text-primary sm:text-3xl">{salaryCoverage.salaryCoveragePercent}%</p>
+        <p className="mt-0.5 text-muted-foreground">Salary coverage</p>
       </div>
-      <div className="h-8 w-px bg-current/20" />
+      <div className="h-8 w-px bg-border" />
       <div className="text-center">
-        <p className="text-2xl font-bold text-current sm:text-3xl">30d</p>
-        <p className="mt-0.5 text-current/70">Freshness window</p>
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">30d</p>
+        <p className="mt-0.5 text-muted-foreground">Freshness window</p>
       </div>
     </div>
   );
@@ -109,19 +112,19 @@ async function LatestJobs() {
 export default async function HomePage() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden bg-[#08111F] py-16 text-white sm:py-24 lg:py-28">
+      <section className="relative isolate overflow-hidden bg-harbor py-16 text-foreground sm:py-24 lg:py-28">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.32),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.22),transparent_30%)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:px-8">
           <div className="animate-fade-in-up">
-            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/78">
+            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               <TrendingUp className="h-3.5 w-3.5" />
               Malta hiring signal
             </div>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.055em] text-foreground sm:text-5xl lg:text-6xl">
               The sharper marketplace for Malta&apos;s tech, digital, and iGaming careers.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
               Impjieg brings salary signals, work-mode clarity, verified employer context, and direct apply paths into one premium Malta hiring workspace.
             </p>
 
@@ -132,13 +135,13 @@ export default async function HomePage() {
                 </Button>
               </Link>
               <Link href="/employer/post-job">
-                <Button variant="outline" size="lg" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+                <Button variant="outline" size="lg" className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
                   Hire Malta talent
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-10 text-white">
+            <div className="mt-10">
               <Suspense fallback={<Skeleton className="h-20 w-full max-w-md" />}>
                 <StatsSection />
               </Suspense>
@@ -146,14 +149,14 @@ export default async function HomePage() {
           </div>
 
           <div className="animate-fade-in-up stagger-2">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.07] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur">
-              <div className="rounded-[1.5rem] border border-white/10 bg-[#0B1220]/80 p-4">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="rounded-[2rem] border border-border/30 bg-card/50 p-4 shadow-[0_28px_90px_rgba(11,18,32,0.15)] backdrop-blur">
+              <div className="rounded-[1.5rem] border border-border/30 bg-background/80 p-4">
+                <div className="flex items-center justify-between border-b border-border pb-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">Marketplace pulse</p>
-                    <p className="mt-1 text-sm font-semibold text-white">Live Malta roles</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Marketplace pulse</p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">Live Malta roles</p>
                   </div>
-                  <span className="rounded-full bg-[#14C7B7]/15 px-3 py-1 text-xs font-semibold text-[#46D1BE]">Updated</span>
+                  <span className="rounded-full bg-lagoon/15 px-3 py-1 text-xs font-semibold text-lagoon">Updated</span>
                 </div>
                 <div className="mt-4 space-y-3">
                   {[
@@ -161,18 +164,18 @@ export default async function HomePage() {
                     ["Compliance analyst", "St Julian's · On-site", "EUR 36k - 48k"],
                     ["Senior React engineer", "Malta / EU · Remote", "EUR 62k - 78k"],
                   ].map(([title, meta, salary]) => (
-                    <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                    <div key={title} className="rounded-2xl border border-border/30 bg-card/50 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-semibold text-white">{title}</p>
-                          <p className="mt-1 text-sm text-white/55">{meta}</p>
+                          <p className="font-semibold text-foreground">{title}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
                         </div>
-                        <p className="shrink-0 font-mono text-sm font-semibold text-[#7AA8FF]">{salary}</p>
+                        <p className="shrink-0 font-mono text-sm font-semibold text-primary">{salary}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                <div className="mt-4 rounded-2xl border border-border/30 bg-card/50 p-4">
                   <Suspense fallback={<Skeleton className="h-28 w-full" />}>
                     <SearchFilters />
                   </Suspense>
@@ -184,7 +187,7 @@ export default async function HomePage() {
       </section>
 
       {/* Trusted by */}
-      <section className="border-y border-border bg-surface/75 py-6 sm:py-8">
+      <section className="border-y border-border bg-muted/30 py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">

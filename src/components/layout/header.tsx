@@ -114,7 +114,7 @@ export default function Header({
                 {SITE.name}
               </span>
               <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
-                {SITE.tagline}
+                Malta&apos;s modern jobs marketplace
               </span>
             </span>
           </Link>

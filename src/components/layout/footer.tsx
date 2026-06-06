@@ -36,7 +36,7 @@ export default function Footer() {
                   {SITE.name}
                 </span>
                 <span className="text-[0.68rem] font-medium tracking-[0.18em] text-white/55">
-                  {SITE.tagline}
+                  Malta&apos;s modern jobs marketplace
                 </span>
               </span>
             </Link>

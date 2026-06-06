@@ -9,7 +9,7 @@ export interface BadgeProps
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variants: Record<NonNullable<BadgeProps["variant"]>, string> = {
-      default: "bg-primary/10 text-primary-hover border-primary/20",
+      default: "bg-primary/10 text-primary border-primary/20",
       success: "bg-success/10 text-success border-success/20",
       warning: "bg-warning/15 text-foreground border-warning/20",
       error: "bg-error/10 text-error border-error/20",

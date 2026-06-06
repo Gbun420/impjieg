@@ -83,7 +83,7 @@ export async function GET() {
     const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>${escapeXml(SITE.title)}</title>
+    <title>${escapeXml(SITE.name)}</title>
     <link>${escapeXml(`${baseUrl}/jobs`)}</link>
     <description>${escapeXml(SITE.description)}</description>
     <language>en-us</language>

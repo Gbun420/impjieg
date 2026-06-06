@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Inter } from "next/font/google";
+import { Sora, Inter, Manrope } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/header";
@@ -18,6 +18,12 @@ const sora = Sora({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
   display: "swap",
 });
 
@@ -71,7 +77,7 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -120,7 +126,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${sora.variable} ${inter.variable}`}
+      className={`h-full antialiased ${sora.variable} ${inter.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
