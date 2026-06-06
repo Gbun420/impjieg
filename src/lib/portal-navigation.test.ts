@@ -23,6 +23,6 @@ test("employer portal nav is grouped cleanly", () => {
   );
   assert.deepEqual(
     employerPortalNavGroups[1].items.map((item) => item.label),
-    ["My Jobs", "Post a Job", "Applications", "Bulk Upload"]
+    ["My Jobs", "Post a Role", "Applications", "Bulk Upload"]
   );
 });

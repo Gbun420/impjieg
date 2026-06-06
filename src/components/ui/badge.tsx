@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "success" | "warning" | "error" | "secondary" | "accent" | "info";
+  variant?: "default" | "success" | "warning" | "error" | "secondary" | "accent" | "info" | "outline";
 }
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
@@ -16,6 +16,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       secondary: "bg-muted text-foreground/80 border-border",
       accent: "bg-secondary/10 text-secondary border-secondary/20",
       info: "bg-primary/10 text-primary border-primary/20",
+      outline: "bg-background/70 text-muted-foreground border-border/70",
     };
 
     return (

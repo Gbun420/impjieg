@@ -4,6 +4,7 @@ import {
   escapeHtml,
   safeUrlHref,
 } from "@/lib/email-security";
+import { buildBrandedEmailShell } from "@/lib/email-branding";
 
 type AlertFilter = {
   sectors: string[];
@@ -78,10 +79,10 @@ export function buildJobAlertDigestEmail({
       const jobUrl = safeUrlHref(job.url, "#");
 
       return `
-        <li style="margin-bottom:16px;">
-          <a href="${jobUrl}" style="font-weight:600;color:#111827;text-decoration:none;">${escapeHtml(job.title)}</a><br>
-          <span style="color:#4b5563;">${escapeHtml(job.employerName)} · ${escapeHtml(job.location)} · ${escapeHtml(job.jobType)}${job.remoteType ? ` · ${escapeHtml(job.remoteType)}` : ""}</span><br>
-          <span style="color:#0f766e;">${escapeHtml(salary)}</span>
+        <li style="margin:0 0 14px;padding:16px;border:1px solid #DBE4F0;border-radius:16px;background:#FFFFFF;list-style:none;">
+          <a href="${jobUrl}" style="font-weight:800;color:#0B1220;text-decoration:none;">${escapeHtml(job.title)}</a><br>
+          <span style="display:inline-block;margin-top:6px;color:#64748B;">${escapeHtml(job.employerName)} · ${escapeHtml(job.location)} · ${escapeHtml(job.jobType)}${job.remoteType ? ` · ${escapeHtml(job.remoteType)}` : ""}</span><br>
+          <span style="display:inline-block;margin-top:8px;color:#1E63FF;font-weight:800;">${escapeHtml(salary)}</span>
         </li>
       `;
     })
@@ -89,19 +90,17 @@ export function buildJobAlertDigestEmail({
 
   return {
     subject: "New jobs matching your Impjieg alert",
-    html: `
-      <h2>New jobs matching your alert</h2>
-      <p>We found ${jobs.length} new job${jobs.length === 1 ? "" : "s"} that match your preferences.</p>
-      <ul style="padding-left:18px;">
-        ${jobsHtml}
-      </ul>
-      <p><a href="${browseJobsUrl}">Browse all jobs on Impjieg</a></p>
-      <hr>
-      <p style="font-size:12px;color:#6b7280;">
-        You are receiving this email because you created a job alert on Impjieg.
-        <a href="${unsubscribeUrl}">Unsubscribe</a>
-      </p>
-    `,
+    html: buildBrandedEmailShell({
+      eyebrow: "Job alert",
+      title: "New roles match your alert",
+      intro: `We found ${jobs.length} new job${jobs.length === 1 ? "" : "s"} aligned with your preferences.`,
+      bodyHtml: `<ul style="margin:0;padding:0;">${jobsHtml}</ul>`,
+      cta: {
+        label: "Browse all jobs",
+        href: browseJobsUrl,
+      },
+      footerHtml: `You are receiving this email because you created a job alert on Impjieg. <a href="${unsubscribeUrl}" style="color:#1E63FF;">Unsubscribe</a>`,
+    }),
   };
 }
 
@@ -117,15 +116,16 @@ export function buildJobAlertConfirmationEmail({
 
   return {
     subject: "Your Impjieg job alert is active",
-    html: `
-      <h2>Your job alert is active</h2>
-      <p>We will email you when new jobs match your alert preferences.</p>
-      <p><a href="${browseJobsUrl}">Browse the latest jobs</a></p>
-      <hr>
-      <p style="font-size:12px;color:#6b7280;">
-        If you no longer want these alerts, you can
-        <a href="${unsubscribeUrl}">unsubscribe here</a>.
-      </p>
-    `,
+    html: buildBrandedEmailShell({
+      eyebrow: "Alert activated",
+      title: "Your job alert is active",
+      intro: "We will email you when new jobs match your alert preferences.",
+      bodyHtml: `<p style="margin:0;color:#334155;line-height:1.7;">Browse the latest jobs any time, or wait for the next matching digest.</p>`,
+      cta: {
+        label: "Browse the latest jobs",
+        href: browseJobsUrl,
+      },
+      footerHtml: `If you no longer want these alerts, you can <a href="${unsubscribeUrl}" style="color:#1E63FF;">unsubscribe here</a>.`,
+    }),
   };
 }

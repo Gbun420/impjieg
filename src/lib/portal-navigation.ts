@@ -50,7 +50,7 @@ export const employerPortalNavGroups: PortalNavGroup[] = [
     description: "Move between listings, posting, and applicant review.",
     items: [
       { href: "/employer/jobs", label: "My Jobs" },
-      { href: "/employer/post-job", label: "Post a Job" },
+      { href: "/employer/post-job", label: "Post a Role" },
       { href: "/employer/applications", label: "Applications" },
       { href: "/employer/bulk-upload", label: "Bulk Upload" },
     ],

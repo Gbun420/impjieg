@@ -19,12 +19,13 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
 
   return (
     <article
-      className={`group relative rounded-[1.5rem] border p-4 sm:p-5 transition-all duration-150 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-md ${
+      className={`group relative overflow-hidden rounded-[1.5rem] border p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-lg sm:p-5 ${
         job.is_featured
-          ? "border-primary/30 bg-[linear-gradient(180deg,rgba(30,99,255,0.04),rgba(20,199,183,0.02))]"
-          : "border-border bg-card hover:bg-card-hover"
+          ? "border-primary/30 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04)_50%,rgba(255,255,255,0.84))]"
+          : "border-border/80 bg-white/82 backdrop-blur hover:bg-white"
       }`}
     >
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-[linear-gradient(180deg,#1E63FF,#14C7B7)] opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
         <Link href={`/jobs/${job.employers.slug}/${job.slug}`} className="min-w-0 flex-1">
           <div className="flex items-start gap-3 sm:gap-4">
@@ -61,7 +62,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 <h2 className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                   {job.title}
                 </h2>
-                {job.is_featured ? <Badge variant="default">Featured</Badge> : null}
+                  {job.is_featured ? <Badge variant="default">Priority role</Badge> : null}
               </div>
 
               <p className="mt-0.5 flex items-center gap-1 text-sm text-foreground/75">
@@ -81,13 +82,14 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
               ) : null}
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                <span className="flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-foreground/80">
+                <span className="flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-foreground/80">
                   <MapPin className="h-3.5 w-3.5 shrink-0" />
                   {job.location}
                 </span>
                 <Badge variant="secondary">{job.job_type}</Badge>
                 {job.remote_type ? <Badge variant="default">{job.remote_type}</Badge> : null}
                 {job.visa_friendly ? <Badge variant="accent">Visa friendly</Badge> : null}
+                {job.sector ? <Badge variant="outline">{job.sector}</Badge> : null}
               </div>
 
               <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -95,7 +97,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                   <Clock className="h-3.5 w-3.5 shrink-0" />
                   Posted {daysAgo(job.created_at)}
                 </span>
-                {job.is_featured ? <span className="font-medium text-primary">Featured listing</span> : null}
+                {job.is_featured ? <span className="font-medium text-primary">Boosted marketplace placement</span> : null}
               </div>
             </div>
           </div>

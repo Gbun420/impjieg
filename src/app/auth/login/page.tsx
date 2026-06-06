@@ -53,7 +53,7 @@ function LoginForm() {
             <p className="text-xs uppercase tracking-[0.28em] text-white/55">
               Workspace access
             </p>
-            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-white">
+            <h1 className="text-3xl font-semibold text-white">
               Welcome back
             </h1>
             <p className="max-w-xl text-sm leading-6 text-white/72">
@@ -64,12 +64,12 @@ function LoginForm() {
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
               <Briefcase className="h-4 w-4 text-signal-teal" />
               <p className="mt-3 text-sm font-medium">Employer tools</p>
-              <p className="mt-1 text-xs text-white/65">Post jobs, review applicants, and manage billing.</p>
+              <p className="mt-1 text-xs text-white/65">Post roles, review applicants, and manage billing.</p>
             </Card>
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
               <UserRound className="h-4 w-4 text-brand-blue" />
               <p className="mt-3 text-sm font-medium">Candidate workspace</p>
-              <p className="mt-1 text-xs text-white/65">Track applications, alerts, and saved jobs.</p>
+              <p className="mt-1 text-xs text-white/65">Track applications, alerts, and saved roles.</p>
             </Card>
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
               <Shield className="h-4 w-4 text-performance-amber" />

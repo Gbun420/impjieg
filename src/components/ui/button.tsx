@@ -27,12 +27,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm hover:shadow-md",
+        "bg-[linear-gradient(135deg,var(--primary)_0%,#174FD1_100%)] text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]",
       secondary:
-        "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20",
+        "border border-secondary/25 bg-secondary/10 text-secondary hover:border-secondary/35 hover:bg-secondary/18",
       outline:
-        "border border-border bg-surface hover:bg-muted/60 text-foreground hover:border-border-hover",
-      ghost: "hover:bg-muted/60 text-foreground",
+        "border border-border bg-surface/90 text-foreground shadow-[0_8px_20px_rgba(11,18,32,0.04)] hover:border-border-hover hover:bg-muted/60",
+      ghost: "text-foreground hover:bg-muted/60 hover:text-primary",
       danger: "bg-error/10 text-error hover:bg-error/20 border border-error/20",
     };
 

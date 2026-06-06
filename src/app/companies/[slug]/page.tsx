@@ -49,7 +49,9 @@ export async function generateMetadata({
 
   return {
     title: `${emp.name} - Jobs & Company Profile | Impjieg`,
-    description: emp.description || `View open roles at ${emp.name} on Impjieg Malta's job board.`,
+    description:
+      emp.description ||
+      `View open roles at ${emp.name} on Impjieg, Malta's jobs marketplace.`,
   };
 }
 

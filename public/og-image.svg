@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label="Impjieg - Malta's modern jobs marketplace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label="Impjieg - Malta's jobs marketplace for tech, digital, and iGaming talent">
   <defs>
     <linearGradient id="og-bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0B1220" />
+      <stop offset="0" stop-color="#08111F" />
       <stop offset="1" stop-color="#121A2B" />
     </linearGradient>
     <radialGradient id="og-teal" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(920 120) rotate(140) scale(280 220)">
@@ -22,37 +22,37 @@
   <circle cx="175" cy="470" r="250" fill="url(#og-blue)" />
   <rect x="72" y="70" width="1056" height="490" rx="40" fill="white" fill-opacity="0.03" stroke="white" stroke-opacity="0.08" />
 
-  <rect x="112" y="120" width="82" height="82" rx="24" fill="#0B1220" stroke="#1E63FF" stroke-opacity="0.35" />
+  <rect x="112" y="120" width="82" height="82" rx="24" fill="#08111F" stroke="#1E63FF" stroke-opacity="0.35" />
   <path d="M131 172.5C131 155 141.8 140 158 132.5" stroke="url(#og-bg-accent)" stroke-width="5" stroke-linecap="round" />
-  <path d="M131.5 171.5L157.5 145.5L174 162" stroke="#F5F8FC" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M131.5 171.5L157.5 145.5L174 162" stroke="#F7F4EC" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" />
   <circle cx="178.5" cy="134.5" r="5" fill="#FFB020" />
 
-  <text x="226" y="157" fill="#F5F8FC" font-family="Sora, Inter, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="-0.04em">Impjieg</text>
-  <text x="226" y="214" fill="#C9D4E5" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="500" letter-spacing="0.02em">Malta&apos;s modern jobs marketplace for tech, digital, and iGaming talent.</text>
-  <text x="226" y="262" fill="#8EA0BF" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="400">Find better roles faster, with clear work-mode tags, salary signals, and employers that actually hire.</text>
+  <text x="226" y="157" fill="#F7F4EC" font-family="Sora, Inter, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="0">Impjieg</text>
+  <text x="226" y="214" fill="#C9D4E5" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600" letter-spacing="0">Malta&apos;s jobs marketplace for tech, digital, and iGaming talent.</text>
+  <text x="226" y="262" fill="#8EA0BF" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="400">Sharper role context, salary signals, work-mode clarity, and direct applications.</text>
 
   <g transform="translate(226 338)">
     <rect width="150" height="44" rx="22" fill="#1E63FF" />
-    <text x="75" y="28" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="600">Find jobs</text>
+    <text x="75" y="28" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="600">Find roles</text>
   </g>
   <g transform="translate(392 338)">
     <rect width="150" height="44" rx="22" fill="none" stroke="#14C7B7" stroke-opacity="0.5" />
-    <text x="75" y="28" text-anchor="middle" fill="#E6F8F7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="600">Post a job</text>
+    <text x="75" y="28" text-anchor="middle" fill="#E6F8F7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="600">Post a role</text>
   </g>
 
   <g transform="translate(226 426)">
     <rect width="168" height="68" rx="20" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.08" />
     <text x="18" y="28" fill="#8EA0BF" font-family="Inter, Arial, sans-serif" font-size="16">Live roles</text>
-    <text x="18" y="51" fill="#F5F8FC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">0+</text>
+    <text x="18" y="51" fill="#F7F4EC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Fresh</text>
   </g>
   <g transform="translate(410 426)">
     <rect width="168" height="68" rx="20" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.08" />
     <text x="18" y="28" fill="#8EA0BF" font-family="Inter, Arial, sans-serif" font-size="16">Clear signals</text>
-    <text x="18" y="51" fill="#F5F8FC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Salary + mode</text>
+    <text x="18" y="51" fill="#F7F4EC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Salary + mode</text>
   </g>
   <g transform="translate(594 426)">
     <rect width="168" height="68" rx="20" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.08" />
     <text x="18" y="28" fill="#8EA0BF" font-family="Inter, Arial, sans-serif" font-size="16">For Malta</text>
-    <text x="18" y="51" fill="#F5F8FC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Tech + iGaming</text>
+    <text x="18" y="51" fill="#F7F4EC" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Tech + iGaming</text>
   </g>
 </svg>

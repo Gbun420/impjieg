@@ -470,12 +470,12 @@ export default function PricingPage() {
           Ready to hire smarter?
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Post your first job in under 2 minutes. No contracts, no hidden fees.
+          Post your first role in under 2 minutes. No contracts, no hidden fees.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link href="/employer/post-job">
             <Button variant="primary" size="lg">
-              Post a job — €{PRICING.standard.price}
+              Post a role — €{PRICING.standard.price}
             </Button>
           </Link>
           <Link href="/contact">

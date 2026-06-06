@@ -173,17 +173,17 @@ export default function SearchFilters() {
 
   return (
     <div className="space-y-4">
-      <Card className="overflow-hidden border-border/70 bg-card/90 p-4 shadow-sm backdrop-blur-sm sm:p-5">
+      <Card className="marketplace-panel overflow-hidden rounded-[1.65rem] p-4 sm:p-5">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Search jobs</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Marketplace search</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Search and filter live roles. Results update automatically.
+                Search live Malta roles. Results update automatically.
               </p>
             </div>
             <span className="hidden rounded-full border border-border/60 bg-muted/30 px-2.5 py-1 text-[11px] font-medium text-muted-foreground sm:inline-flex">
-              Live results
+              Live signal
             </span>
           </div>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
@@ -227,7 +227,7 @@ export default function SearchFilters() {
 
       <div
         id="job-filters-panel"
-        className={`${showFilters ? "block" : "hidden"} space-y-5 rounded-[1.75rem] border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-5`}
+        className={`${showFilters ? "block" : "hidden"} marketplace-panel space-y-5 rounded-[1.75rem] p-4 sm:p-5`}
       >
         <div className="flex items-center justify-between gap-3 lg:hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Filter options</p>

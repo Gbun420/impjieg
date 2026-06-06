@@ -86,7 +86,7 @@ export async function GET() {
       },
       // Application information
       how_to_apply: job.application_url || job.application_email || "Apply through the application button on the job page",
-      // Additional metadata for job boards
+      // Additional metadata for marketplace consumers
       source: "impjieg",
       language: "en"
     }));
