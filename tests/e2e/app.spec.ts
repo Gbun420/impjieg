@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { createHmac } from 'node:crypto';
 import { checkA11y, checkAccessibleNames, checkImageAlts, checkHeadingHierarchy } from '../helpers/a11y';
+
+const ADMIN_SESSION_COOKIE = 'impjieg_admin_session';
+const ADMIN_SESSION_MESSAGE = 'impjieg-admin-session';
+const DEV_ADMIN_TOKEN = 'local-admin';
+
+function buildDevAdminSessionValue() {
+  return createHmac('sha256', DEV_ADMIN_TOKEN).update(ADMIN_SESSION_MESSAGE).digest('hex');
+}
 
 test('homepage loads and is accessible', async ({ page }) => {
   await page.goto('/');
@@ -38,6 +47,36 @@ test('login page loads and has form', async ({ page }) => {
   await expect(page.getByLabel('Email')).toBeVisible();
   await expect(page.getByLabel('Password')).toBeVisible();
   await checkA11y(page);
+  await checkAccessibleNames(page);
+});
+
+test('admin aggregation route stays protected', async ({ page }) => {
+  await page.goto('/admin/aggregation');
+  await expect(page).toHaveURL(/\/admin\/login$/);
+  await expect(page.getByRole('heading', { name: /Admin console/i })).toBeVisible();
+  await expect(page.getByLabel('Admin email')).toBeVisible();
+  await expect(page.getByLabel('Password')).toBeVisible();
+});
+
+test('authenticated admin aggregation portal renders live data', async ({ page, context }) => {
+  await context.addCookies([
+    {
+      name: ADMIN_SESSION_COOKIE,
+      value: buildDevAdminSessionValue(),
+      domain: 'localhost',
+      path: '/admin',
+      httpOnly: true,
+      sameSite: 'Lax',
+      secure: false,
+    },
+  ]);
+
+  await page.goto('/admin/aggregation');
+  await expect(page).toHaveURL(/\/admin\/aggregation$/);
+  await expect(page.getByRole('heading', { name: /Job aggregation portal/, level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Source inventory/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Latest runs/ })).toBeVisible();
+  await expect(page.getByText('Primary XML feed used for search discovery', { exact: true })).toBeVisible();
   await checkAccessibleNames(page);
 });
 

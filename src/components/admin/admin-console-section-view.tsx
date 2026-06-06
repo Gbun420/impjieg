@@ -109,17 +109,37 @@ function Panel({
 function listBadgeVariant(status?: string | null) {
   if (!status) return "secondary";
   const normalized = status.toLowerCase();
-  if (["active", "succeeded", "paid", "verified", "shortlisted", "interview", "completed", "trialing"].includes(normalized)) {
+  if (["active", "succeeded", "paid", "verified", "shortlisted", "interview", "completed", "trialing", "approved"].includes(normalized)) {
     return "success";
   }
-  if (["pending", "draft", "past_due"].includes(normalized)) {
+  if (["pending", "draft", "past_due", "partial", "queued", "needs_review", "degraded"].includes(normalized)) {
     return "warning";
   }
-  if (["failed", "rejected", "canceled", "suspended"].includes(normalized)) {
+  if (["failed", "rejected", "canceled", "suspended", "offline", "error"].includes(normalized)) {
     return "error";
   }
 
   return "secondary";
+}
+
+function healthBadgeVariant(status?: string | null) {
+  if (!status) return "secondary";
+  const normalized = status.toLowerCase();
+  if (normalized === "healthy") return "success";
+  if (normalized === "degraded") return "warning";
+  if (normalized === "offline") return "error";
+  return "secondary";
+}
+
+function shortValue(value: string | null | undefined) {
+  if (!value) return "—";
+  return value.length > 12 ? `${value.slice(0, 12)}…` : value;
+}
+
+function formatMilliseconds(value: number | null | undefined) {
+  if (value === null || value === undefined) return "n/a";
+  if (value < 1000) return `${value} ms`;
+  return `${Math.round(value / 100) / 10}s`;
 }
 
 function SectionItem({
@@ -211,6 +231,125 @@ function JobsConsole({ data }: { data: AdminConsoleData }) {
           />
         ))}
       </Panel>
+    </div>
+  );
+}
+
+function AggregationConsole({ data }: { data: AdminConsoleData }) {
+  const sourceById = new Map(data.aggregationSources.map((source) => [source.id, source]));
+  const recentSource = data.aggregationSources[0];
+  const latestRun = data.aggregationRuns[0];
+  const openErrors = data.aggregationErrors.filter((error) => !error.resolved_at);
+  const pendingSnapshots = data.aggregationSnapshots.filter((snapshot) => snapshot.status === "needs_review");
+  const enabledSources = data.aggregationSources.filter((source) => source.enabled).length;
+  const healthySources = data.aggregationSources.filter((source) => source.health_status === "healthy").length;
+
+  return (
+    <div className="space-y-6">
+      <SummaryGrid
+        metrics={[
+          { label: "Sources", value: data.aggregationSources.length, note: `${enabledSources} enabled · ${healthySources} healthy` },
+          { label: "Runs", value: data.aggregationRuns.length, note: latestRun ? `Latest ${latestRun.status} run ${daysAgo(latestRun.created_at)}` : "No runs loaded" },
+          { label: "Open errors", value: openErrors.length, note: `${data.aggregationErrors.length} total error records` },
+          { label: "Pending snapshots", value: pendingSnapshots.length, note: recentSource ? `Latest source: ${recentSource.name}` : "No sources loaded" },
+        ]}
+      />
+
+      <Panel title="Source inventory" description="The live aggregation inputs that power marketplace discovery.">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {data.aggregationSources.map((source) => (
+            <div
+              key={source.id}
+              className="rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{source.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {source.type} · {source.base_url ?? source.feed_url ?? "No URL configured"}
+                  </p>
+                </div>
+                <Badge variant={healthBadgeVariant(source.health_status)}>{source.health_status}</Badge>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Priority {source.priority} · {source.enabled ? "Enabled" : "Disabled"} · Limit {source.active_jobs_limit}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Last run {source.last_run_at ? daysAgo(source.last_run_at) : "never"} · success{" "}
+                {source.last_success_at ? daysAgo(source.last_success_at) : "never"}
+              </p>
+              {source.notes ? <p className="mt-2 text-xs text-muted-foreground">{source.notes}</p> : null}
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="Latest runs" description="Most recent ingestion attempts and their throughput.">
+          {data.aggregationRuns.map((run) => {
+            const source = sourceById.get(run.source_id);
+            return (
+              <SectionItem
+                key={run.id}
+                title={source?.name ?? shortValue(run.source_id)}
+                subtitle={`${run.status} · ${source?.type ?? "unknown source type"}`}
+                meta={`Fetched ${run.fetched_count} · imported ${run.imported_count} · updated ${run.updated_count} · duplicates ${run.duplicate_count} · errors ${run.error_count} · runtime ${formatMilliseconds(run.runtime_ms)}`}
+                badge={<Badge variant={listBadgeVariant(run.status)}>{run.status}</Badge>}
+              />
+            );
+          })}
+        </Panel>
+
+        <Panel title="Open errors" description="Unresolved ingestion and validation issues from the live pipeline.">
+          {data.aggregationErrors.map((error) => {
+            const source = sourceById.get(error.source_id);
+            return (
+              <SectionItem
+                key={error.id}
+                title={error.raw_title ?? error.source_url ?? shortValue(error.id)}
+                subtitle={`${source?.name ?? shortValue(error.source_id)} · ${error.raw_company ?? "Unknown company"}`}
+                meta={`${error.validation_error ?? "No validation error"} · ${daysAgo(error.created_at)}`}
+                badge={<Badge variant={error.resolved_at ? "success" : "error"}>{error.resolved_at ? "Resolved" : "Open"}</Badge>}
+              />
+            );
+          })}
+        </Panel>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="Import snapshots" description="Latest normalized payloads and their approval state.">
+          {data.aggregationSnapshots.map((snapshot) => {
+            const source = sourceById.get(snapshot.source_id);
+            return (
+              <SectionItem
+                key={snapshot.id}
+                title={snapshot.external_id ?? snapshot.canonical_url ?? shortValue(snapshot.id)}
+                subtitle={`${source?.name ?? shortValue(snapshot.source_id)} · ${snapshot.canonical_url ?? "No canonical URL"}`}
+                meta={`Imported ${snapshot.imported_at ? daysAgo(snapshot.imported_at) : "never"} · last seen ${snapshot.last_seen_at ? daysAgo(snapshot.last_seen_at) : "never"}`}
+                badge={<Badge variant={listBadgeVariant(snapshot.status)}>{snapshot.status}</Badge>}
+                actions={
+                  <>
+                    {snapshot.canonical_url ? <ConsoleAction href={snapshot.canonical_url} label="Canonical" external /> : null}
+                    {snapshot.apply_url ? <ConsoleAction href={snapshot.apply_url} label="Apply" external /> : null}
+                  </>
+                }
+              />
+            );
+          })}
+        </Panel>
+
+        <Panel title="Duplicate matches" description="Records flagged as likely duplicates by the live matcher.">
+          {data.aggregationDuplicates.map((duplicate) => (
+            <SectionItem
+              key={duplicate.id}
+              title={`${shortValue(duplicate.job_id)} ↔ ${shortValue(duplicate.duplicate_job_id)}`}
+              subtitle={duplicate.match_type}
+              meta={`Confidence ${duplicate.confidence ?? "n/a"}% · ${duplicate.notes ?? "No notes recorded"}`}
+              badge={<Badge variant={duplicate.confidence && duplicate.confidence >= 90 ? "success" : "warning"}>{duplicate.confidence ?? "n/a"}%</Badge>}
+            />
+          ))}
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -565,6 +704,7 @@ export function AdminConsoleSectionView({
       </div>
 
       {section === "jobs" ? <JobsConsole data={data} /> : null}
+      {section === "aggregation" ? <AggregationConsole data={data} /> : null}
       {section === "employers" ? <EmployersConsole data={data} /> : null}
       {section === "candidates" ? <CandidatesConsole data={data} /> : null}
       {section === "applications" ? <ApplicationsConsole data={data} /> : null}

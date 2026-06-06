@@ -11,6 +11,7 @@ test("admin console nav includes the wired live consoles", () => {
     adminConsoleNavItems.map((item) => item.label),
     [
       "Overview",
+      "Aggregation",
       "Jobs",
       "Employers",
       "Candidates",
@@ -25,6 +26,7 @@ test("admin console nav includes the wired live consoles", () => {
 });
 
 test("admin console section resolver maps known console slugs", () => {
+  assert.equal(resolveAdminConsoleSection(["aggregation"]), "aggregation");
   assert.equal(resolveAdminConsoleSection(["jobs"]), "jobs");
   assert.equal(resolveAdminConsoleSection(["audit-log"]), "audit-log");
   assert.equal(resolveAdminConsoleSection(["unknown"]), null);
@@ -32,6 +34,9 @@ test("admin console section resolver maps known console slugs", () => {
 });
 
 test("admin console metadata stays aligned with the live consoles", () => {
+  const aggregationMeta = getAdminConsoleSectionMeta("aggregation");
+  assert.equal(aggregationMeta.title, "Job aggregation portal");
+
   const jobsMeta = getAdminConsoleSectionMeta("jobs");
   assert.equal(jobsMeta.title, "Jobs operations");
   assert.match(jobsMeta.description, /Review live listings/i);

@@ -1,0 +1,105 @@
+name: AI Maintenance
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to process
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  validate-label:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && startsWith(github.event.label.name, 'ai-agent:'))
+    steps:
+      - name: Classify maintenance lane
+        id: classify
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ github.event_name == 'workflow_dispatch' && inputs.issue_number || github.event.issue.number }}
+          LABEL_NAME: ${{ github.event_name == 'workflow_dispatch' && 'workflow_dispatch' || github.event.label.name }}
+        with:
+          script: |
+            const label = process.env.LABEL_NAME;
+            const safeLaneLabels = new Set(['ai-agent:safe', 'ai-agent:ui', 'ai-agent:test-fix']);
+            const approvalLaneLabels = new Set(['ai-agent:security', 'ai-agent:db', 'ai-agent:auth', 'ai-agent:payment', 'ai-agent:admin', 'ai-agent:needs-approval']);
+
+            let lane = 'manual';
+            if (safeLaneLabels.has(label)) {
+              lane = 'safe';
+            } else if (approvalLaneLabels.has(label)) {
+              lane = 'approval';
+            }
+
+            core.setOutput('lane', lane);
+
+            const issueNumber = Number(process.env.ISSUE_NUMBER || 0);
+            if (issueNumber > 0) {
+              const body = lane === 'approval'
+                ? [
+                    `AI maintenance workflow received label \`${label}\`.`,
+                    '',
+                    'This lane requires human approval before any merge or production path.',
+                    '',
+                    'Policy reminder:',
+                    '- branch only',
+                    '- PR only',
+                    '- no direct production edits',
+                  ].join('\n')
+                : [
+                    `AI maintenance workflow accepted for label \`${label}\`.`,
+                    '',
+                    'Required checks:',
+                    '- `npm run lint`',
+                    '- `npm test`',
+                    '- `npm run build`',
+                    '',
+                    'Branch policy: create a scoped branch, open a PR, and do not push to `main`.',
+                  ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body,
+              });
+            }
+
+            core.notice(`AI maintenance workflow classified issue ${issueNumber || 'n/a'} as ${lane} for label ${label}.`);
+
+      - name: Check out repository
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        run: npm ci
+
+      - name: Lint
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        run: npm run lint
+
+      - name: Test
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        run: npm test
+
+      - name: Build
+        if: steps.classify.outputs.lane == 'safe' || steps.classify.outputs.lane == 'manual'
+        run: npm run build

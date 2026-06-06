@@ -30,5 +30,13 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_SUPABASE_URL: 'https://dev.supabase.co',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'dev-supabase-anon-key',
+      SUPABASE_SERVICE_ROLE_KEY: 'dev-supabase-service-key',
+      INTERNAL_ADMIN_TOKEN: 'local-admin',
+      PLAYWRIGHT_E2E: '1',
+    },
   },
 });

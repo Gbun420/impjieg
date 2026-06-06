@@ -16,6 +16,7 @@ import { formatDate, formatSalary } from "@/lib/utils";
 
 export type AdminConsoleSection =
   | "dashboard"
+  | "aggregation"
   | "jobs"
   | "employers"
   | "candidates"
@@ -37,6 +38,7 @@ export const adminConsoleSections: Array<{
   label: string;
 }> = [
   { slug: "dashboard", href: "/admin/dashboard", label: "Overview" },
+  { slug: "aggregation", href: "/admin/aggregation", label: "Aggregation" },
   { slug: "jobs", href: "/admin/jobs", label: "Jobs" },
   { slug: "employers", href: "/admin/employers", label: "Employers" },
   { slug: "candidates", href: "/admin/candidates", label: "Candidates" },
@@ -76,6 +78,12 @@ export function getAdminConsoleSectionMeta(section: AdminConsoleSection) {
       description:
         "Live production metrics, account health, and the latest events across the marketplace.",
       eyebrow: "Operations hub",
+    },
+    aggregation: {
+      title: "Job aggregation portal",
+      description:
+        "Track the live marketplace feeds that power search, discovery, alerts, and billing signals.",
+      eyebrow: "Aggregation control",
     },
     jobs: {
       title: "Jobs operations",
@@ -145,6 +153,11 @@ type LatestEmployer = Employer;
 type LatestSubscription = Database["public"]["Tables"]["subscriptions"]["Row"];
 type LatestPayment = Payment;
 type LatestJobAlert = JobAlert;
+type LatestAggregationSource = Database["public"]["Tables"]["job_sources"]["Row"];
+type LatestAggregationRun = Database["public"]["Tables"]["job_source_runs"]["Row"];
+type LatestAggregationError = Database["public"]["Tables"]["job_source_errors"]["Row"];
+type LatestAggregationSnapshot = Database["public"]["Tables"]["job_import_snapshots"]["Row"];
+type LatestAggregationDuplicate = Database["public"]["Tables"]["job_duplicates"]["Row"];
 type LatestCandidateProfile = CandidateProfile;
 type LatestCandidateApplication = CandidateApplication & {
   jobs: Pick<Job, "title" | "slug" | "status"> | null;
@@ -166,6 +179,11 @@ type AdminAuditRow = {
 };
 
 export type AdminConsoleData = Awaited<ReturnType<typeof getAdminDashboardData>> & {
+  aggregationSources: LatestAggregationSource[];
+  aggregationRuns: LatestAggregationRun[];
+  aggregationErrors: LatestAggregationError[];
+  aggregationSnapshots: LatestAggregationSnapshot[];
+  aggregationDuplicates: LatestAggregationDuplicate[];
   candidateProfiles: LatestCandidateProfile[];
   candidateApplications: LatestCandidateApplication[];
   candidateAlerts: LatestCandidateAlert[];
@@ -226,6 +244,156 @@ function serializeAuditValue(value: unknown) {
 }
 
 function getDemoAdminConsoleData() {
+  const aggregationSources = [
+    {
+      id: "demo-source-1",
+      name: "JobsMalta XML",
+      type: "xml_feed",
+      base_url: "https://jobsmalta.example",
+      feed_url: "https://jobsmalta.example/feed.xml",
+      enabled: true,
+      priority: 10,
+      active_jobs_limit: 250,
+      default_status: "needs_confirmation",
+      default_category_id: null,
+      default_company_id: null,
+      employer_assignment_mode: "source_company",
+      posting_date_mode: "original_date",
+      expiry_days: 30,
+      crawl_frequency_minutes: 180,
+      respect_robots_txt: true,
+      rate_limit_per_hour: 120,
+      timeout_seconds: 30,
+      retry_count: 3,
+      user_agent: "ImpjiegBot/1.0",
+      last_run_at: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
+      last_success_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      last_error_at: null,
+      health_status: "healthy",
+      notes: "Primary XML feed used for search discovery",
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 16).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    },
+    {
+      id: "demo-source-2",
+      name: "Agency RSS",
+      type: "rss_feed",
+      base_url: "https://agency.example",
+      feed_url: "https://agency.example/rss",
+      enabled: true,
+      priority: 30,
+      active_jobs_limit: 80,
+      default_status: "confirmed",
+      default_category_id: null,
+      default_company_id: null,
+      employer_assignment_mode: "manual_company",
+      posting_date_mode: "import_date",
+      expiry_days: 21,
+      crawl_frequency_minutes: 720,
+      respect_robots_txt: true,
+      rate_limit_per_hour: 60,
+      timeout_seconds: 30,
+      retry_count: 2,
+      user_agent: null,
+      last_run_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+      last_success_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+      last_error_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+      health_status: "degraded",
+      notes: "Retrying intermittent RSS responses",
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+    },
+  ] as LatestAggregationSource[];
+
+  const aggregationRuns = [
+    {
+      id: "demo-run-1",
+      source_id: "demo-source-1",
+      status: "succeeded",
+      fetched_count: 42,
+      imported_count: 18,
+      updated_count: 9,
+      duplicate_count: 6,
+      rejected_count: 4,
+      error_count: 1,
+      error_messages: [],
+      runtime_ms: 18342,
+      started_at: new Date(Date.now() - 1000 * 60 * 52).toISOString(),
+      finished_at: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
+      created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 49).toISOString(),
+    },
+    {
+      id: "demo-run-2",
+      source_id: "demo-source-2",
+      status: "partial",
+      fetched_count: 17,
+      imported_count: 6,
+      updated_count: 1,
+      duplicate_count: 2,
+      rejected_count: 3,
+      error_count: 2,
+      error_messages: ["One feed item timed out"],
+      runtime_ms: 9021,
+      started_at: new Date(Date.now() - 1000 * 60 * 150).toISOString(),
+      finished_at: new Date(Date.now() - 1000 * 60 * 147).toISOString(),
+      created_at: new Date(Date.now() - 1000 * 60 * 160).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 146).toISOString(),
+    },
+  ] as LatestAggregationRun[];
+
+  const aggregationErrors = [
+    {
+      id: "demo-error-1",
+      source_id: "demo-source-2",
+      run_id: "demo-run-2",
+      source_url: "https://agency.example/jobs/123",
+      raw_title: "Senior QA Engineer",
+      raw_company: "Agency Example",
+      raw_payload: { title: "Senior QA Engineer" },
+      validation_error: "Missing salary range",
+      stack_trace: null,
+      resolved_at: null,
+      resolved_by: null,
+      resolution_note: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    },
+  ] as LatestAggregationError[];
+
+  const aggregationSnapshots = [
+    {
+      id: "demo-snapshot-1",
+      source_id: "demo-source-1",
+      job_id: "demo-job-1",
+      external_id: "xml-123",
+      canonical_url: "https://jobsmalta.example/jobs/123",
+      apply_url: "https://jobsmalta.example/jobs/123/apply",
+      content_hash: "hash-1",
+      fuzzy_hash: "fuzzy-1",
+      raw_payload: { title: "Senior Product Designer" },
+      normalized_job: { title: "Senior Product Designer" },
+      status: "approved",
+      imported_at: new Date(Date.now() - 1000 * 60 * 42).toISOString(),
+      last_seen_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+      created_at: new Date(Date.now() - 1000 * 60 * 43).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    },
+  ] as LatestAggregationSnapshot[];
+
+  const aggregationDuplicates = [
+    {
+      id: "demo-duplicate-1",
+      job_id: "demo-job-1",
+      duplicate_job_id: "demo-job-2",
+      match_type: "title_and_company",
+      confidence: 94.2,
+      notes: "Near-identical roles from the same source family",
+      created_at: new Date(Date.now() - 1000 * 60 * 26).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 26).toISOString(),
+    },
+  ] as LatestAggregationDuplicate[];
+
   const candidateProfiles = [
     {
       id: "demo-candidate-1",
@@ -465,6 +633,11 @@ function getDemoAdminConsoleData() {
       },
     ],
     formattedAt: formatDate(new Date()),
+    aggregationSources,
+    aggregationRuns,
+    aggregationErrors,
+    aggregationSnapshots,
+    aggregationDuplicates,
     candidateProfiles,
     candidateApplications,
     candidateAlerts,
@@ -487,11 +660,58 @@ export async function getAdminConsoleData() {
 
   const supabase = createAdminServiceClient();
   const [
+    aggregationSources,
+    aggregationRuns,
+    aggregationErrors,
+    aggregationSnapshots,
+    aggregationDuplicates,
     candidateProfiles,
     candidateApplications,
     candidateAlerts,
     auditLogs,
   ] = await Promise.all([
+    safeRowsQuery<LatestAggregationSource>(
+      "aggregation sources",
+      supabase
+        .from("job_sources")
+        .select("*")
+        .order("priority", { ascending: true })
+        .order("updated_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestAggregationRun>(
+      "aggregation runs",
+      supabase
+        .from("job_source_runs")
+        .select("*")
+        .order("started_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestAggregationError>(
+      "aggregation errors",
+      supabase
+        .from("job_source_errors")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestAggregationSnapshot>(
+      "aggregation snapshots",
+      supabase
+        .from("job_import_snapshots")
+        .select("*")
+        .order("last_seen_at", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(8)
+    ),
+    safeRowsQuery<LatestAggregationDuplicate>(
+      "aggregation duplicates",
+      supabase
+        .from("job_duplicates")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(8)
+    ),
     safeRowsQuery<LatestCandidateProfile>(
       "candidate profiles",
       supabase
@@ -528,6 +748,11 @@ export async function getAdminConsoleData() {
 
   return {
     ...dashboard,
+    aggregationSources,
+    aggregationRuns,
+    aggregationErrors,
+    aggregationSnapshots,
+    aggregationDuplicates,
     candidateProfiles,
     candidateApplications,
     candidateAlerts,

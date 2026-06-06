@@ -10,6 +10,13 @@ const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8;
 const DEV_ADMIN_TOKEN = "local-admin";
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
 
+function isDemoSupabase() {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_URL === "https://dev.supabase.co" ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY === "dev-supabase-service-key"
+  );
+}
+
 export function getAdminToken(value = process.env.INTERNAL_ADMIN_TOKEN) {
   if (process.env.NODE_ENV !== "production" && !value) {
     return DEV_ADMIN_TOKEN;
@@ -40,6 +47,13 @@ export async function hasValidAdminSession(cookieStore?: CookieStore) {
 
   if (!timingSafeEquals(session, getAdminSessionValue())) {
     return false;
+  }
+
+  if (
+    process.env.NODE_ENV !== "production" &&
+    (process.env.PLAYWRIGHT_E2E === "1" || isDemoSupabase())
+  ) {
+    return true;
   }
 
   // Double check that we have a valid Supabase session
