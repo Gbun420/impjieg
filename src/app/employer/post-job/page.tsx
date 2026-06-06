@@ -156,7 +156,7 @@ export default function PostJobPage() {
           <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
             <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] px-6 py-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Commercial upsells
+                Hiring add-ons
               </p>
               <h2 className="mt-1 text-lg font-semibold text-foreground">
                 Recommended next steps
@@ -185,7 +185,7 @@ export default function PostJobPage() {
                       }
                     }}
                   >
-                    Add boost
+                    Add visibility
                   </Button>
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function PostJobPage() {
               <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-semibold text-foreground">Bulk credits</p>
+                  <p className="text-sm font-semibold text-foreground">Hiring credits</p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Best if you are planning multiple hires and want to avoid paying per listing.

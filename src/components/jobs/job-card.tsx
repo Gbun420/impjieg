@@ -71,6 +71,15 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 )}
               </p>
 
+              {salaryText ? (
+                <div className="mt-3 flex items-center gap-1.5">
+                  <Banknote className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="font-mono text-sm font-semibold text-primary sm:text-[0.95rem]">
+                    {salaryText}
+                  </span>
+                </div>
+              ) : null}
+
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                 <span className="flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-foreground/80">
                   <MapPin className="h-3.5 w-3.5 shrink-0" />
@@ -79,12 +88,6 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 <Badge variant="secondary">{job.job_type}</Badge>
                 {job.remote_type ? <Badge variant="default">{job.remote_type}</Badge> : null}
                 {job.visa_friendly ? <Badge variant="accent">Visa friendly</Badge> : null}
-                {salaryText ? (
-                  <span className="flex items-center gap-1 font-mono font-medium text-primary">
-                    <Banknote className="h-3.5 w-3.5 shrink-0" />
-                    {salaryText}
-                  </span>
-                ) : null}
               </div>
 
               <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">

@@ -20,6 +20,7 @@ const companyLinks = [
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
+  { label: "Cookies", href: "/cookies" },
 ];
 
 export default function Footer() {
@@ -40,7 +41,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
-              Jobs in Malta’s tech, digital, and iGaming sectors.
+              Malta’s modern jobs marketplace for tech, digital, and iGaming talent.
             </p>
             <span className="mt-1.5 inline-flex rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[11px] font-medium tracking-[0.14em] text-muted-foreground">
               Made in Malta
@@ -106,26 +107,7 @@ export default function Footer() {
           <p>
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <p className="text-xs">
-            A project by{" "}
-            <a
-              href="https://mackmedia.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground underline hover:text-primary transition-colors"
-            >
-              Mack Media
-            </a>
-            , built by{" "}
-            <a
-              href="https://dopaminedigital.co/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground underline hover:text-primary transition-colors"
-            >
-              Dopamine Digital
-            </a>
-          </p>
+          <p className="text-xs text-muted-foreground">Malta’s modern hiring marketplace.</p>
         </div>
       </div>
     </footer>

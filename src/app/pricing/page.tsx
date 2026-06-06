@@ -4,13 +4,13 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Simple, transparent pricing for listings, credit packs, subscriptions, promotion bundles, and employer growth services.",
+    "Employer pricing for one-off listings, hiring credits, subscriptions, add-ons, and growth services.",
 };
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, X, Megaphone, BrainCircuit, Target, BarChart3, ArrowRight } from "lucide-react";
+import { Check, Sparkles, Megaphone, BrainCircuit, Target, BarChart3, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PRICING, SUBSCRIPTION_PLANS, CREDIT_PACKS, PROMOTION_BUNDLES, SCREENING_UPSELLS } from "@/lib/constants";
 
@@ -34,29 +34,6 @@ const featuredFeatures = [
   "Bulk CSV upload",
   "PDF hiring reports",
 ];
-
-const COMPARISON = [
-  { feature: "Price per job", impjieg: "€29", keepmeposted: "€110", jobsinmalta: "€95", jobhound: "Custom" },
-  { feature: "Self-serve checkout", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Application pipeline", impjieg: true, keepmeposted: false, jobsinmalta: "Basic", jobhound: "Basic" },
-  { feature: "AI job description", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Analytics dashboard", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "PDF hiring reports", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Bulk CSV upload", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "WhatsApp notifications", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Email templates", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Dark mode", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-  { feature: "Google for Jobs schema", impjieg: true, keepmeposted: false, jobsinmalta: false, jobhound: false },
-];
-
-const COMPARISON_COLUMNS = [
-  { key: "impjieg", label: "Impjieg", featured: true },
-  { key: "keepmeposted", label: "KeepMePosted", featured: false },
-  { key: "jobsinmalta", label: "JobsinMalta", featured: false },
-  { key: "jobhound", label: "Jobhound", featured: false },
-] as const;
-
-const MOBILE_COMPARISON_ROWS = COMPARISON.slice(0, 5);
 
 const DECISION_GUIDE = [
   {
@@ -102,15 +79,38 @@ const HIRING_SUPPORT_GUIDE = [
     icon: BrainCircuit,
   },
   {
-    title: "Background Check",
-    copy: "Order from the application view for final-stage hires when trust checks matter.",
-    price: `€${SCREENING_UPSELLS.backgroundCheck.price}`,
-    icon: BrainCircuit,
-  },
-  {
     title: "Reference Check",
     copy: "Order from the application view to verify experience and credibility.",
     price: `€${SCREENING_UPSELLS.referenceCheck.price}`,
+    icon: BrainCircuit,
+  },
+  {
+    title: "Candidate Verification",
+    copy: "Use candidate-consented verification for final-stage hiring when you need more diligence.",
+    price: `€${SCREENING_UPSELLS.backgroundCheck.price}`,
+    icon: BrainCircuit,
+  },
+];
+
+const PRICING_PILLARS = [
+  {
+    title: "Salary-first listings",
+    copy: "Every public listing puts compensation and work mode where candidates can see it first.",
+    icon: Target,
+  },
+  {
+    title: "Direct employer applications",
+    copy: "Reduce friction by letting candidates apply straight to the hiring team.",
+    icon: Megaphone,
+  },
+  {
+    title: "Visibility when you need it",
+    copy: "Promote urgent roles without hiding the base price behind a sales call.",
+    icon: BarChart3,
+  },
+  {
+    title: "Hiring support on demand",
+    copy: "Add screening and verification only when the role calls for it.",
     icon: BrainCircuit,
   },
 ];
@@ -126,27 +126,21 @@ const GROWTH_SERVICE = {
   ],
 };
 
-function CheckCell({ value }: { value: boolean | string }) {
-  if (value === true) return <Check className="mx-auto h-4 w-4 text-success" />;
-  if (value === false) return <X className="mx-auto h-4 w-4 text-muted-foreground/40" />;
-  return <span className="text-xs text-muted-foreground">{value}</span>;
-}
-
 export default function PricingPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Employer monetization
+          Employer pricing
         </p>
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-          Pricing that fits{" "}
+          Plans for every hiring stage{" "}
           <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             how often you hire
           </span>
         </h1>
         <p className="mt-3 text-lg text-muted-foreground">
-          Decide quickly between a single listing, a visibility boost, or a repeatable hiring plan.
+          Start with one listing, add visibility when a role needs attention, or move to a repeatable hiring plan.
         </p>
       </div>
 
@@ -162,13 +156,13 @@ export default function PricingPage() {
       <Tabs defaultValue="pay-per-job" className="mt-12 w-full">
         <TabsList className="grid w-full grid-cols-3 rounded-2xl border border-border/60 bg-surface p-1 shadow-sm">
           <TabsTrigger value="pay-per-job" className="rounded-xl px-4 py-2.5 font-medium text-foreground/75 hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground">
-            Pay Per Job
+            One-off hiring
           </TabsTrigger>
           <TabsTrigger value="subscriptions" className="rounded-xl px-4 py-2.5 font-medium text-foreground/75 hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground">
-            Subscriptions
+            Repeat hiring
           </TabsTrigger>
           <TabsTrigger value="add-ons" className="rounded-xl px-4 py-2.5 font-medium text-foreground/75 hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground">
-            Add-ons & Upsells
+            Hiring add-ons
           </TabsTrigger>
         </TabsList>
 
@@ -178,12 +172,12 @@ export default function PricingPage() {
             {/* Standard */}
             <Card className="p-8">
               <div>
-                <Badge variant="secondary">Best for occasional hiring</Badge>
+                <Badge variant="secondary">Best for one-off hiring</Badge>
                 <h2 className="mt-3 text-xl font-semibold text-foreground">
-                  {PRICING.standard.label}
+                  Standard listing
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  {PRICING.standard.description}
+                  A clean 30-day listing with direct applications and search visibility.
                 </p>
                 <div className="mt-5 flex items-baseline gap-1">
                   <span className="font-mono text-4xl font-bold text-foreground">
@@ -192,11 +186,11 @@ export default function PricingPage() {
                   <span className="text-muted-foreground">/listing</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Clean, direct, and priced for a single vacancy.
+                  Clean, direct, and built for a single vacancy.
                 </p>
                 <Link href="/employer/post-job" className="mt-6 block">
                   <Button variant="outline" size="lg" className="w-full">
-                    Get Started
+                    Start hiring
                   </Button>
                 </Link>
               </div>
@@ -216,19 +210,19 @@ export default function PricingPage() {
 
             {/* Featured */}
             <Card className="relative border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-8">
-              <Badge
-                variant="default"
-                className="absolute -top-3 left-1/2 -translate-x-1/2"
-              >
-                <Sparkles className="mr-1 h-3 w-3" /> Most Popular
-              </Badge>
+                <Badge
+                  variant="default"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2"
+                >
+                  <Sparkles className="mr-1 h-3 w-3" /> Most Popular
+                </Badge>
               <div>
                 <Badge variant="info">Best for visibility</Badge>
                 <h2 className="mt-3 text-xl font-semibold text-foreground">
-                  {PRICING.featured.label}
+                  Featured listing
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  {PRICING.featured.description}
+                  A premium listing with stronger placement and faster candidate attention.
                 </p>
                 <div className="mt-5 flex items-baseline gap-1">
                   <span className="font-mono text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -241,7 +235,7 @@ export default function PricingPage() {
                 </p>
                 <Link href="/employer/post-job" className="mt-6 block">
                   <Button variant="primary" size="lg" className="w-full">
-                    Get Started
+                    Start hiring
                   </Button>
                 </Link>
               </div>
@@ -260,9 +254,9 @@ export default function PricingPage() {
             </Card>
           </div>
 
-          {/* Credit Packs */}
+          {/* Hiring credits */}
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-foreground">Credit Packs</h2>
+            <h2 className="text-xl font-semibold text-foreground">Hiring credits</h2>
             <p className="mt-2 text-muted-foreground">
               Buy credits in bulk and keep hiring without reopening checkout each time.
             </p>
@@ -289,7 +283,7 @@ export default function PricingPage() {
                   </div>
                   <div className="mt-4">
                     <Button variant="outline" size="sm" className="w-full">
-                      Buy Credits
+                      Buy hiring credits
                     </Button>
                   </div>
                 </Card>
@@ -301,7 +295,7 @@ export default function PricingPage() {
         {/* Subscriptions */}
         <TabsContent value="subscriptions" className="mt-4 space-y-6">
           <p className="text-muted-foreground">
-            Save with monthly or annual subscriptions. Best for teams that hire regularly.
+            Save with monthly or annual plans. Best for teams that hire regularly.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
             {Object.entries(SUBSCRIPTION_PLANS).map(([key, plan]) => (
@@ -344,7 +338,7 @@ export default function PricingPage() {
           </div>
         </TabsContent>
 
-        {/* Add-ons & Upsells */}
+        {/* Hiring add-ons */}
         <TabsContent value="add-ons" className="mt-4 space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Promotion Bundles */}
@@ -455,78 +449,19 @@ export default function PricingPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Competitive Comparison */}
-      <div className="mt-16">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            How We Compare
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Impjieg vs other Malta job boards
-          </p>
-        </div>
-
-        <div className="mt-8 hidden overflow-x-auto rounded-2xl border border-border/50 lg:block">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/50 bg-muted/30">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Feature</th>
-                <th className="px-4 py-3 text-center font-medium text-primary">Impjieg</th>
-                <th className="px-4 py-3 text-center font-medium text-muted-foreground">KeepMePosted</th>
-                <th className="px-4 py-3 text-center font-medium text-muted-foreground">JobsinMalta</th>
-                <th className="px-4 py-3 text-center font-medium text-muted-foreground">Jobhound</th>
-              </tr>
-            </thead>
-            <tbody>
-              {COMPARISON.map((row, i) => (
-                <tr key={row.feature} className={`border-b border-border/20 ${i % 2 === 0 ? "bg-muted/10" : ""}`}>
-                  <td className="px-4 py-3 font-medium text-foreground">{row.feature}</td>
-                  <td className="px-4 py-3 text-center"><CheckCell value={row.impjieg} /></td>
-                  <td className="px-4 py-3 text-center"><CheckCell value={row.keepmeposted} /></td>
-                  <td className="px-4 py-3 text-center"><CheckCell value={row.jobsinmalta} /></td>
-                  <td className="px-4 py-3 text-center"><CheckCell value={row.jobhound} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-8 grid gap-3 lg:hidden">
-          {COMPARISON_COLUMNS.map((column) => (
-            <Card
-              key={column.key}
-              className={`p-4 ${column.featured ? "border-primary/20 bg-primary/5" : "border-border/60 bg-surface"}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{column.label}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {column.featured ? "Our current live product" : "Competitor comparison baseline"}
-                  </p>
-                </div>
-                {column.featured ? (
-                  <Badge variant="default">Impjieg</Badge>
-                ) : (
-                  <Badge variant="secondary">Competitor</Badge>
-                )}
+      <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {PRICING_PILLARS.map((pillar) => {
+          const Icon = pillar.icon;
+          return (
+            <Card key={pillar.title} className="p-5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <Icon className="h-5 w-5 text-primary" />
               </div>
-              <dl className="mt-4 space-y-3">
-                {MOBILE_COMPARISON_ROWS.map((row) => (
-                  <div key={row.feature} className="flex items-start justify-between gap-4 border-t border-border/40 pt-3 first:border-t-0 first:pt-0">
-                    <dt className="min-w-0 flex-1 text-sm text-muted-foreground">{row.feature}</dt>
-                    <dd className="shrink-0 text-right text-sm font-medium text-foreground">
-                      <CheckCell value={row[column.key]} />
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <h2 className="mt-4 text-base font-semibold text-foreground">{pillar.title}</h2>
+              <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{pillar.copy}</p>
             </Card>
-          ))}
-        </div>
-
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          Pricing data sourced from competitor websites as of May 2026. Contact us if any information is outdated.
-        </p>
+          );
+        })}
       </div>
 
       {/* CTA */}
@@ -540,7 +475,7 @@ export default function PricingPage() {
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link href="/employer/post-job">
             <Button variant="primary" size="lg">
-              Post a Job — €{PRICING.standard.price}
+              Post a job — €{PRICING.standard.price}
             </Button>
           </Link>
           <Link href="/contact">

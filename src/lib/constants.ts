@@ -1,7 +1,7 @@
 export const SITE = {
   name: "Impjieg",
   title: "Impjieg — Malta’s modern jobs marketplace",
-  tagline: "Malta's modern jobs marketplace for tech, digital, and iGaming talent.",
+  tagline: "Tech, digital & iGaming jobs",
   description:
     "Find tech, digital, and iGaming jobs in Malta with clear filters, work-mode signals, and faster apply paths.",
   url: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",

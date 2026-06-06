@@ -9,11 +9,8 @@ import { logAdminAction } from "@/lib/admin-audit";
 import { clearAdminSession, setAdminSession } from "@/lib/admin-session";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import {
-  buildAdminOtpAuthUri,
   encryptAdminMfaSecret,
-  generateAdminMfaSecret,
   readAdminMfaChallengeCookie,
-  setAdminMfaChallengeCookie,
   verifyTotpCode,
   clearAdminMfaChallengeCookie,
 } from "@/lib/admin-mfa";
@@ -67,55 +64,23 @@ export async function adminLogin(formData: FormData) {
   if (!user || user.app_metadata?.role !== "admin" || !user.email || !isSuperAdminEmail(user.email)) {
     await supabase.auth.signOut();
     await clearAdminSession(cookieStore);
+    await clearAdminMfaChallengeCookie(cookieStore);
     return { error: "This account is not authorized for admin access." };
   }
 
+  await clearAdminMfaChallengeCookie(cookieStore);
+  await setAdminSession(cookieStore);
+
   const serviceSupabase = createServiceClient(getSupabaseUrl(), getSupabaseServiceKey());
-  const { data: factor } = await serviceSupabase
-    .from("admin_mfa_factors")
-    .select("user_id, email, secret_encrypted, enabled")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  await logAdminAction(serviceSupabase, {
+    adminEmail: user.email,
+    action: "admin_login",
+    entityType: "admin_session",
+    entityId: user.id,
+    afterValue: { success: true, mfa: false },
+  });
 
-  if (!factor) {
-    const secret = generateAdminMfaSecret();
-    await setAdminMfaChallengeCookie(
-      {
-        userId: user.id,
-        email: user.email,
-        mode: "setup",
-        secret,
-        issuedAt: Date.now(),
-      },
-      cookieStore
-    );
-
-    return {
-      requiresMfa: true,
-      mfaMode: "setup" as const,
-      setupSecret: secret,
-      otpauthUri: buildAdminOtpAuthUri({ email: user.email, secret }),
-    };
-  }
-
-  if (factor.enabled === false) {
-    return { error: "Admin MFA is disabled for this account. Contact an administrator." };
-  }
-
-  await setAdminMfaChallengeCookie(
-    {
-      userId: user.id,
-      email: user.email,
-      mode: "login",
-      issuedAt: Date.now(),
-    },
-    cookieStore
-  );
-
-  return {
-    requiresMfa: true,
-    mfaMode: "verify" as const,
-  };
+  return { success: true };
 }
 
 export async function adminLogout() {

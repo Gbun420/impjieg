@@ -16,10 +16,18 @@ import {
   Users,
   CheckCircle2,
 } from "lucide-react";
-import { SECTORS } from "@/lib/constants";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
+
+const HOMEPAGE_SECTORS = [
+  "iGaming",
+  "Technology",
+  "Legal & Compliance",
+  "Finance & Banking",
+  "Marketing & Media",
+  "Retail & E-commerce",
+] as const;
 
 async function StatsSection() {
   const supabase = await createClient();
@@ -115,7 +123,7 @@ export default async function HomePage() {
               <span className="text-gradient">tech, digital, and iGaming talent.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Find better roles faster with clear work-mode tags, salary ranges, and employers that actually hire.
+              Discover Malta&apos;s tech, digital, and iGaming roles with salary clarity, work-mode filters, and direct employer applications.
             </p>
           </div>
 
@@ -133,7 +141,7 @@ export default async function HomePage() {
             </Link>
             <Link href="/employer/post-job">
               <Button variant="outline" size="lg">
-                Post a Job
+                Hire Talent
               </Button>
             </Link>
           </div>
@@ -168,20 +176,81 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="rounded-[1.75rem] border border-border bg-card p-6 sm:p-8 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                For employers
+              </p>
+              <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Hire better candidates without agency-level fees.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm sm:text-base leading-7 text-muted-foreground">
+                Post salary-transparent roles, boost urgent vacancies, and review applicants from one clean Malta hiring dashboard.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link href="/employer/post-job">
+                  <Button variant="primary" size="lg">
+                    Start Hiring
+                  </Button>
+                </Link>
+                <Link href="/pricing">
+                  <Button variant="outline" size="lg">
+                    View Pricing
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {[
+                {
+                  title: "Paid visibility",
+                  copy: "Give urgent roles stronger placement across the marketplace.",
+                  icon: TrendingUp,
+                },
+                {
+                  title: "Screening support",
+                  copy: "Add candidate checks when a role needs a tighter shortlist.",
+                  icon: Shield,
+                },
+                {
+                  title: "Hiring analytics",
+                  copy: "See what is getting views, clicks, and applications faster.",
+                  icon: Users,
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.title} className="rounded-[1.5rem] border border-border bg-surface p-5 shadow-sm">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="mt-4 text-base font-semibold text-foreground">{item.title}</h3>
+                    <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{item.copy}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Browse by Sector */}
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse by sector</h2>
-              <p className="text-sm text-muted-foreground mt-1">Find roles in the industries that move Malta</p>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse key sectors</h2>
+              <p className="text-sm text-muted-foreground mt-1">Focus on the industries that move Malta hiring forward</p>
             </div>
             <Link href="/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               All sectors <ArrowRight className="inline h-3.5 w-3.5 ml-0.5" />
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {SECTORS.slice(0, 8).map((sector) => (
+            {HOMEPAGE_SECTORS.map((sector) => (
               <Link
                 key={sector}
                 href={`/jobs?sector=${encodeURIComponent(sector)}`}
@@ -256,15 +325,15 @@ export default async function HomePage() {
             <Building2 className="h-6 w-6 text-primary" />
           </div>
           <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            Hiring? Post a job that earns attention.
+            Hiring? Post roles that get seen.
           </h2>
           <p className="mt-2 text-base text-muted-foreground">
-            Reach Malta&apos;s best-fit candidates with salary clarity and a cleaner application flow.
+            Reach Malta&apos;s best-fit candidates with salary clarity, stronger visibility, and a cleaner application flow.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/employer/post-job">
               <Button variant="primary" size="lg">
-                Post a Job
+                Start Hiring
               </Button>
             </Link>
             <Link href="/pricing">
