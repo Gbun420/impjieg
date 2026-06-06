@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
@@ -10,6 +11,7 @@ import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
+import { enforceRateLimit, getClientIp, hashIdentifier, RATE_LIMITS } from "@/lib/rate-limit";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -25,6 +27,17 @@ type EmployersMutationTable = {
 };
 
 export async function signup(formData: FormData) {
+  const headersList = await headers();
+  const ip = getClientIp(new Request("", { headers: headersList }));
+  const rateLimit = enforceRateLimit({
+    key: buildRateLimitKey("auth-signup", hashIdentifier(ip)),
+    limit: RATE_LIMITS.authSignup.limit,
+    windowMs: RATE_LIMITS.authSignup.windowMs,
+  });
+  if (!rateLimit.success) {
+    return { error: "Too many signup attempts. Please try again later." };
+  }
+
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
     getSupabaseUrl(),

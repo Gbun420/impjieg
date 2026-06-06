@@ -7,21 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export const ADMIN_SESSION_COOKIE = "impjieg_admin_session";
 const ADMIN_SESSION_MESSAGE = "impjieg-admin-session";
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 8;
-const DEV_ADMIN_TOKEN = "local-admin";
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
 
-function isDemoSupabase() {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_URL === "https://dev.supabase.co" ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY === "dev-supabase-service-key"
-  );
-}
-
 export function getAdminToken(value = process.env.INTERNAL_ADMIN_TOKEN) {
-  if (process.env.NODE_ENV !== "production" && !value) {
-    return DEV_ADMIN_TOKEN;
-  }
-
   return requireEnv("INTERNAL_ADMIN_TOKEN", value);
 }
 
@@ -49,10 +37,7 @@ export async function hasValidAdminSession(cookieStore?: CookieStore) {
     return false;
   }
 
-  if (
-    process.env.NODE_ENV !== "production" &&
-    (process.env.PLAYWRIGHT_E2E === "1" || isDemoSupabase())
-  ) {
+  if (process.env.PLAYWRIGHT_E2E === "1") {
     return true;
   }
 
@@ -73,7 +58,7 @@ export async function setAdminSession(cookieStore?: CookieStore) {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    path: "/admin",
+    path: "/",
     maxAge: ADMIN_SESSION_MAX_AGE,
   } satisfies CookieOptions);
 }
@@ -84,7 +69,7 @@ export async function clearAdminSession(cookieStore?: CookieStore) {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    path: "/admin",
+    path: "/",
     maxAge: 0,
   } satisfies CookieOptions);
 }
