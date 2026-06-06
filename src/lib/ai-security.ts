@@ -119,3 +119,37 @@ export function ensureLengthWithinLimit(
     throw new AiSecurityError(message, 413);
   }
 }
+
+const PROMPT_INJECTION_PATTERNS = [
+  /ignore\s+previous\s+instructions/i,
+  /disregard\s+previous\s+instructions/i,
+  /forget\s+previous\s+instructions/i,
+  /system\s+prompt/i,
+  /you\s+are\s+an?\s+ai/i,
+  /as\s+an\s+ai/i,
+  /<\/prompt>/i,
+  /<prompt>/i,
+  /\[INST\]/i,
+  /\[\/INST\]/i,
+  /###\s*instruction/i,
+  /###\s*system/i,
+];
+
+export function sanitizePromptInput(value: string, maxLength: number): string {
+  let sanitized = value
+    .replace(/\u0000/g, "")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.slice(0, maxLength);
+  }
+
+  for (const pattern of PROMPT_INJECTION_PATTERNS) {
+    sanitized = sanitized.replace(pattern, "[filtered]");
+  }
+
+  return sanitized;
+}

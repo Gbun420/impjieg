@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { requireEnv } from "@/lib/runtime-env";
+import { checkAndMarkIdempotent } from "@/lib/idempotency";
 import type Stripe from "stripe";
 
 function getSupabaseAdmin() {
@@ -38,6 +39,10 @@ export async function POST(request: Request) {
       { error: "Webhook signature verification failed" },
       { status: 400 }
     );
+  }
+
+  if (!checkAndMarkIdempotent(`stripe-webhook:${event.id}`, 24 * 60 * 60 * 1000)) {
+    return NextResponse.json({ received: true, duplicate: true });
   }
 
   const supabase = getSupabaseAdmin();

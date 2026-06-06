@@ -8,6 +8,7 @@ import {
   enforceAiRateLimit,
   normalizePromptText,
   readJsonBodyWithLimit,
+  sanitizePromptInput,
   type AiAuthenticatedUser,
 } from "@/lib/ai-security";
 import { z } from "zod";
@@ -65,16 +66,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "AI service not configured" }, { status: 503 });
     }
 
+    const safeTitle = sanitizePromptInput(title, 200);
+    const safeSector = sector ? sanitizePromptInput(sector, 100) : "General";
+    const safeJobType = jobType ? sanitizePromptInput(jobType, 100) : "Full-time";
+    const safeSeniority = seniority ? sanitizePromptInput(seniority, 100) : "Mid Level";
+    const safeLocation = location ? sanitizePromptInput(location, 100) : "Malta";
+    const safeSkills = skills ? sanitizePromptInput(skills, 1000) : "";
+    const safeBenefits = benefits ? sanitizePromptInput(benefits, 1000) : "";
+    const safeDescription = description ? sanitizePromptInput(description, 4000) : "";
+
     const prompt = `Generate a professional job description for the following role:
 
-Job Title: ${title}
-Sector: ${sector || "General"}
-Job Type: ${jobType || "Full-time"}
-Seniority: ${seniority || "Mid Level"}
-Location: ${location || "Malta"}
-${skills ? `Key Skills: ${skills}` : ""}
-${benefits ? `Benefits: ${benefits}` : ""}
-${description ? `Additional context: ${description}` : ""}
+Job Title: ${safeTitle}
+Sector: ${safeSector}
+Job Type: ${safeJobType}
+Seniority: ${safeSeniority}
+Location: ${safeLocation}
+${safeSkills ? `Key Skills: ${safeSkills}` : ""}
+${safeBenefits ? `Benefits: ${safeBenefits}` : ""}
+${safeDescription ? `Additional context: ${safeDescription}` : ""}
 
 Format the response as plain text with these sections:
 1. A compelling 2-3 sentence role overview
