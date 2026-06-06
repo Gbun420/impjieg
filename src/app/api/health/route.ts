@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { getSupabaseUrl } from "@/lib/supabase/env";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 
 export const runtime = "edge";
