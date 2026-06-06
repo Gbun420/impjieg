@@ -123,7 +123,7 @@ async function matchScoreWithDeps(request: Request, deps: MatchScoreDeps) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    enforceAiRateLimit({
+    await enforceAiRateLimit({
       key: buildAiRateLimitKey("match-score", user, request),
       limit: deps.rateLimit?.limit ?? MATCH_SCORE_RATE_LIMIT,
       windowMs: deps.rateLimit?.windowMs ?? MATCH_SCORE_RATE_LIMIT_WINDOW_MS,

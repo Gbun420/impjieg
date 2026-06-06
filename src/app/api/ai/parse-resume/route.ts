@@ -56,7 +56,7 @@ async function parseResumeWithDeps(request: Request, deps: ParseResumeDeps) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    enforceAiRateLimit({
+    await enforceAiRateLimit({
       key: buildAiRateLimitKey("parse-resume", user, request),
       limit: deps.rateLimit?.limit ?? PARSE_RESUME_RATE_LIMIT,
       windowMs: deps.rateLimit?.windowMs ?? PARSE_RESUME_RATE_LIMIT_WINDOW_MS,

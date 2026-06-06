@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
     const aiUser: AiAuthenticatedUser = { id: user.id, email: user.email };
 
-    enforceAiRateLimit({
+    await enforceAiRateLimit({
       key: buildAiRateLimitKey("generate-description", aiUser, request),
       limit: GEN_DESC_RATE_LIMIT,
       windowMs: GEN_DESC_RATE_LIMIT_WINDOW_MS,

@@ -1,7 +1,3 @@
-type RateLimitBucket = {
-  timestamps: number[];
-};
-
 export class AiSecurityError extends Error {
   status: number;
 
@@ -17,22 +13,10 @@ export type AiAuthenticatedUser = {
   email?: string | null;
 };
 
-type RateLimitStore = Map<string, RateLimitBucket>;
-
-const globalForAiRateLimit = globalThis as typeof globalThis & {
-  __impjiegAiRateLimitStore?: RateLimitStore;
-};
-
-function getRateLimitStore() {
-  if (!globalForAiRateLimit.__impjiegAiRateLimitStore) {
-    globalForAiRateLimit.__impjiegAiRateLimitStore = new Map();
-  }
-
-  return globalForAiRateLimit.__impjiegAiRateLimitStore;
-}
+import { enforceRateLimitRedis } from "@/lib/redis-rate-limit";
 
 export function resetAiRateLimitState() {
-  getRateLimitStore().clear();
+  // No-op for Redis-backed rate limiter
 }
 
 export function getRequestIp(request: Request) {
@@ -53,7 +37,7 @@ export function buildAiRateLimitKey(scope: string, user: AiAuthenticatedUser, re
   return `${scope}:${user.id}:${getRequestIp(request)}`;
 }
 
-export function enforceAiRateLimit({
+export async function enforceAiRateLimit({
   key,
   limit,
   windowMs,
@@ -64,20 +48,15 @@ export function enforceAiRateLimit({
   windowMs: number;
   now?: number;
 }) {
-  const store = getRateLimitStore();
-  const bucket = store.get(key) ?? { timestamps: [] };
-  bucket.timestamps = bucket.timestamps.filter((timestamp) => now - timestamp < windowMs);
+  const result = await enforceRateLimitRedis({ key, limit, windowMs, now });
 
-  if (bucket.timestamps.length >= limit) {
+  if (!result.success) {
     throw new AiSecurityError("Too many requests. Please try again later.", 429);
   }
 
-  bucket.timestamps.push(now);
-  store.set(key, bucket);
-
   return {
-    remaining: Math.max(0, limit - bucket.timestamps.length),
-    resetAt: bucket.timestamps[0] ? bucket.timestamps[0] + windowMs : now + windowMs,
+    remaining: result.remaining,
+    resetAt: result.resetAt,
   };
 }
 

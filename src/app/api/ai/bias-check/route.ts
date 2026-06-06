@@ -56,7 +56,7 @@ async function biasCheckWithDeps(request: Request, deps: BiasCheckDeps) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    enforceAiRateLimit({
+    await enforceAiRateLimit({
       key: buildAiRateLimitKey("bias-check", user, request),
       limit: deps.rateLimit?.limit ?? BIAS_CHECK_RATE_LIMIT,
       windowMs: deps.rateLimit?.windowMs ?? BIAS_CHECK_RATE_LIMIT_WINDOW_MS,
