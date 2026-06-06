@@ -4,6 +4,7 @@ import {
   buildImpjiegWhatsAppApplicationMessage,
   sendWhatsAppMessage,
 } from "@/lib/twilio-whatsapp";
+import { SITE } from "@/lib/constants";
 
 import { z } from "zod";
 
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const { applicationId, candidateName, jobTitle, employerPhone } = parsed.data;
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/applications`;
+  const dashboardUrl = `${SITE.url}/employer/applications`;
   const message = buildImpjiegWhatsAppApplicationMessage({
     applicationId,
     candidateName,

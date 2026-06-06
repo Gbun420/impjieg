@@ -5,6 +5,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { buildEmployerNotificationEmail, buildCandidateConfirmationEmail } from "./apply-helpers";
 import { sendEmail } from "@/lib/email-sender";
+import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type {
   Application,
@@ -157,7 +158,7 @@ export async function submitApplication(formData: FormData) {
       coverLetter,
       cvUrl,
       jobTitle: jobTitleStr,
-      dashboardUrl: `${process.env.NEXT_PUBLIC_URL}/employer/applications`,
+      dashboardUrl: `${SITE.url}/employer/applications`,
     });
 
     await sendEmail({
@@ -182,7 +183,7 @@ export async function submitApplication(formData: FormData) {
   // Send WhatsApp notification if enabled
   if (employer && employer.whatsapp_notifications && employer.whatsapp_number) {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/api/notifications/whatsapp`, {
+      await fetch(`${SITE.url}/api/notifications/whatsapp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const primaryAdminEmail = process.env.ADMIN_BOOTSTRAP_PRIMARY_EMAIL?.trim();
     const primaryAdminPassword = process.env.ADMIN_BOOTSTRAP_PRIMARY_PASSWORD;
     const partnerAdminEmail = process.env.ADMIN_BOOTSTRAP_PARTNER_EMAIL?.trim();
-    const baseUrl = process.env.NEXT_PUBLIC_URL || new URL(request.url).origin;
+    const baseUrl = new URL(request.url).origin;
 
     if (!primaryAdminEmail || !primaryAdminPassword) {
       return NextResponse.json(

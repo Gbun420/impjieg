@@ -3,6 +3,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { buildJobAlertDigestEmail, jobMatchesAlert } from "@/lib/job-alerts";
 import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { SITE } from "@/lib/constants";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlert = Database["public"]["Tables"]["job_alerts"]["Row"];
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
         remoteType: job.remote_type,
         salaryMin: job.salary_min,
         salaryMax: job.salary_max,
-        url: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/jobs/${job.employers.slug}/${job.slug}`,
+        url: `${SITE.url}/jobs/${job.employers.slug}/${job.slug}`,
       }));
 
     if (matches.length === 0) {
@@ -92,7 +93,7 @@ export async function GET(request: Request) {
     const emailPayload = buildJobAlertDigestEmail({
       alertId: alert.id,
       jobs: matches,
-      baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
+      baseUrl: SITE.url,
     });
 
     const result = await sendEmail({

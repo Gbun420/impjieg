@@ -18,7 +18,7 @@ export function escapeXml(value: string) {
 export async function GET() {
   try {
     const supabase = await createClient();
-    const baseUrl = process.env.NEXT_PUBLIC_URL || SITE.url;
+    const baseUrl = SITE.url;
 
     const { data: jobs, error } = await supabase
       .from("jobs")

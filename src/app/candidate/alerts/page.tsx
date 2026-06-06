@@ -64,6 +64,11 @@ export default function CandidateAlertsPage() {
     is_active: true,
   });
   const [locationInput, setLocationInput] = useState("");
+  const nameId = "candidate-alert-name";
+  const salaryMinId = "candidate-alert-salary-min";
+  const remoteTypeId = "candidate-alert-remote-type";
+  const frequencyId = "candidate-alert-frequency";
+  const locationInputId = "candidate-alert-location";
 
   useEffect(() => {
     fetchAlerts();
@@ -254,16 +259,22 @@ export default function CandidateAlertsPage() {
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
-              <label className="text-sm font-medium text-foreground">Alert Name</label>
+              <label htmlFor={nameId} className="text-sm font-medium text-foreground">
+                Alert Name
+              </label>
               <Input
+                id={nameId}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Senior Developer Roles"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Salary Min (€)</label>
+              <label htmlFor={salaryMinId} className="text-sm font-medium text-foreground">
+                Salary Min (€)
+              </label>
               <Input
+                id={salaryMinId}
                 type="number"
                 value={formData.salary_min || ""}
                 onChange={(e) => setFormData({ ...formData, salary_min: parseInt(e.target.value) || 0 })}
@@ -272,8 +283,11 @@ export default function CandidateAlertsPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Remote Type</label>
+              <label htmlFor={remoteTypeId} className="text-sm font-medium text-foreground">
+                Remote Type
+              </label>
               <select
+                id={remoteTypeId}
                 value={formData.remote_type}
                 onChange={(e) => setFormData({ ...formData, remote_type: e.target.value })}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -285,8 +299,11 @@ export default function CandidateAlertsPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Frequency</label>
+              <label htmlFor={frequencyId} className="text-sm font-medium text-foreground">
+                Frequency
+              </label>
               <select
+                id={frequencyId}
                 value={formData.frequency}
                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -299,7 +316,7 @@ export default function CandidateAlertsPage() {
           </div>
 
           <div className="mt-4">
-            <label className="text-sm font-medium text-foreground">Sectors</label>
+            <p className="text-sm font-medium text-foreground">Sectors</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {SECTORS.map((sector) => (
                 <button
@@ -319,7 +336,7 @@ export default function CandidateAlertsPage() {
           </div>
 
           <div className="mt-4">
-            <label className="text-sm font-medium text-foreground">Job Types</label>
+            <p className="text-sm font-medium text-foreground">Job Types</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {JOB_TYPES.map((type) => (
                 <button
@@ -339,9 +356,12 @@ export default function CandidateAlertsPage() {
           </div>
 
           <div className="mt-4">
-            <label className="text-sm font-medium text-foreground">Locations</label>
+            <label htmlFor={locationInputId} className="text-sm font-medium text-foreground">
+              Locations
+            </label>
             <div className="mt-2 flex gap-2">
               <Input
+                id={locationInputId}
                 value={locationInput}
                 onChange={(e) => setLocationInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addLocation())}

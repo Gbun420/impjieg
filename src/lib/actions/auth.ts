@@ -6,6 +6,7 @@ import { slugify } from "@/lib/utils";
 import { signupWithAutoConfirm } from "./auth-signup";
 import { resolvePostLoginDestination } from "@/app/candidate/candidate-queries";
 import { isSuperAdminEmail } from "@/lib/admin-access";
+import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
@@ -137,7 +138,7 @@ export async function resetPassword(formData: FormData) {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/callback?next=${encodeURIComponent("/auth/login?message=reset-sent")}`,
+    redirectTo: `${SITE.url}/auth/callback?next=${encodeURIComponent("/auth/login?message=reset-sent")}`,
   });
 
   if (error) {

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { SITE } from "@/lib/constants";
 import { stripe, PRICES } from "@/lib/stripe";
 import type { Database, Employer, Payment } from "@/lib/supabase/types";
 
@@ -81,8 +82,8 @@ export async function createCheckoutSession(
       },
     ],
     mode: "payment",
-    success_url: `${process.env.NEXT_PUBLIC_URL}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL}/employer/post-job`,
+    success_url: `${SITE.url}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${SITE.url}/employer/post-job`,
     metadata: {
       jobId,
       employerId: typedEmployer.id,

@@ -43,7 +43,7 @@ export function buildImpjiegWhatsAppApplicationMessage({
   applicationId,
   candidateName,
   jobTitle,
-  dashboardUrl = `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/employer/applications`,
+  dashboardUrl = `${SITE.url}/employer/applications`,
 }: {
   applicationId: string;
   candidateName: string;

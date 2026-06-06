@@ -4,6 +4,7 @@ import { z } from "zod";
 import { buildJobAlertConfirmationEmail } from "@/lib/job-alerts";
 import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { SITE } from "@/lib/constants";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlertInsert = Database["public"]["Tables"]["job_alerts"]["Insert"];
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
   if (alertId) {
     const emailPayload = buildJobAlertConfirmationEmail({
       alertId,
-      baseUrl: process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app",
+      baseUrl: SITE.url,
     });
 
     await sendEmail({

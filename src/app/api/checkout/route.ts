@@ -7,6 +7,7 @@ import {
   CREDIT_PACKS,
   PROMOTION_BUNDLES,
   SCREENING_UPSELLS,
+  SITE,
 } from "@/lib/constants";
 import type { Database } from "@/lib/supabase/types";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
@@ -315,7 +316,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         free: true,
         message: `${metadata.serviceLabel} ordered using your available credit.`,
-        url: `${process.env.NEXT_PUBLIC_URL}/employer/applications?screening=ordered`,
+        url: `${SITE.url}/employer/applications?screening=ordered`,
       });
     }
 
@@ -359,12 +360,12 @@ export async function POST(request: Request) {
       // but since we are calculating it server-side, we'd ideally create a one-time coupon
       // or use manual price overrides.
       // Here we just pass the info to success/metadata.
-      success_url: `${process.env.NEXT_PUBLIC_URL}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${SITE.url}/employer/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: serviceType
-        ? `${process.env.NEXT_PUBLIC_URL}/employer/applications`
+        ? `${SITE.url}/employer/applications`
         : jobId
-          ? `${process.env.NEXT_PUBLIC_URL}/employer/jobs/${jobId}`
-          : `${process.env.NEXT_PUBLIC_URL}/employer/dashboard`,
+          ? `${SITE.url}/employer/jobs/${jobId}`
+          : `${SITE.url}/employer/dashboard`,
       metadata: {
         ...metadata,
         paymentId: payment.id,

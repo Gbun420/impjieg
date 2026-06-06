@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { SECTORS, LOCATIONS } from "@/lib/constants";
+import { SECTORS, LOCATIONS, SITE } from "@/lib/constants";
 import { isJobPubliclyLive } from "@/lib/job-visibility";
 import type { Employer } from "@/lib/supabase/types";
 
@@ -16,8 +16,7 @@ function labelToSlug(label: string): string {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app";
+  const baseUrl = SITE.url;
 
     const staticPages = [
       "",

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "@/lib/constants";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/employer/", "/auth/"],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_URL || "https://impjieg.vercel.app"}/sitemap.xml`,
+    sitemap: `${SITE.url}/sitemap.xml`,
   };
 }

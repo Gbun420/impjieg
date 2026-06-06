@@ -14,7 +14,9 @@ export async function GET(request: Request) {
       const isLocalEnv = process.env.NODE_ENV === "development";
       const baseUrl = isLocalEnv
         ? origin
-        : `https://${forwardedHost || process.env.NEXT_PUBLIC_URL || "impjieg.vercel.app"}`;
+        : forwardedHost
+          ? `https://${forwardedHost}`
+          : origin;
       return NextResponse.redirect(`${baseUrl}${next}`);
     }
   }

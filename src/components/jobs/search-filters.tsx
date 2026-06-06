@@ -65,6 +65,7 @@ export default function SearchFilters() {
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
   const syncTimer = useRef<number | null>(null);
+  const searchInputId = "job-search-input";
 
   const initial = useMemo(
     () => ({
@@ -187,14 +188,16 @@ export default function SearchFilters() {
           </div>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
             <div className="flex-1 space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Search roles</label>
+              <label htmlFor={searchInputId} className="text-sm font-medium text-foreground">
+                Search roles
+              </label>
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
+                  id={searchInputId}
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  aria-label="Search jobs by title, company, or description"
                   placeholder="Search by role, company, or skill"
                   className="pl-9"
                 />

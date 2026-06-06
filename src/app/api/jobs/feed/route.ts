@@ -9,7 +9,7 @@ export const revalidate = 3600; // Revalidate every hour
 export async function GET() {
   try {
     const supabase = await createClient();
-    const baseUrl = process.env.NEXT_PUBLIC_URL || SITE.url;
+    const baseUrl = SITE.url;
     
     // Fetch active jobs with employer information
     const { data: jobs, error } = await supabase

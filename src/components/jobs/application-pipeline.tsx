@@ -122,6 +122,8 @@ function EmailModal({
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const subjectId = "application-email-subject";
+  const messageId = "application-email-message";
 
   const handleTemplateSelect = (templateId: string) => {
     const template = EMAIL_TEMPLATES.find((t) => t.id === templateId);
@@ -180,8 +182,11 @@ function EmailModal({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Subject</label>
+            <label htmlFor={subjectId} className="text-sm font-medium text-muted-foreground">
+              Subject
+            </label>
             <input
+              id={subjectId}
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
@@ -191,8 +196,11 @@ function EmailModal({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Message</label>
+            <label htmlFor={messageId} className="text-sm font-medium text-muted-foreground">
+              Message
+            </label>
             <textarea
+              id={messageId}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={6}
