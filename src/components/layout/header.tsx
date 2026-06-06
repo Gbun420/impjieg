@@ -15,9 +15,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { SITE } from "@/lib/constants";
 
 const navLinks = [
-  { label: "Jobs", href: "/jobs" },
+  { label: "Find jobs", href: "/jobs" },
   { label: "Companies", href: "/companies" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Hire talent", href: "/pricing" },
 ];
 
 export default function Header({
@@ -151,8 +151,8 @@ export default function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/82 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
           <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
           <span className="flex flex-col leading-none">
@@ -165,12 +165,12 @@ export default function Header({
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden items-center gap-2 rounded-full border border-border/70 bg-surface/70 p-1 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
             >
               {link.label}
             </Link>
@@ -218,7 +218,7 @@ export default function Header({
                   <Button variant="ghost" size="sm">Sign in</Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button variant="primary" size="sm">Post a Job</Button>
+                  <Button variant="primary" size="sm">Post a role</Button>
                 </Link>
               </>
             )}
@@ -310,7 +310,7 @@ export default function Header({
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="primary" size="md" className="w-full justify-start">
-                      Post a Job
+                    Post a role
                     </Button>
                   </Link>
                 </>

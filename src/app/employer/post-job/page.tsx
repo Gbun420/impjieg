@@ -138,7 +138,7 @@ export default function PostJobPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">Post a Job</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Post a Role</h1>
 
       {error && (
         <div
@@ -509,7 +509,7 @@ export default function PostJobPage() {
         >
           {isLoading
             ? "Creating..."
-            : "Post Job"}
+            : "Post Role"}
         </Button>
       </form>
     </div>

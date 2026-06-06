@@ -627,13 +627,13 @@ export default function ApplicationsPage({
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground">No applications yet</p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      Post a job to start seeing candidates here, then move them through New,
+                      Post a role to start seeing candidates here, then move them through New,
                       Reviewed, Shortlisted, Interview, Offered, Hired, and Rejected as your pipeline grows.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       <Link href="/employer/post-job">
                         <Button variant="primary" size="sm">
-                          Post a Job
+                          Post a Role
                         </Button>
                       </Link>
                       <Link href="/employer/jobs">

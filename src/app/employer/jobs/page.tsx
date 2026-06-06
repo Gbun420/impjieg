@@ -64,7 +64,7 @@ export default async function EmployerJobsPage() {
           <Link href="/employer/post-job" className="w-full sm:w-auto">
             <Button variant="primary" className="w-full sm:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" />
-              Post a Job
+              Post a Role
             </Button>
           </Link>
         </div>

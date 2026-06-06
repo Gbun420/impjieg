@@ -62,7 +62,7 @@ export function buildImpjiegWhatsAppApplicationMessage({
     "Open your employer dashboard:",
     dashboardUrl,
     "",
-    "Impjieg · Malta tech, digital, and iGaming hiring",
+    "Impjieg · Malta tech, digital, and iGaming marketplace",
   ].join("\n");
 }
 

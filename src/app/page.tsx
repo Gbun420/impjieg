@@ -44,20 +44,20 @@ async function StatsSection() {
   }>);
 
   return (
-    <div className="flex items-center justify-center gap-6 sm:gap-10 text-sm">
+    <div className="flex items-center justify-center gap-6 text-sm text-current sm:gap-10">
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl font-bold text-foreground">{salaryCoverage.activeJobs}</p>
-        <p className="text-foreground/75 mt-0.5">Active jobs</p>
+        <p className="text-2xl font-bold text-current sm:text-3xl">{salaryCoverage.activeJobs}</p>
+        <p className="mt-0.5 text-current/70">Active jobs</p>
       </div>
-      <div className="h-8 w-px bg-border" />
+      <div className="h-8 w-px bg-current/20" />
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl font-bold text-foreground">{salaryCoverage.salaryCoveragePercent}%</p>
-        <p className="text-foreground/75 mt-0.5">Listings with salary ranges</p>
+        <p className="text-2xl font-bold text-current sm:text-3xl">{salaryCoverage.salaryCoveragePercent}%</p>
+        <p className="mt-0.5 text-current/70">Salary coverage</p>
       </div>
-      <div className="h-8 w-px bg-border" />
+      <div className="h-8 w-px bg-current/20" />
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl font-bold text-foreground">30d</p>
-        <p className="text-foreground/75 mt-0.5">30-day expiry</p>
+        <p className="text-2xl font-bold text-current sm:text-3xl">30d</p>
+        <p className="mt-0.5 text-current/70">Freshness window</p>
       </div>
     </div>
   );
@@ -109,58 +109,87 @@ async function LatestJobs() {
 export default async function HomePage() {
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+      <section className="relative isolate overflow-hidden bg-[#08111F] py-16 text-white sm:py-24 lg:py-28">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.32),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.22),transparent_30%)]" />
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:px-8">
           <div className="animate-fade-in-up">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-6">
+            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/78">
               <TrendingUp className="h-3.5 w-3.5" />
-              Made in Malta
+              Malta hiring signal
             </div>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Malta&apos;s modern jobs marketplace for{" "}
-              <span className="text-gradient">tech, digital, and iGaming talent.</span>
+            <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
+              The sharper marketplace for Malta&apos;s tech, digital, and iGaming careers.
             </h1>
-            <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-muted-foreground">
-              Discover Malta&apos;s tech, digital, and iGaming roles with salary clarity, work-mode filters, and direct employer applications.
+            <p className="mt-5 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
+              Impjieg brings salary signals, work-mode clarity, verified employer context, and direct apply paths into one premium Malta hiring workspace.
             </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/jobs">
+                <Button variant="primary" size="lg">
+                  Find better roles
+                </Button>
+              </Link>
+              <Link href="/employer/post-job">
+                <Button variant="outline" size="lg" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+                  Hire Malta talent
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-10 text-white">
+              <Suspense fallback={<Skeleton className="h-20 w-full max-w-md" />}>
+                <StatsSection />
+              </Suspense>
+            </div>
           </div>
 
-          <div className="mx-auto mt-8 max-w-xl animate-fade-in-up stagger-2">
-            <Suspense fallback={<Skeleton className="mx-auto h-10 w-full" />}>
-              <SearchFilters />
-            </Suspense>
-          </div>
-
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up stagger-2">
-            <Link href="/jobs">
-              <Button variant="primary" size="lg">
-                Find Jobs
-              </Button>
-            </Link>
-            <Link href="/employer/post-job">
-              <Button variant="outline" size="lg">
-                Hire Talent
-              </Button>
-            </Link>
-          </div>
-
-          <div className="mt-10 animate-fade-in-up stagger-3">
-            <Suspense fallback={<Skeleton className="h-20 w-full max-w-md mx-auto" />}>
-              <StatsSection />
-            </Suspense>
+          <div className="animate-fade-in-up stagger-2">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.07] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur">
+              <div className="rounded-[1.5rem] border border-white/10 bg-[#0B1220]/80 p-4">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">Marketplace pulse</p>
+                    <p className="mt-1 text-sm font-semibold text-white">Live Malta roles</p>
+                  </div>
+                  <span className="rounded-full bg-[#14C7B7]/15 px-3 py-1 text-xs font-semibold text-[#46D1BE]">Updated</span>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {[
+                    ["Product designer", "Sliema · Hybrid", "EUR 42k - 55k"],
+                    ["Compliance analyst", "St Julian's · On-site", "EUR 36k - 48k"],
+                    ["Senior React engineer", "Malta / EU · Remote", "EUR 62k - 78k"],
+                  ].map(([title, meta, salary]) => (
+                    <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-white">{title}</p>
+                          <p className="mt-1 text-sm text-white/55">{meta}</p>
+                        </div>
+                        <p className="shrink-0 font-mono text-sm font-semibold text-[#7AA8FF]">{salary}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                  <Suspense fallback={<Skeleton className="h-28 w-full" />}>
+                    <SearchFilters />
+                  </Suspense>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Trusted by */}
-      <section className="border-y border-border py-6 sm:py-8">
+      <section className="border-y border-border bg-surface/75 py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-success" />
-              <span>Verified employers</span>
+              <span>Employer context</span>
             </div>
             <div className="hidden sm:block h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
@@ -170,7 +199,7 @@ export default async function HomePage() {
             <div className="hidden sm:block h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
-              <span>Regularly updated</span>
+              <span>Fresh market signal</span>
             </div>
           </div>
         </div>
@@ -179,15 +208,15 @@ export default async function HomePage() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-[1.75rem] border border-border bg-card p-6 sm:p-8 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            <div className="marketplace-panel rounded-[1.75rem] p-6 sm:p-8">
+              <p className="brand-eyebrow">
                 For employers
               </p>
               <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Hire better candidates without agency-level fees.
+                Build a stronger Malta hiring pipeline without agency-level drag.
               </h2>
               <p className="mt-3 max-w-2xl text-sm sm:text-base leading-7 text-muted-foreground">
-                Post salary-transparent roles, boost urgent vacancies, and review applicants from one clean Malta hiring dashboard.
+                Publish polished roles, surface salary and work-mode expectations, boost urgent vacancies, and review applicants from one clean employer workspace.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link href="/employer/post-job">
@@ -223,7 +252,7 @@ export default async function HomePage() {
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.title} className="rounded-[1.5rem] border border-border bg-surface p-5 shadow-sm">
+                  <div key={item.title} className="marketplace-panel rounded-[1.5rem] p-5">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
@@ -280,7 +309,7 @@ export default async function HomePage() {
             <p className="text-sm text-muted-foreground mt-1">Built around clarity, speed, and trust</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className="marketplace-panel rounded-[1.35rem] p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                 <Banknote className="h-5 w-5 text-primary" />
               </div>
@@ -291,7 +320,7 @@ export default async function HomePage() {
                 Every listing shows a salary range up front, so candidates can judge fit before they apply.
               </p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className="marketplace-panel rounded-[1.35rem] p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                 <Clock className="h-5 w-5 text-primary" />
               </div>
@@ -302,7 +331,7 @@ export default async function HomePage() {
                 Jobs expire after 30 days, keeping the marketplace current and useful.
               </p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className="marketplace-panel rounded-[1.35rem] p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                 <Users className="h-5 w-5 text-primary" />
               </div>

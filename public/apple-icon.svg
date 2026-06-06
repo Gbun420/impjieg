@@ -5,7 +5,7 @@
       <stop offset="1" stop-color="#14C7B7" />
     </linearGradient>
   </defs>
-  <rect width="180" height="180" rx="40" fill="#0B1220" />
+  <rect width="180" height="180" rx="40" fill="#08111F" />
   <path
     d="M56 114.5C56 92.4 69.2 73.5 90 64"
     stroke="url(#impjieg-apple-gradient)"
@@ -14,7 +14,7 @@
   />
   <path
     d="M56.5 113.5L89.5 80.5L111 102"
-    stroke="#F5F8FC"
+    stroke="#F7F4EC"
     stroke-width="12"
     stroke-linecap="round"
     stroke-linejoin="round"

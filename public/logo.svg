@@ -5,7 +5,7 @@
       <stop offset="1" stop-color="#14C7B7" />
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="40" height="40" rx="12" fill="#0B1220" />
+  <rect x="4" y="4" width="40" height="40" rx="12" fill="#08111F" />
   <path
     d="M14 28.5C14 23 17 18 22.5 15.5"
     stroke="url(#impjieg-brand-gradient)"
@@ -14,7 +14,7 @@
   />
   <path
     d="M14.5 27.5L22 20L27 25"
-    stroke="#F5F8FC"
+    stroke="#F7F4EC"
     stroke-width="3"
     stroke-linecap="round"
     stroke-linejoin="round"
@@ -23,13 +23,23 @@
   <text
     x="56"
     y="30"
-    fill="#0B1220"
+    fill="#08111F"
     font-family="Sora, Inter, Arial, sans-serif"
     font-size="24"
     font-weight="700"
-    letter-spacing="-0.04em"
+    letter-spacing="0"
   >
     Impjieg
   </text>
-  <circle cx="221.5" cy="14.5" r="3.5" fill="#FF6B57" />
+  <text
+    x="154"
+    y="31"
+    fill="#64748B"
+    font-family="Inter, Arial, sans-serif"
+    font-size="10"
+    font-weight="700"
+    letter-spacing="0.16em"
+  >
+    MALTA
+  </text>
 </svg>

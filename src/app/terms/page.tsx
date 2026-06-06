@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms",
-  description: "Terms of Service for Impjieg. Read our terms and conditions for posting jobs and using our platform.",
+  description: "Terms of Service for Impjieg. Read our terms and conditions for posting roles and using our platform.",
 };
 
 export default function TermsPage() {
@@ -41,8 +41,8 @@ export default function TermsPage() {
           2. Services
         </h2>
         <p>
-          {SITE.name} operates as an online job board connecting employers with
-          job seekers in Malta. Our services include:
+          {SITE.name} operates as an online jobs marketplace connecting
+          employers with job seekers in Malta. Our services include:
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>Job listing publication and management</li>
@@ -111,7 +111,7 @@ export default function TermsPage() {
           In compliance with Regulation (EU) No 910/2014 (eIDAS), contracts
           formed through the Platform are legally binding electronic contracts.
           Your actions of clicking &quot;Accept&quot;, &quot;Purchase&quot;, or
-          &quot;Post Job&quot; constitute your electronic signature and
+          &quot;Post Role&quot; constitute your electronic signature and
           acceptance of these Terms.
         </p>
         <p>

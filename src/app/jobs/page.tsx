@@ -11,9 +11,9 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Browse Jobs",
+  title: "Browse Malta Jobs",
   description:
-    "Browse the latest jobs in Malta. Find tech, finance, administration, and hospitality roles with salary clarity and direct applications.",
+    "Browse Malta tech, digital, and iGaming roles with salary signals, work-mode clarity, and direct applications.",
 };
 
 const DEFAULT_JOBS_PER_PAGE = 20;
@@ -223,8 +223,8 @@ async function JobsContent({
           </div>
         ) : (
           <>
-            <p className="text-sm text-muted-foreground mb-4">
-              {totalJobs} job{totalJobs !== 1 ? "s" : ""} found
+            <p className="mb-4 text-sm font-medium text-muted-foreground">
+              {totalJobs} live role{totalJobs !== 1 ? "s" : ""} found across the marketplace
             </p>
             <div className="space-y-3">
               {typedJobs.map((job) => (
@@ -253,10 +253,30 @@ export default async function JobsPage({
   const params = await searchParams;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-6">
-        Browse Jobs
-      </h1>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mb-8 overflow-hidden rounded-[2rem] border border-border/70 bg-[#08111F] p-6 text-white shadow-[0_22px_70px_rgba(11,18,32,0.18)] sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#46D1BE]">
+          Malta marketplace search
+        </p>
+        <div className="mt-3 grid gap-4 lg:grid-cols-[1fr_0.72fr] lg:items-end">
+          <div>
+            <h1 className="text-3xl font-bold tracking-[-0.05em] text-white sm:text-4xl">
+              Browse roles with the signals that matter.
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68 sm:text-base">
+              Filter Malta&apos;s tech, digital, and iGaming jobs by salary range, location, work mode, and hiring context.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-xs text-white/68">
+            {["Salary", "Work mode", "Employer"].map((item) => (
+              <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-3">
+                <p className="font-semibold text-white">{item}</p>
+                <p className="mt-1">Signals</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <Suspense fallback={<SearchFiltersSkeleton />}>
         <JobsContent searchParams={params} />
       </Suspense>

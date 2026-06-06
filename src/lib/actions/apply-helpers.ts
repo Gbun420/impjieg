@@ -1,4 +1,5 @@
 import { escapeHtml, sanitizeEmailHeader, safeUrlHref } from "@/lib/email-security";
+import { buildBrandedEmailShell } from "@/lib/email-branding";
 
 export function buildEmployerNotificationEmail({
   employerEmail,
@@ -31,17 +32,25 @@ export function buildEmployerNotificationEmail({
     to: [sanitizeEmailHeader(employerEmail)],
     replyTo: [sanitizeEmailHeader(candidateEmail)],
     subject: sanitizeEmailHeader(`New Application: ${candidateName} applied for ${jobTitle}`),
-    html: `
-      <h2>New Application Received</h2>
-      <p><strong>Candidate:</strong> ${safeCandidateName}</p>
-      <p><strong>Email:</strong> ${safeCandidateEmail}</p>
-      ${safeCandidatePhone ? `<p><strong>Phone:</strong> ${safeCandidatePhone}</p>` : ""}
-      <p><strong>Job:</strong> ${safeJobTitle}</p>
-      ${safeCoverLetter ? `<h3>Cover Letter</h3><p>${safeCoverLetter}</p>` : ""}
-      ${safeCvUrl ? `<p><a href="${safeCvUrl}">View CV</a></p>` : ""}
-      <hr>
-      <p><a href="${safeDashboardUrl}">View in Dashboard</a></p>
-    `,
+    html: buildBrandedEmailShell({
+      eyebrow: "Employer pipeline",
+      title: "New application received",
+      intro: `${candidateName} applied for ${jobTitle}.`,
+      bodyHtml: `
+        <div style="border:1px solid #DBE4F0;border-radius:18px;background:#F5F8FC;padding:18px;">
+          <p style="margin:0 0 10px;"><strong>Candidate:</strong> ${safeCandidateName}</p>
+          <p style="margin:0 0 10px;"><strong>Email:</strong> ${safeCandidateEmail}</p>
+          ${safeCandidatePhone ? `<p style="margin:0 0 10px;"><strong>Phone:</strong> ${safeCandidatePhone}</p>` : ""}
+          <p style="margin:0;"><strong>Job:</strong> ${safeJobTitle}</p>
+        </div>
+        ${safeCoverLetter ? `<h2 style="margin:24px 0 8px;font-size:16px;">Cover letter</h2><p style="margin:0;color:#334155;line-height:1.7;">${safeCoverLetter}</p>` : ""}
+        ${safeCvUrl ? `<p style="margin:18px 0 0;"><a href="${safeCvUrl}" style="color:#1E63FF;font-weight:700;">View CV</a></p>` : ""}
+      `,
+      cta: {
+        label: "View in dashboard",
+        href: safeDashboardUrl,
+      },
+    }),
   };
 }
 
@@ -60,16 +69,16 @@ export function buildCandidateConfirmationEmail({
 
   return {
     subject: sanitizeEmailHeader(`Application Received: ${jobTitle} at ${employerName}`),
-    html: `
-      <h2>Application Received</h2>
-      <p>Hi ${safeCandidateName},</p>
-      <p>Thank you for applying for the <strong>${safeJobTitle}</strong> position at <strong>${safeEmployerName}</strong>.</p>
-      <p>The employer has been notified of your application and will contact you directly if they wish to proceed.</p>
-      <p>Good luck with your application!</p>
-      <hr>
-      <p style="font-size:12px;color:#6b7280;">
-        This is an automated confirmation from Impjieg.
-      </p>
-    `,
+    html: buildBrandedEmailShell({
+      eyebrow: "Application confirmation",
+      title: "Application received",
+      intro: `Thanks for applying to ${employerName}.`,
+      bodyHtml: `
+        <p style="margin:0 0 14px;color:#334155;line-height:1.7;">Hi ${safeCandidateName},</p>
+        <p style="margin:0 0 14px;color:#334155;line-height:1.7;">Your application for <strong>${safeJobTitle}</strong> at <strong>${safeEmployerName}</strong> has been sent.</p>
+        <p style="margin:0;color:#334155;line-height:1.7;">The employer has been notified and will contact you directly if they wish to proceed.</p>
+      `,
+      footerHtml: "This is an automated confirmation from Impjieg.",
+    }),
   };
 }
