@@ -55,10 +55,13 @@ export async function enforceRateLimitRedis({
   `;
 
   try {
-    const result = await client.eval(luaScript, {
-      keys: [key],
-      arguments: [windowSec.toString(), limit.toString()],
-    }) as [number, number, number];
+    const result = await client.eval(
+      luaScript,
+      1,
+      key,
+      windowSec.toString(),
+      limit.toString()
+    ) as [number, number, number];
 
     const [success, remaining, ttl] = result;
     return {
