@@ -227,7 +227,7 @@ export default function SearchFilters() {
 
       <div
         id="job-filters-panel"
-        className={`${showFilters ? "block" : "hidden"} lg:block space-y-5 rounded-[1.75rem] border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-5`}
+        className={`${showFilters ? "block" : "hidden"} space-y-5 rounded-[1.75rem] border border-border/60 bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-5`}
       >
         <div className="flex items-center justify-between gap-3 lg:hidden">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Filter options</p>

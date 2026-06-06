@@ -119,6 +119,21 @@ test('search filters are accessible', async ({ page }) => {
   await checkAccessibleNames(page);
 });
 
+test('search filters can be shown and hidden on desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/jobs');
+
+  const filterButton = page.getByRole('button', { name: 'Show filters' });
+  const filterPanel = page.locator('#job-filters-panel');
+
+  await expect(filterPanel).toBeHidden();
+  await filterButton.click();
+  await expect(page.getByRole('button', { name: 'Hide filters' })).toBeVisible();
+  await expect(filterPanel).toBeVisible();
+  await page.getByRole('button', { name: 'Hide filters' }).click();
+  await expect(filterPanel).toBeHidden();
+});
+
 test('about page loads', async ({ page }) => {
   await page.goto('/about');
   await expect(page).toHaveTitle(/About/);
