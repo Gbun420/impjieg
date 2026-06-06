@@ -16,7 +16,6 @@ import {
   MapPin,
   Building2,
   Clock,
-  ArrowLeft,
   ExternalLink,
 } from "lucide-react";
 import { daysAgo } from "@/lib/utils";
@@ -67,21 +66,13 @@ export default async function CandidateApplicationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/candidate/dashboard">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Dashboard
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            My Applications
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {typedApps.length} application{typedApps.length !== 1 ? "s" : ""} tracked
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          My Applications
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {typedApps.length} application{typedApps.length !== 1 ? "s" : ""} tracked
+        </p>
       </div>
 
       {/* Status Summary */}

@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
   Bell,
   Plus,
   Trash2,
@@ -216,21 +214,13 @@ export default function CandidateAlertsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <Link href="/candidate/dashboard" className="shrink-0">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-1.5 h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Job Alerts
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Get notified about new jobs matching your criteria
-            </p>
-          </div>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Job Alerts
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Get notified about new jobs matching your criteria
+          </p>
         </div>
         {!showForm && (
           <Button variant="primary" onClick={() => setShowForm(true)} className="self-start sm:self-auto">

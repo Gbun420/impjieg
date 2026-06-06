@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Sparkles,
   MapPin,
   Briefcase,
@@ -112,22 +111,14 @@ export default async function RecommendationsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <Link href="/candidate/dashboard" className="shrink-0">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-1.5 h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <div className="min-w-0">
-            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
-              <Sparkles className="h-6 w-6 text-primary" />
-              Recommended Jobs
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              AI-powered matches based on your profile
-            </p>
-          </div>
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
+            <Sparkles className="h-6 w-6 text-primary" />
+            Recommended Jobs
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            AI-powered matches based on your profile
+          </p>
         </div>
       </div>
 
