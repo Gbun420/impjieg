@@ -1,5 +1,3 @@
-import { requireEnv } from "@/lib/runtime-env";
-
 function getSuperAdminEmails(): readonly string[] {
   const configured = process.env.SUPER_ADMIN_EMAILS;
   if (configured) {
