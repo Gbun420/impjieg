@@ -4,7 +4,7 @@ import { ArrowRight, Shield, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { adminConsoleNavItems } from "@/lib/admin-consoles";
+import { adminConsoleNavGroups, adminConsoleNavItems } from "@/lib/admin-consoles";
 
 export const adminNavItems = adminConsoleNavItems;
 
@@ -73,11 +73,11 @@ export function AdminSectionShell({
         </div>
       </Card>
 
-      <div className="rounded-[1.35rem] border border-border/70 bg-surface p-3 shadow-sm">
-        <div className="mb-3 flex items-center justify-between gap-3 px-1">
-          <div>
+      <div className="rounded-[1.35rem] border border-border/70 bg-surface p-4 shadow-sm">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1">
             <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Consoles</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Switch between live admin sections without leaving the protected shell.
             </p>
           </div>
@@ -97,22 +97,36 @@ export function AdminSectionShell({
           </div>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {adminNavItems.map((item) => {
-            const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
-            return (
-              <Link key={item.href} href={item.href} className="shrink-0">
-                <Button
-                  type="button"
-                  variant={active ? "primary" : "outline"}
-                  size="sm"
-                  className="min-w-max"
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
+        <div className="grid gap-3 xl:grid-cols-4">
+          {adminConsoleNavGroups.map((group) => (
+            <div key={group.label} className="rounded-2xl border border-border/60 bg-background/70 p-3">
+              <div className="mb-3 space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                  {group.label}
+                </p>
+                <p className="text-xs leading-5 text-muted-foreground">
+                  {group.description}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((item) => {
+                  const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
+                  return (
+                    <Link key={item.href} href={item.href} className="shrink-0">
+                      <Button
+                        type="button"
+                        variant={active ? "primary" : "outline"}
+                        size="sm"
+                        className="min-w-max"
+                      >
+                        {item.label}
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -32,6 +32,12 @@ export type AdminConsoleNavItem = {
   label: string;
 };
 
+export type AdminConsoleNavGroup = {
+  label: string;
+  description: string;
+  items: AdminConsoleNavItem[];
+};
+
 export const adminConsoleSections: Array<{
   slug: AdminConsoleSection;
   href: string;
@@ -56,6 +62,37 @@ export const adminConsoleNavItems: AdminConsoleNavItem[] = adminConsoleSections.
     label,
   })
 );
+
+export const adminConsoleNavGroups: AdminConsoleNavGroup[] = [
+  {
+    label: "Overview",
+    description: "Start here for live status and the aggregation control plane.",
+    items: adminConsoleNavItems.filter((item) =>
+      ["/admin/dashboard", "/admin/aggregation"].includes(item.href)
+    ),
+  },
+  {
+    label: "Marketplace",
+    description: "Listings, employers, candidates, and application flow.",
+    items: adminConsoleNavItems.filter((item) =>
+      ["/admin/jobs", "/admin/employers", "/admin/candidates", "/admin/applications", "/admin/alerts"].includes(item.href)
+    ),
+  },
+  {
+    label: "Revenue",
+    description: "Payments, subscriptions, and commercial grant controls.",
+    items: adminConsoleNavItems.filter((item) =>
+      ["/admin/payments", "/admin/subscriptions", "/admin/commercial-grants"].includes(item.href)
+    ),
+  },
+  {
+    label: "Security",
+    description: "Audit and operational safety controls.",
+    items: adminConsoleNavItems.filter((item) =>
+      ["/admin/audit-log"].includes(item.href)
+    ),
+  },
+];
 
 export function resolveAdminConsoleSection(segments?: string[] | null) {
   const section = segments?.[0];

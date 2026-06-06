@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   adminConsoleNavItems,
+  adminConsoleNavGroups,
   getAdminConsoleSectionMeta,
   resolveAdminConsoleSection,
 } from "./admin-consoles";
@@ -22,6 +23,17 @@ test("admin console nav includes the wired live consoles", () => {
       "Grants",
       "Audit log",
     ]
+  );
+});
+
+test("admin console nav groups keep the shell organized", () => {
+  assert.deepEqual(
+    adminConsoleNavGroups.map((group) => group.label),
+    ["Overview", "Marketplace", "Revenue", "Security"]
+  );
+  assert.deepEqual(
+    adminConsoleNavGroups[0].items.map((item) => item.label),
+    ["Overview", "Aggregation"]
   );
 });
 
