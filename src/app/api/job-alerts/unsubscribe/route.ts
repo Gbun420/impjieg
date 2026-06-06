@@ -4,6 +4,7 @@ import {
   type VerifiedSignedToken,
 } from "@/lib/email-security";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { enforceRateLimit, getClientIp, hashIdentifier, buildRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import type { Database } from "@/lib/supabase/types";
 
 export const runtime = "nodejs";
@@ -97,6 +98,16 @@ export async function unsubscribeJobAlertWithDeps(
 }
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimit = enforceRateLimit({
+    key: buildRateLimitKey("job-alerts-unsubscribe", hashIdentifier(ip)),
+    limit: RATE_LIMITS.jobAlertsUnsubscribe.limit,
+    windowMs: RATE_LIMITS.jobAlertsUnsubscribe.windowMs,
+  });
+  if (!rateLimit.success) {
+    return new Response("Too many requests. Please try again later.", { status: 429 });
+  }
+
   try {
     const supabaseUrl = getSupabaseUrl();
     const supabaseServiceKey = getSupabaseServiceKey();

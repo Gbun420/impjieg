@@ -5,6 +5,7 @@ import { buildJobAlertConfirmationEmail } from "@/lib/job-alerts";
 import { sendEmail } from "@/lib/email-sender";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { SITE } from "@/lib/constants";
+import { enforceRateLimit, getClientIp, hashIdentifier, buildRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import type { Database } from "@/lib/supabase/types";
 
 type JobAlertInsert = Database["public"]["Tables"]["job_alerts"]["Insert"];
@@ -25,6 +26,16 @@ type JobAlertsTable = {
 };
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimit = enforceRateLimit({
+    key: buildRateLimitKey("job-alerts-create", hashIdentifier(ip)),
+    limit: RATE_LIMITS.jobAlertsCreate.limit,
+    windowMs: RATE_LIMITS.jobAlertsCreate.windowMs,
+  });
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = createJobAlertSchema.safeParse(body);
 
