@@ -4,9 +4,15 @@ type SecurityHeadersOptions = {
 };
 
 export function buildContentSecurityPolicy({ nonce, isDev = false }: SecurityHeadersOptions) {
+  const scriptSrc = [
+    "'self'",
+    `'nonce-${nonce}'`,
+    ...(isDev ? ["'unsafe-eval'", "https://vercel.live"] : []),
+  ].join(" ");
+
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src ${scriptSrc}`,
     `style-src 'self' 'nonce-${nonce}'`,
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
