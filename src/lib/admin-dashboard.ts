@@ -14,6 +14,14 @@ type LatestEmployer = Employer;
 type PaymentRow = Database["public"]["Tables"]["payments"]["Row"];
 type JobAlertRow = Database["public"]["Tables"]["job_alerts"]["Row"];
 type SubscriptionRow = Database["public"]["Tables"]["subscriptions"]["Row"];
+type AuditLogRow = {
+  id: string;
+  admin_email: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  created_at: string;
+};
 
 function createAdminServiceClient() {
   return createServiceClient<Database>(
@@ -197,6 +205,33 @@ function getDemoAdminDashboardData() {
     },
   ] as SubscriptionRow[];
 
+  const recentAuditLogs = [
+    {
+      id: "demo-audit-1",
+      admin_email: "admin@example.com",
+      action: "admin_login",
+      entity_type: "admin_session",
+      entity_id: "demo-admin-1",
+      created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    },
+    {
+      id: "demo-audit-2",
+      admin_email: "admin@example.com",
+      action: "grant_created",
+      entity_type: "admin_commercial_grant",
+      entity_id: "demo-grant-1",
+      created_at: new Date(Date.now() - 1000 * 60 * 52).toISOString(),
+    },
+    {
+      id: "demo-audit-3",
+      admin_email: "admin@example.com",
+      action: "job_reviewed",
+      entity_type: "job",
+      entity_id: "demo-job-1",
+      created_at: new Date(Date.now() - 1000 * 60 * 96).toISOString(),
+    },
+  ] as AuditLogRow[];
+
   const stats = [
     { label: "Total Jobs", value: 42, note: "31 active · 9 featured" },
     { label: "Employers", value: 18, note: "14 verified" },
@@ -214,6 +249,7 @@ function getDemoAdminDashboardData() {
     recentPayments,
     recentAlerts,
     recentSubscriptions,
+    recentAuditLogs,
     alertStats: { total: 24, active: 19 },
     summary: {
       jobs: 42,
@@ -345,6 +381,7 @@ export async function getAdminDashboardData() {
     recentEmployers,
     recentAlerts,
     recentSubscriptions,
+    recentAuditLogs,
     allPayments,
   ] = await Promise.all([
     safeCountQuery("jobs", supabase.from("jobs").select("id", { count: "exact", head: true })),
@@ -441,6 +478,14 @@ export async function getAdminDashboardData() {
         .order("created_at", { ascending: false })
         .limit(6)
     ),
+    safeRowsQuery<AuditLogRow>(
+      "recent admin audit logs",
+      supabase
+        .from("admin_audit_logs")
+        .select("id, admin_email, action, entity_type, entity_id, created_at")
+        .order("created_at", { ascending: false })
+        .limit(6)
+    ),
     safeRowsQuery<PaymentRow>(
       "all payments",
       supabase
@@ -506,6 +551,7 @@ export async function getAdminDashboardData() {
     recentPayments,
     recentAlerts,
     recentSubscriptions,
+    recentAuditLogs,
     alertStats,
     summary: {
       jobs: jobsCount,

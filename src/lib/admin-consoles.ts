@@ -620,6 +620,7 @@ function getDemoAdminConsoleData() {
         updated_at: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(),
       },
     ] as LatestSubscription[],
+    recentAuditLogs: auditLogs,
   };
 
   const allPayments = dashboard.recentPayments;

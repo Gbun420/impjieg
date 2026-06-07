@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ComponentType } from "react";
-import { Briefcase, Building2, FileText, Bell, CreditCard, Users, ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  Briefcase,
+  Building2,
+  CreditCard,
+  FileText,
+  History,
+  TriangleAlert,
+  Users,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +22,7 @@ import {
   getAdminConsoleSectionMeta,
 } from "@/lib/admin-consoles";
 import { getAdminDashboardData } from "@/lib/admin-dashboard";
+import { buildAdminDashboardPriorityItems } from "@/lib/admin-dashboard-insights";
 import { hasValidAdminSession } from "@/lib/admin-session";
 import { daysAgo, formatDate, formatSalary } from "@/lib/utils";
 
@@ -37,6 +48,20 @@ const statusColors: Record<string, "default" | "success" | "warning" | "error" |
 function getBadgeVariant(status?: string | null) {
   if (!status) return "secondary";
   return statusColors[status] ?? "secondary";
+}
+
+function getPriorityBadgeVariant(tone: "critical" | "warning" | "info") {
+  if (tone === "critical") return "error";
+  if (tone === "warning") return "warning";
+  return "info";
+}
+
+function formatAuditAction(action: string) {
+  return action.replace(/_/g, " ");
+}
+
+function formatAuditEntity(entityType: string, entityId: string) {
+  return `${entityType.replace(/_/g, " ")} · ${entityId}`;
 }
 
 function StatCard({
@@ -124,10 +149,17 @@ export default async function AdminDashboardPage() {
     recentPayments,
     recentAlerts,
     recentSubscriptions,
+    recentAuditLogs,
     serviceStatus,
     formattedAt,
     summary,
   } = dashboardData;
+  const priorityItems = buildAdminDashboardPriorityItems({
+    summary,
+    serviceStatus,
+    recentAuditLogs,
+  });
+  const attentionItemCount = priorityItems.filter((item) => item.tone !== "info").length;
   const isDemoMode = serviceStatus.some((item) => item.value === "demo mode");
   const consoleShortcutGroups = adminConsoleNavGroups.map((group) => ({
     label: group.label,
@@ -189,8 +221,10 @@ export default async function AdminDashboardPage() {
                 <p className="mt-2 text-sm font-medium text-white">Authenticated only</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Mode</p>
-                <p className="mt-2 text-sm font-medium text-white">Production data</p>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-white/50">Priority</p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  {attentionItemCount} item{attentionItemCount === 1 ? "" : "s"} need attention
+                </p>
               </div>
             </div>
           </div>
@@ -248,18 +282,107 @@ export default async function AdminDashboardPage() {
         })}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Card className="border-dashed border-border/60 p-5 shadow-sm md:col-span-2 xl:col-span-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Additional admin consoles are wired to live data
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Use the shortcuts above to open jobs, employers, candidates, applications, payments, alerts, subscriptions, and the audit log.
-              </p>
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+          <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(226,76,76,0.95)_0%,rgba(30,99,255,0.95)_48%,rgba(20,199,183,0.95)_100%)]" />
+          <div className="p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                  Priority queue
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-foreground">
+                  What needs attention now
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  The dashboard ranks live risks and operational work so you can move straight to the issue that matters.
+                </p>
+              </div>
+              <Badge variant={attentionItemCount > 0 ? "warning" : "success"}>
+                {attentionItemCount} active
+              </Badge>
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {priorityItems.map((item) => (
+                <Link key={item.label} href={item.href} className="group">
+                  <div className="h-full rounded-[1.25rem] border border-border/70 bg-muted/20 p-4 transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-2">
+                        <Badge variant={getPriorityBadgeVariant(item.tone)}>{item.label}</Badge>
+                        <p className="text-base font-semibold text-foreground">{item.value}</p>
+                        <p className="text-sm leading-6 text-muted-foreground">{item.note}</p>
+                      </div>
+                      {item.tone === "critical" ? (
+                        <TriangleAlert className="mt-1 h-4 w-4 text-error" />
+                      ) : item.tone === "warning" ? (
+                        <TriangleAlert className="mt-1 h-4 w-4 text-warning" />
+                      ) : (
+                        <ArrowRight className="mt-1 h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
+          <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(20,199,183,0.95)_0%,rgba(30,99,255,0.95)_100%)]" />
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                  Recent admin activity
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-foreground">
+                  Latest recorded actions
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Audit entries from the latest admin session and operational changes.
+                </p>
+              </div>
+              <Badge variant="info">
+                <History className="mr-1.5 h-3.5 w-3.5" />
+                Live log
+              </Badge>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {recentAuditLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="rounded-[1.25rem] border border-border/70 bg-muted/20 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">
+                        {formatAuditAction(log.action)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatAuditEntity(log.entity_type, log.entity_id)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-medium text-foreground">{log.admin_email}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {formatDate(log.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5">
+              <Link href="/admin/audit-log">
+                <Button variant="outline" size="sm">
+                  Open full audit log
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </Card>
       </section>
