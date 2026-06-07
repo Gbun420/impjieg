@@ -262,10 +262,10 @@ export default function SearchFilters() {
                   <label
                     key={option}
                     htmlFor={id}
-                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors ${
+                    className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                       checked
-                        ? "border-primary/40 bg-primary/5 text-foreground"
-                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50"
+                        ? "border-primary/40 bg-primary/5 text-primary"
+                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     }`}
                   >
                     <input
@@ -273,7 +273,7 @@ export default function SearchFilters() {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleValue(option, workTypes, setWorkTypes)}
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary shrink-0"
                     />
                     <span>{option}</span>
                   </label>
@@ -292,10 +292,10 @@ export default function SearchFilters() {
                   <label
                     key={option}
                     htmlFor={id}
-                    className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors ${
+                    className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                       checked
-                        ? "border-primary/40 bg-primary/5 text-foreground"
-                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50"
+                        ? "border-primary/40 bg-primary/5 text-primary"
+                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     }`}
                   >
                     <input
@@ -303,7 +303,7 @@ export default function SearchFilters() {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleValue(option, experience, setExperience)}
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary shrink-0"
                     />
                     <span>{option}</span>
                   </label>
