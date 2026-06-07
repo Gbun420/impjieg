@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
@@ -11,7 +10,6 @@ import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
-import { enforceRateLimit, getClientIp, hashIdentifier, buildRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -27,17 +25,6 @@ type EmployersMutationTable = {
 };
 
 export async function signup(formData: FormData) {
-  const headersList = await headers();
-  const ip = getClientIp(new Request("", { headers: headersList }));
-  const rateLimit = enforceRateLimit({
-    key: buildRateLimitKey("auth-signup", hashIdentifier(ip)),
-    limit: RATE_LIMITS.authSignup.limit,
-    windowMs: RATE_LIMITS.authSignup.windowMs,
-  });
-  if (!rateLimit.success) {
-    return { error: "Too many signup attempts. Please try again later." };
-  }
-
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
     getSupabaseUrl(),
@@ -84,17 +71,6 @@ export async function signup(formData: FormData) {
 }
 
 export async function login(formData: FormData) {
-  const headersList = await headers();
-  const ip = getClientIp(new Request("", { headers: headersList }));
-  const rateLimit = enforceRateLimit({
-    key: buildRateLimitKey("auth-login", hashIdentifier(ip)),
-    limit: RATE_LIMITS.auth.limit,
-    windowMs: RATE_LIMITS.auth.windowMs,
-  });
-  if (!rateLimit.success) {
-    return { error: "Too many login attempts. Please try again later." };
-  }
-
   const supabase = await createClient();
   const serviceSupabase = createServiceClient(
     getSupabaseUrl(),
@@ -152,17 +128,6 @@ export async function logout() {
 }
 
 export async function resetPassword(formData: FormData) {
-  const headersList = await headers();
-  const ip = getClientIp(new Request("", { headers: headersList }));
-  const rateLimit = enforceRateLimit({
-    key: buildRateLimitKey("auth-reset-password", hashIdentifier(ip)),
-    limit: RATE_LIMITS.authResetPassword.limit,
-    windowMs: RATE_LIMITS.authResetPassword.windowMs,
-  });
-  if (!rateLimit.success) {
-    return { error: "Too many password reset attempts. Please try again later." };
-  }
-
   const supabase = await createClient();
   const email = formData.get("email") as string;
 
