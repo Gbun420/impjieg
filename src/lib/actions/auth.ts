@@ -108,7 +108,7 @@ export async function login(formData: FormData) {
     return { error: "Email and password are required" };
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -123,9 +123,7 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = signInData.user;
 
   const isAdmin = Boolean(user?.email && isSuperAdminEmail(user.email) && user.app_metadata?.role === "admin");
 
