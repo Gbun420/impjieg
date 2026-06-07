@@ -34,7 +34,7 @@ type CandidateAlertsMutationTable = {
   };
 };
 
-export const candidateAlertInputSchema = z.object({
+const candidateAlertInputSchema = z.object({
   name: z.string().trim().max(255).optional().transform((value) => (value ? value : null)),
   sectors: z.array(z.string()).default([]).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
   job_types: z.array(z.string()).default([]).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
@@ -45,7 +45,7 @@ export const candidateAlertInputSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export const candidateAlertUpdateSchema = z.object({
+const candidateAlertUpdateSchema = z.object({
   name: z.string().trim().max(255).optional().transform((value) => (value ? value : null)),
   sectors: z.array(z.string()).transform((values) => values.map((value) => value.trim()).filter(Boolean)),
   job_types: z.array(z.string()).transform((values) => values.map((value) => value.trim()).filter(Boolean)),

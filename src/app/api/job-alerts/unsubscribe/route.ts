@@ -35,7 +35,7 @@ function buildHtmlResponse(status: number, title: string, bodyText: string) {
   });
 }
 
-export async function unsubscribeJobAlertWithDeps(
+async function unsubscribeJobAlertWithDeps(
   request: Request,
   deps: JobAlertUnsubscribeDeps
 ) {

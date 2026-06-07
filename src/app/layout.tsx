@@ -6,8 +6,8 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import CookieConsentBanner from "@/components/cookie-consent-banner";
 import { SITE } from "@/lib/constants";
-import { hasSupabasePublicEnv } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -98,31 +98,11 @@ export const viewport = {
   ],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const canResolveAuthServerSide = hasSupabasePublicEnv();
-  let user = null;
-  let isEmployer = false;
-
-  if (canResolveAuthServerSide) {
-    const supabase = await createClient();
-    const authResult = await supabase.auth.getUser();
-    user = authResult.data.user ?? null;
-
-    if (user) {
-      const { data: employer } = await supabase
-        .from("employers")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      isEmployer = Boolean(employer);
-    }
-  }
-
   return (
     <html
       lang="en"
@@ -131,7 +111,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <ThemeProvider>
-          <Header initialAuthState={{ isLoggedIn: Boolean(user), isEmployer }} />
+          <Header />
           <main className="flex-1">
             {children}
           </main>

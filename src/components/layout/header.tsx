@@ -24,14 +24,14 @@ const navLinks = [
 export default function Header({
   initialAuthState,
 }: {
-  initialAuthState: {
+  initialAuthState?: {
     isLoggedIn: boolean;
     isEmployer: boolean;
   };
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(initialAuthState.isLoggedIn);
-  const [isEmployer, setIsEmployer] = useState(initialAuthState.isEmployer);
+  const [isLoggedIn, setIsLoggedIn] = useState(initialAuthState?.isLoggedIn ?? false);
+  const [isEmployer, setIsEmployer] = useState(initialAuthState?.isEmployer ?? false);
   const { theme, toggleTheme } = useTheme();
   const hydrated = useHydrated();
   const router = useRouter();

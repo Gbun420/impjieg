@@ -192,10 +192,4 @@ export async function POST(request: Request) {
   return parseResumeWithDeps(request, buildParseResumeDeps());
 }
 
-export {
-  MAX_PARSE_RESUME_BODY_BYTES,
-  MAX_RESUME_TEXT_CHARS,
-  PARSE_RESUME_RATE_LIMIT,
-  PARSE_RESUME_RATE_LIMIT_WINDOW_MS,
-  parseResumeWithDeps,
-};
+

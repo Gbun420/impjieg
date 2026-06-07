@@ -175,10 +175,4 @@ export async function POST(request: Request) {
   return biasCheckWithDeps(request, buildBiasCheckDeps());
 }
 
-export {
-  BIAS_CHECK_RATE_LIMIT,
-  BIAS_CHECK_RATE_LIMIT_WINDOW_MS,
-  MAX_BIAS_CHECK_BODY_BYTES,
-  MAX_BIAS_CHECK_TEXT_CHARS,
-  biasCheckWithDeps,
-};
+

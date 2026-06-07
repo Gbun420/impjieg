@@ -6,7 +6,7 @@ import type { JobWithEmployer } from "@/lib/supabase/types";
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
 
-export function escapeXml(value: string) {
+function escapeXml(value: string) {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

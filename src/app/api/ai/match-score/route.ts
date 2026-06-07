@@ -208,12 +208,4 @@ export async function POST(request: Request) {
   return matchScoreWithDeps(request, buildMatchScoreDeps());
 }
 
-export {
-  MAX_MATCH_SCORE_BODY_BYTES,
-  MAX_MATCH_SCORE_PROMPT_CHARS,
-  MATCH_SCORE_RATE_LIMIT,
-  MATCH_SCORE_RATE_LIMIT_WINDOW_MS,
-  aiMatchCandidateProfileSchema,
-  matchScoreBodySchema,
-  matchScoreWithDeps,
-};
+
