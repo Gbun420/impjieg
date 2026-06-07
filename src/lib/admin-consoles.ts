@@ -691,6 +691,7 @@ function isDemoSupabase() {
 
 export async function getAdminConsoleData() {
   const dashboard = await getAdminDashboardData();
+  // Always try to use real data, fallback to demo only if Supabase is explicitly in demo mode
   if (process.env.NODE_ENV !== "production" && isDemoSupabase()) {
     return getDemoAdminConsoleData();
   }
