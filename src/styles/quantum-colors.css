@@ -1,0 +1,29 @@
+:root {
+  /* Nature Distilled Collection */
+  --quantum-ethereal-white: #F8F9FA;
+  --quantum-limestone-gray: #E0E0E0;
+  --quantum-obsidian-charcoal: #1F2937;
+  --quantum-marble-vein: #E5E7EB;
+
+  /* Dopamine Resonance Collection */
+  --quantum-neon-mint: #6EE7B7;
+  --quantum-coral-pulse: #F87171;
+  --quantum-azure-depth: #0EA5E9;
+  --quantum-sunset-harmonics: #F97316;
+  --quantum-violet-insight: #8B5CF6;
+  --quantum-emerald-growth: #10B981;
+
+  /* State Colors */
+  --logo-primary: var(--quantum-azure-depth);
+  --logo-secondary: var(--quantum-emerald-growth);
+  --logo-glow: rgba(14, 165, 233, 0.3);
+}
+
+.dark {
+  --quantum-ethereal-white: #111827;
+  --quantum-limestone-gray: #374151;
+  --quantum-obsidian-charcoal: #F9FAFB;
+  --quantum-marble-vein: #4B5563;
+
+  --logo-glow: rgba(110, 231, 183, 0.2);
+}
