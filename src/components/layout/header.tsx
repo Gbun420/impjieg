@@ -10,13 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { Menu, X, Sun, Moon, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, Briefcase, Building2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { SITE } from "@/lib/constants";
 
 const navLinks = [
-  { label: "Find jobs", href: "/jobs" },
-  { label: "Companies", href: "/companies" },
+  { label: "Find jobs", href: "/jobs", icon: Briefcase },
+  { label: "Companies", href: "/companies", icon: Building2 },
   { label: "Hire talent", href: "/pricing" },
 ];
 
@@ -151,12 +151,15 @@ export default function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/82 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-          <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
+          <div className="relative">
+            <Image src="/logo-icon.svg" alt="" width={36} height={36} className="shrink-0" aria-hidden="true" />
+            <span className="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-primary/80" aria-hidden="true" />
+          </div>
           <span className="flex flex-col leading-none">
-            <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
+            <span className="font-display text-xl font-semibold tracking-[-0.03em] text-foreground group-hover:text-primary transition-colors">
               {SITE.name}
             </span>
             <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
@@ -165,51 +168,53 @@ export default function Header({
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-border/70 bg-surface/70 p-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="relative flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
+              >
+                {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
+                <span>{link.label}</span>
+                <span className="absolute bottom-0 left-1/2 h-0.5 w-0 bg-primary transition-all group-hover:w-full group-hover:left-0" aria-hidden="true" />
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {hydrated ? (
             <button
               onClick={toggleTheme}
-              className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-surface/70 text-muted-foreground transition-all hover:bg-surface hover:border-border hover:text-foreground"
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               aria-pressed={theme === "dark"}
             >
               {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
+                <Sun className="h-4.5 w-4.5" />
               ) : (
-                <Moon className="h-4 w-4" />
+                <Moon className="h-4.5 w-4.5" />
               )}
             </button>
           ) : (
-            <span
-              className="hidden md:flex h-8 w-8"
-              aria-hidden="true"
-            />
+            <span className="hidden md:flex h-9 w-9" aria-hidden="true" />
           )}
 
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
               <>
                 <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
-                  <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
-                    Dashboard
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    <span>Dashboard</span>
                   </Button>
                 </Link>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogOut className="mr-1.5 h-3.5 w-3.5" />
-                  Sign Out
+                <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span>Sign Out</span>
                 </Button>
               </>
             ) : (
@@ -217,8 +222,11 @@ export default function Header({
                 <Link href="/auth/login">
                   <Button variant="ghost" size="sm">Sign in</Button>
                 </Link>
-                <Link href="/auth/signup">
-                  <Button variant="primary" size="sm">Post a role</Button>
+                <Link href="/employer/post-job">
+                  <Button variant="primary" size="sm" className="gap-2">
+                    <Briefcase className="h-3.5 w-3.5" />
+                    <span>Post a role</span>
+                  </Button>
                 </Link>
               </>
             )}
@@ -226,8 +234,9 @@ export default function Header({
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+            className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors"
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
               <X className="h-5 w-5" />
@@ -240,33 +249,37 @@ export default function Header({
 
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background animate-fade-in">
-          <nav className="mx-auto max-w-6xl px-4 py-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="pt-2 mt-2 border-t border-border space-y-1">
+          <nav className="mx-auto max-w-6xl px-4 py-4 space-y-2">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />}
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
+            <div className="pt-3 mt-3 border-t border-border space-y-2">
               {hydrated ? (
                 <button
                   onClick={() => {
                     toggleTheme();
                     setMobileOpen(false);
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted transition-colors"
                 >
                   {theme === "dark" ? (
                     <>
-                      <Sun className="h-4 w-4" /> Light Mode
+                      <Sun className="h-5 w-5 shrink-0" /> Light Mode
                     </>
                   ) : (
                     <>
-                      <Moon className="h-4 w-4" /> Dark Mode
+                      <Moon className="h-5 w-5 shrink-0" /> Dark Mode
                     </>
                   )}
                 </button>
@@ -277,21 +290,21 @@ export default function Header({
                     href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Button variant="ghost" size="md" className="w-full justify-start">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <Button variant="ghost" size="md" className="w-full justify-start gap-3">
+                      <LayoutDashboard className="h-5 w-5" />
                       Dashboard
                     </Button>
                   </Link>
                   <Button
                     variant="outline"
                     size="md"
-                    className="w-full justify-start"
+                    className="w-full justify-start gap-3"
                     onClick={async () => {
                       await handleLogout();
                       setMobileOpen(false);
                     }}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="h-5 w-5" />
                     Sign Out
                   </Button>
                 </>
@@ -302,15 +315,16 @@ export default function Header({
                     onClick={() => setMobileOpen(false)}
                   >
                     <Button variant="ghost" size="md" className="w-full justify-start">
-                      Login
+                      Sign in
                     </Button>
                   </Link>
                   <Link
-                    href="/auth/signup"
+                    href="/employer/post-job"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Button variant="primary" size="md" className="w-full justify-start">
-                    Post a role
+                    <Button variant="primary" size="md" className="w-full justify-start gap-3">
+                      <Briefcase className="h-5 w-5" />
+                      Post a role
                     </Button>
                   </Link>
                 </>

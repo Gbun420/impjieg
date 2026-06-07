@@ -47,7 +47,7 @@ export default function CheckoutPage({
     }
   }, [jobId, router]);
 
-  async function handleCheckout() {
+  async function handleCheckout(bundleType?: string) {
     setIsLoading(true);
     setError(null);
 
@@ -55,7 +55,7 @@ export default function CheckoutPage({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId, listingType }),
+        body: JSON.stringify({ jobId, listingType, bundleType }),
       });
 
       const data = await res.json();
@@ -71,6 +71,10 @@ export default function CheckoutPage({
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleAddVisibility() {
+    await handleCheckout("featuredBoost");
   }
 
   if (!jobId) {
@@ -191,8 +195,8 @@ export default function CheckoutPage({
               </div>
             </div>
             <div className="mt-4">
-              <Button type="button" variant="outline" className="w-full">
-                Add from pricing
+              <Button type="button" variant="outline" className="w-full" onClick={handleAddVisibility}>
+                Add Featured Boost
               </Button>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "@/lib/email-sender";
 import type { Application, Database, Employer, Job } from "@/lib/supabase/types";
 
 type EmployerRef = Pick<Employer, "id">;
@@ -77,8 +78,6 @@ export async function updateApplicationStatus(applicationId: string, status: str
 
 export async function sendCandidateEmail(applicationId: string, subject: string, message: string) {
   const supabase = await createClient();
-  void subject;
-  void message;
 
   const {
     data: { user },
@@ -90,19 +89,34 @@ export async function sendCandidateEmail(applicationId: string, subject: string,
 
   const { data: applicationData } = await supabase
     .from("applications")
-    .select("candidate_email, candidate_name")
+    .select("candidate_email, candidate_name, jobs(title)")
     .eq("id", applicationId)
     .single();
   const application = applicationData as Pick<
     Application,
     "candidate_email" | "candidate_name"
-  > | null;
+  > & { jobs: { title: string } | null } | null;
 
   if (!application) {
     return { error: "Application not found" };
   }
 
-  return { success: true, email: application.candidate_email };
+  const html = message.replace(/\n/g, "<br>");
+  const text = message;
+
+  const result = await sendEmail({
+    to: { email: application.candidate_email, name: application.candidate_name },
+    subject,
+    html,
+    text,
+    replyTo: "hello@impjieg.com",
+  });
+
+  if (!result.success) {
+    return { error: result.error, category: result.category };
+  }
+
+  return { success: true, email: application.candidate_email, messageId: result.messageId };
 }
 
 export async function duplicateJob(jobId: string) {
@@ -259,5 +273,34 @@ export async function deleteJob(jobId: string) {
 
   revalidatePath("/employer/jobs");
   revalidatePath("/employer/dashboard");
+  return { success: true };
+}
+
+export async function withdrawApplication(applicationId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const applicationsTable = supabase.from(
+    "applications"
+  ) as unknown as ApplicationsMutationTable;
+
+  const { error } = await applicationsTable
+    .update({ status: "withdrawn" })
+    .eq("id", applicationId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/candidate/applications");
+  revalidatePath("/candidate/dashboard");
   return { success: true };
 }
