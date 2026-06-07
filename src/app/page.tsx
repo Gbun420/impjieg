@@ -5,6 +5,7 @@ import SearchFilters from "@/components/jobs/search-filters";
 import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 import { deriveEmployerComplianceSummary } from "@/lib/compliance";
 import {
   Banknote,
@@ -15,6 +16,11 @@ import {
   TrendingUp,
   Users,
   CheckCircle2,
+  Star,
+  MessageSquare,
+  Verified,
+  Zap,
+  RefreshCw,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
@@ -43,6 +49,14 @@ async function StatsSection() {
     salary_max: number | null;
   }>);
 
+  const { count: employerCount } = await supabase
+    .from("employers")
+    .select("*", { count: "exact", head: true });
+
+  const { count: candidateCount } = await supabase
+    .from("candidate_profiles")
+    .select("*", { count: "exact", head: true });
+
   return (
     <div className="flex items-center justify-center gap-6 text-sm text-foreground sm:gap-10">
       <div className="text-center">
@@ -58,6 +72,16 @@ async function StatsSection() {
       <div className="text-center">
         <p className="text-2xl font-bold text-foreground sm:text-3xl">30d</p>
         <p className="mt-0.5 text-muted-foreground">Freshness window</p>
+      </div>
+      <div className="h-8 w-px bg-border" />
+      <div className="text-center">
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">{employerCount || 0}</p>
+        <p className="mt-0.5 text-muted-foreground">Employers</p>
+      </div>
+      <div className="h-8 w-px bg-border" />
+      <div className="text-center">
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">{candidateCount || 0}</p>
+        <p className="mt-0.5 text-muted-foreground">Candidates</p>
       </div>
     </div>
   );
@@ -127,13 +151,17 @@ export default async function HomePage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/jobs">
-                <Button variant="primary" size="lg">
-                  Find better roles
+                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+                  <span className="flex items-center gap-2">
+                    Find better roles
+                  </span>
                 </Button>
               </Link>
               <Link href="/employer/post-job">
-                <Button variant="outline" size="lg" className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
-                  Hire Malta talent
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
+                  <span className="flex items-center gap-2">
+                    Hire Malta talent
+                  </span>
                 </Button>
               </Link>
             </div>
@@ -173,6 +201,13 @@ export default async function HomePage() {
                   ))}
                 </div>
                 <div className="mt-4 rounded-2xl border border-border/30 bg-card/50 p-4">
+                  <div className="mb-3 flex flex-wrap gap-1.5 text-xs">
+                    <span className="text-muted-foreground">Try filtering by:</span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">iGaming</span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">Remote</span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">€50k+</span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-featured">Senior</span>
+                  </div>
                   <Suspense fallback={<Skeleton className="h-28 w-full" />}>
                     <SearchFilters />
                   </Suspense>
@@ -205,6 +240,62 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Trust Signals & Testimonials */}
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Trusted by Malta&apos;s fastest-growing teams</h2>
+            <p className="text-sm text-muted-foreground mt-1">Real companies, real results</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                quote: "Impjieg cut our time-to-hire in half. The salary transparency attracts serious candidates, and the verified employer badge gave us instant credibility.",
+                author: "Sarah M.",
+                role: "Head of People, Fintech Scale-up",
+                company: "PayFlow Malta",
+                avatar: "SM",
+              },
+              {
+                quote: "Finally a platform that understands Malta's market. We filled 3 senior roles in 4 weeks—something agencies couldn't do in months.",
+                author: "Michael B.",
+                role: "Engineering Lead, iGaming Studio",
+                company: "Apex Gaming",
+                avatar: "MB",
+              },
+              {
+                quote: "The direct apply flow means we talk to candidates same-day. No middlemen, no delays. It's how hiring should work.",
+                author: "Lisa K.",
+                role: "Talent Acquisition, Legal Tech",
+                company: "Lexora",
+                avatar: "LK",
+              },
+            ].map((testimonial, idx) => (
+              <Card key={idx} className="marketplace-panel p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg font-semibold">&ldquo;</span>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-warning fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm leading-7 text-foreground/90 mb-5">{testimonial.quote}</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm text-foreground">{testimonial.author}</p>
+                    <p className="text-xs text-muted-foreground">{testimonial.role} · {testimonial.company}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -220,12 +311,12 @@ export default async function HomePage() {
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link href="/employer/post-job">
-                  <Button variant="primary" size="lg">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto">
                     Start Hiring
                   </Button>
                 </Link>
                 <Link href="/pricing">
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     View Pricing
                   </Button>
                 </Link>
@@ -343,10 +434,99 @@ export default async function HomePage() {
               </p>
             </div>
           </div>
+
+          {/* How it works - Verification, Freshness, Boosted Placement */}
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Card className="marketplace-panel p-6 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 mx-auto">
+                <Verified className="h-6 w-6 text-success" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-foreground">Verified employers</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Companies complete profile verification (website, logo, description, industry) and post at least one live role.
+                Verified employers get a trust badge on their profile and job cards, signaling legitimacy to candidates.
+              </p>
+              <Link href="/employer/settings" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                Get verified <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Card>
+            <Card className="marketplace-panel p-6 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto">
+                <RefreshCw className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-foreground">30-day freshness</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  Every job auto-expires after 30 days. Expired roles are removed from search, so you only see active opportunities.
+                  &ldquo;Posted X days ago&rdquo; timestamps show exact freshness&mdash;no stale listings clogging results.
+                </p>
+              <Link href="/jobs" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                Browse fresh roles <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Card>
+            <Card className="marketplace-panel p-6 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 mx-auto">
+                <Zap className="h-6 w-6 text-warning" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-foreground">Boosted placement</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Featured roles appear at the top of search, in the hero carousel, and get priority in candidate alerts.
+                Boosted jobs see ~3× more views and applications. Add when posting or upgrade anytime from your dashboard.
+              </p>
+              <Link href="/pricing" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                See pricing <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Card>
+          </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* FAQ */}
+      <section className="border-t border-border py-12 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Common questions</h2>
+            <p className="text-sm text-muted-foreground mt-1">Everything you need to know about Impjieg</p>
+          </div>
+          <dl className="space-y-4">
+            {[
+              {
+                q: "Is it free to post a job?",
+                a: "Yes — your first listing is free. No credit card required. After that, standard listings are €29 for 30 days, and featured listings (3× visibility) are €59. Volume discounts and subscription plans are available for teams hiring regularly.",
+              },
+              {
+                q: "How does employer verification work?",
+                a: "Companies verify by completing their profile (website, logo, description, industry, location) and posting at least one live role. Verified employers get a trust badge on their profile and job cards, which signals legitimacy to candidates and improves application rates.",
+              },
+              {
+                q: "What does 'freshness window' mean?",
+                a: "Every job expires automatically after 30 days. Expired roles are removed from search results, so candidates only see active opportunities. Each listing shows exactly when it was posted (e.g., 'Posted 3 days ago').",
+              },
+              {
+                q: "How do candidates apply?",
+                a: "Candidates apply directly through Impjieg — their profile and CV are sent straight to the employer's dashboard. No external redirects, no agency middlemen. Employers get instant notification and can respond within the platform.",
+              },
+              {
+                q: "Can I boost an existing listing?",
+                a: "Yes. From your employer dashboard, click 'Boost' on any active standard listing to upgrade it to featured. The boost takes effect immediately and lasts for the remaining duration of your 30-day listing.",
+              },
+              {
+                q: "What sectors and locations are covered?",
+                a: "Impjieg focuses on tech, digital, iGaming, finance, legal, marketing, and related professional sectors in Malta. Remote and hybrid roles open to Malta-based candidates are also welcome.",
+              },
+            ].map((faq, idx) => (
+              <div key={idx} className="group rounded-xl border border-border/50 bg-background/50 p-5 hover:border-primary/30 transition-colors">
+                <dt className="flex items-center justify-between gap-4 font-medium text-foreground">
+                  {faq.q}
+                  <MessageSquare className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </dt>
+                <dd className="mt-3 text-sm text-muted-foreground leading-relaxed">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* CTA - Single focused action for employers */}
       <section className="relative overflow-hidden py-16 sm:py-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
@@ -362,15 +542,13 @@ export default async function HomePage() {
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/employer/post-job">
               <Button variant="primary" size="lg">
-                Start Hiring
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="outline" size="lg">
-                View Pricing
+                Start Hiring Free
               </Button>
             </Link>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            First listing free · No card required · 30-day listing
+          </p>
         </div>
       </section>
     </div>

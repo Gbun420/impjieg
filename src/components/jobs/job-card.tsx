@@ -12,10 +12,41 @@ interface JobCardProps {
   isAuthenticated?: boolean;
 }
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function getAvatarColor(name: string) {
+  const colors = [
+    "bg-primary/10 text-primary",
+    "bg-secondary/10 text-secondary",
+    "bg-accent/10 text-accent",
+    "bg-success/10 text-success",
+    "bg-warning/10 text-warning",
+    "bg-purple-500/10 text-purple-500",
+    "bg-pink-500/10 text-pink-500",
+    "bg-orange-500/10 text-orange-500",
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export default function JobCard({ job, isSaved = false, isAuthenticated = false }: JobCardProps) {
   const salaryText = (job.salary_min || job.salary_max)
     ? `${formatSalary(job.salary_min ?? 0)}${job.salary_max ? ` - ${formatSalary(job.salary_max)}` : "+"}`
     : null;
+
+  const employerName = job.employers?.name || "Unknown Company";
+  const initials = getInitials(employerName);
+  const avatarColor = getAvatarColor(employerName);
 
   return (
     <article
@@ -36,23 +67,22 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 : "bg-muted"
             }`}
               role="img"
-              aria-label={
-                job.employers.logo_url
-                  ? `${job.employers.name} logo`
-                  : `${job.employers.name} logo placeholder`
-              }
+              aria-label={`${employerName} logo`}
             >
               {job.employers.logo_url ? (
                 <Image
                   src={job.employers.logo_url}
-                  alt={`${job.employers.name} logo`}
+                  alt={`${employerName} logo`}
                   width={32}
                   height={32}
                   className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg object-cover"
                 />
               ) : (
-                <span aria-hidden="true" className="text-base sm:text-lg font-semibold uppercase text-muted-foreground">
-                  {job.employers.name.charAt(0)}
+                <span
+                  className={`text-base sm:text-lg font-semibold uppercase ${avatarColor}`}
+                  aria-hidden="true"
+                >
+                  {initials}
                 </span>
               )}
             </div>
