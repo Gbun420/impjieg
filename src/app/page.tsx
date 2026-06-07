@@ -209,7 +209,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="marketplace-panel rounded-[1.75rem] p-6 sm:p-8">
-              <p className="brand-eyebrow">
+              <p className="brand-eyebrow text-primary">
                 For employers
               </p>
               <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">

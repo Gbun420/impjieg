@@ -11,7 +11,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="overflow-hidden rounded-[2rem] bg-[#08111F] p-8 text-white shadow-[0_26px_70px_rgba(8,17,31,0.28)] sm:p-10">
-        <span className="brand-eyebrow border-white/15 bg-white/10 text-[#7AA8FF]">
+        <span className="brand-eyebrow border-white/15 bg-white/10 text-white">
           Malta marketplace
         </span>
         <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">

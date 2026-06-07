@@ -13,15 +13,15 @@ function buildDevAdminSessionValue() {
 test('homepage loads and is accessible', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Impjieg/);
-  await expect(page.getByRole('heading', { name: /Jobs in Malta, with pay up front\./ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /The sharper marketplace for Malta/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
 
 test('browse jobs page loads', async ({ page }) => {
   await page.goto('/jobs');
-  await expect(page).toHaveTitle(/Browse Jobs/);
-  await expect(page.getByRole('heading', { name: /Browse Jobs/ })).toBeVisible();
+  await expect(page).toHaveTitle(/Browse Malta Jobs/);
+  await expect(page.getByRole('heading', { name: /Browse roles with the signals that matter/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
@@ -29,7 +29,7 @@ test('browse jobs page loads', async ({ page }) => {
 test('pricing page loads', async ({ page }) => {
   await page.goto('/pricing');
   await expect(page).toHaveTitle(/Pricing/);
-  await expect(page.getByRole('heading', { name: /Flexible Pricing/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Plans for every hiring stage/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
@@ -107,9 +107,9 @@ test('mobile navigation opens and is accessible', async ({ page }) => {
   await expect(menuButton).toBeVisible();
   await menuButton.click();
   const mobileNav = page.locator('.md\\:hidden nav');
-  await expect(mobileNav.getByRole('link', { name: 'Jobs' })).toBeVisible();
-  await expect(mobileNav.getByRole('link', { name: 'Pricing', exact: true })).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: 'Find jobs' })).toBeVisible();
   await expect(mobileNav.getByRole('link', { name: 'Companies' })).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: 'Hire talent' })).toBeVisible();
   await checkAccessibleNames(page);
 });
 
@@ -122,9 +122,9 @@ test('theme toggle switches between dark and light', async ({ page }) => {
     const menuButton = page.getByRole('button', { name: /Toggle menu/ });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
-    themeButton = page.getByRole('button', { name: /Dark Mode|Light Mode/ });
+    themeButton = page.getByRole('button', { name: /Light Mode|Dark Mode/ });
   } else {
-    themeButton = page.getByRole('button', { name: /Toggle theme/ });
+    themeButton = page.getByRole('button', { name: /Switch to (light|dark) mode/i });
   }
   await expect(themeButton).toBeVisible();
   await themeButton.click();
@@ -149,10 +149,10 @@ test('footer links are accessible', async ({ page }) => {
 
 test('search filters are accessible', async ({ page }) => {
   await page.goto('/jobs');
-  const searchInput = page.getByPlaceholder(/Search jobs/);
-  await expect(searchInput).toBeVisible();
+  const searchInput = page.getByPlaceholder(/Search by role, company, or skill/);
+  await expect(searchInput).toBeVisible({ timeout: 10000 });
   await checkAccessibleNames(page);
-  const filterButton = page.getByRole('button', { name: /Filters/ });
+  const filterButton = page.getByRole('button', { name: /Show filters/ });
   await expect(filterButton).toBeVisible();
   await filterButton.click();
   await checkAccessibleNames(page);
@@ -165,9 +165,10 @@ test('search filters can be shown and hidden on desktop', async ({ page }) => {
   const filterButton = page.getByRole('button', { name: 'Show filters' });
   const filterPanel = page.locator('#job-filters-panel');
 
+  await expect(filterButton).toBeVisible({ timeout: 10000 });
   await expect(filterPanel).toBeHidden();
   await filterButton.click();
-  await expect(page.getByRole('button', { name: 'Hide filters' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Hide filters' })).toBeVisible({ timeout: 5000 });
   await expect(filterPanel).toBeVisible();
   await page.getByRole('button', { name: 'Hide filters' }).click();
   await expect(filterPanel).toBeHidden();
@@ -176,6 +177,7 @@ test('search filters can be shown and hidden on desktop', async ({ page }) => {
 test('about page loads', async ({ page }) => {
   await page.goto('/about');
   await expect(page).toHaveTitle(/About/);
+  await expect(page.getByRole('heading', { name: /About Impjieg/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });

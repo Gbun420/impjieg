@@ -188,24 +188,35 @@ async function JobsContent({
 
   query.range(from, to);
 
+  let jobsData: JobWithEmployer[] | null = null;
+  let jobsError: { message: string } | null = null;
+  let jobsCount: number | null = null;
+
+  try {
+    const result = await query;
+    jobsData = result.data as unknown as JobWithEmployer[] | null;
+    jobsError = result.error;
+    jobsCount = result.count;
+  } catch (err) {
+    jobsError = { message: err instanceof Error ? err.message : 'Failed to load jobs' };
+  }
+
   const [
     { data: savedJobs },
-    { data: jobs, error, count },
   ] = await Promise.all([
     savedJobsPromise,
-    query,
   ]);
 
-  if (error || !jobs) {
+  if (jobsError || !jobsData) {
     return <p className="text-sm text-muted-foreground">Error loading jobs.</p>;
   }
 
-  const typedJobs = jobs as unknown as JobWithEmployer[];
+  const typedJobs = jobsData;
   const searchKey = new URLSearchParams(
     Object.entries(searchParams).filter(([, value]) => Boolean(value)) as [string, string][]
   ).toString();
   const savedJobIds = new Set((savedJobs || []).map((row) => row.job_id));
-  const totalJobs = count ?? typedJobs.length;
+  const totalJobs = jobsCount ?? typedJobs.length;
   const hasNextPage = from + typedJobs.length < totalJobs;
 
   return (
