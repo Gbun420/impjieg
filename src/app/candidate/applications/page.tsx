@@ -17,8 +17,10 @@ import {
   Building2,
   Clock,
   ExternalLink,
+  RotateCcw,
 } from "lucide-react";
 import { daysAgo } from "@/lib/utils";
+import { withdrawApplication } from "@/lib/actions/applications";
 import type { LucideIcon } from "lucide-react";
 import type { CandidateApplication } from "@/lib/supabase/types";
 
@@ -168,6 +170,14 @@ export default async function CandidateApplicationsPage() {
                     >
                       {config.label}
                     </Badge>
+                    {app.status === "applied" && (
+                      <form action={withdrawApplication}>
+                        <input type="hidden" name="applicationId" value={app.id} />
+                        <Button variant="ghost" size="sm" title="Withdraw application">
+                          <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
+                        </Button>
+                      </form>
+                    )}
                   </div>
                 </div>
               </Card>

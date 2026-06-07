@@ -73,9 +73,8 @@ export default function CheckoutPage({
     }
   }
 
-  async function handleAddVisibility() {
-    await handleCheckout("featuredBoost");
-  }
+  const handleMainCheckout = () => handleCheckout();
+  const handleAddVisibility = () => handleCheckout("featuredBoost");
 
   if (!jobId) {
     return (
@@ -207,7 +206,7 @@ export default function CheckoutPage({
         variant="primary"
         size="lg"
         className="w-full"
-        onClick={handleCheckout}
+        onClick={handleMainCheckout}
         isLoading={isLoading}
       >
         {finalPrice === 0

@@ -18,6 +18,16 @@ type ApplicationsMutationTable = {
     };
   };
 };
+
+type CandidateApplicationsMutationTable = {
+  update(values: ApplicationUpdate): {
+    eq(column: "id", value: string): {
+      eq(column: "user_id", value: string): Promise<{
+        error: { message: string } | null;
+      }>;
+    };
+  };
+};
 type JobsMutationTable = {
   insert(values: JobInsert[]): {
     select(): {
@@ -276,7 +286,7 @@ export async function deleteJob(jobId: string) {
   return { success: true };
 }
 
-export async function withdrawApplication(applicationId: string) {
+export async function withdrawApplication(formData: FormData) {
   const supabase = await createClient();
 
   const {
@@ -284,23 +294,24 @@ export async function withdrawApplication(applicationId: string) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Not authenticated" };
+    return;
+  }
+
+  const applicationId = formData.get("applicationId") as string;
+
+  if (!applicationId) {
+    return;
   }
 
   const applicationsTable = supabase.from(
-    "applications"
-  ) as unknown as ApplicationsMutationTable;
+    "candidate_applications"
+  ) as unknown as CandidateApplicationsMutationTable;
 
-  const { error } = await applicationsTable
+  await applicationsTable
     .update({ status: "withdrawn" })
     .eq("id", applicationId)
     .eq("user_id", user.id);
 
-  if (error) {
-    return { error: error.message };
-  }
-
   revalidatePath("/candidate/applications");
   revalidatePath("/candidate/dashboard");
-  return { success: true };
 }
