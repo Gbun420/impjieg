@@ -68,19 +68,38 @@ export async function adminLogin(formData: FormData) {
     return { error: "This account is not authorized for admin access." };
   }
 
-  await clearAdminMfaChallengeCookie(cookieStore);
-  await setAdminSession(cookieStore);
-
   const serviceSupabase = createServiceClient(getSupabaseUrl(), getSupabaseServiceKey());
-  await logAdminAction(serviceSupabase, {
-    adminEmail: user.email,
-    action: "admin_login",
-    entityType: "admin_session",
-    entityId: user.id,
-    afterValue: { success: true, mfa: false },
-  });
+  const { data: mfaFactor } = await serviceSupabase
+    .from("admin_mfa_factors")
+    .select("enabled")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
-  return { success: true };
+  const { generateAdminMfaSecret, setAdminMfaChallengeCookie } = await import("@/lib/admin-mfa");
+
+  if (mfaFactor?.enabled) {
+    await setAdminMfaChallengeCookie({
+      userId: user.id,
+      email: user.email,
+      mode: "login",
+      issuedAt: Date.now(),
+    }, cookieStore);
+
+    return { mfaRequired: true };
+  }
+
+  // Not enabled or not found - trigger setup
+  const secret = generateAdminMfaSecret();
+
+  await setAdminMfaChallengeCookie({
+    userId: user.id,
+    email: user.email,
+    mode: "setup",
+    secret,
+    issuedAt: Date.now(),
+  }, cookieStore);
+
+  return { mfaRequired: true };
 }
 
 export async function adminLogout() {

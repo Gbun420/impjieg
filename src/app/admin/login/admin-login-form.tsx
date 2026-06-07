@@ -26,6 +26,11 @@ export default function AdminLoginForm() {
       return;
     }
 
+    if (result?.mfaRequired) {
+      router.push("/admin/login/mfa");
+      return;
+    }
+
     router.push("/admin/dashboard");
     router.refresh();
   }

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!checkAndMarkIdempotent(`stripe-webhook:${event.id}`, 24 * 60 * 60 * 1000)) {
+  if (!(await checkAndMarkIdempotent(`stripe-webhook:${event.id}`, 24 * 60 * 60 * 1000))) {
     return NextResponse.json({ received: true, duplicate: true });
   }
 

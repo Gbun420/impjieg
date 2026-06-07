@@ -13,10 +13,10 @@ export type AiAuthenticatedUser = {
   email?: string | null;
 };
 
-import { enforceRateLimitRedis } from "@/lib/redis-rate-limit";
+import { enforceRateLimitRedis, resetRateLimitState } from "@/lib/redis-rate-limit";
 
 export function resetAiRateLimitState() {
-  // No-op for Redis-backed rate limiter
+  resetRateLimitState();
 }
 
 export function getRequestIp(request: Request) {
