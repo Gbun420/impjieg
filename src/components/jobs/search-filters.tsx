@@ -252,9 +252,9 @@ export default function SearchFilters() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <fieldset className="space-y-2">
+          <fieldset className="space-y-3">
             <legend className="text-sm font-medium text-foreground">Employment type</legend>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="flex flex-wrap gap-2">
               {WORK_TYPES.map((option) => {
                 const checked = workTypes.includes(option);
                 const id = `work-type-${option.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -262,10 +262,10 @@ export default function SearchFilters() {
                   <label
                     key={option}
                     htmlFor={id}
-                    className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                       checked
-                        ? "border-primary/40 bg-primary/5 text-primary"
-                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        ? "border-primary bg-primary/10 text-primary shadow-[0_0_0_1px_rgba(30,99,255,0.2)]"
+                        : "border-border bg-background hover:border-primary/30 hover:bg-primary/5"
                     }`}
                   >
                     <input
@@ -273,18 +273,18 @@ export default function SearchFilters() {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleValue(option, workTypes, setWorkTypes)}
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary shrink-0"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20 shrink-0"
                     />
-                    <span>{option}</span>
+                    <span className="whitespace-nowrap">{option}</span>
                   </label>
                 );
               })}
             </div>
           </fieldset>
 
-          <fieldset className="space-y-2">
+          <fieldset className="space-y-3">
             <legend className="text-sm font-medium text-foreground">Experience level</legend>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-2">
               {EXPERIENCE_LEVELS.map((option) => {
                 const checked = experience.includes(option);
                 const id = `experience-${option.toLowerCase()}`;
@@ -292,10 +292,10 @@ export default function SearchFilters() {
                   <label
                     key={option}
                     htmlFor={id}
-                    className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                       checked
-                        ? "border-primary/40 bg-primary/5 text-primary"
-                        : "border-border/60 bg-background/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        ? "border-primary bg-primary/10 text-primary shadow-[0_0_0_1px_rgba(30,99,255,0.2)]"
+                        : "border-border bg-background hover:border-primary/30 hover:bg-primary/5"
                     }`}
                   >
                     <input
@@ -303,9 +303,9 @@ export default function SearchFilters() {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleValue(option, experience, setExperience)}
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary shrink-0"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20 shrink-0"
                     />
-                    <span>{option}</span>
+                    <span className="whitespace-nowrap">{option}</span>
                   </label>
                 );
               })}
