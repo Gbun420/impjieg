@@ -15,9 +15,6 @@ import {
   TrendingUp,
   Users,
   CheckCircle2,
-  Sparkles,
-  Target,
-  Zap,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
@@ -286,7 +283,7 @@ export default async function HomePage() {
               <Link
                 key={sector}
                 href={`/jobs?sector=${encodeURIComponent(sector)}`}
-                className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-border-hover hover:bg-card-hover hover:shadow-sm"
+                className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card-hover hover:shadow-sm"
               >
                 {sector}
               </Link>

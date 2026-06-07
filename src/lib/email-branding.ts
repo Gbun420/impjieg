@@ -32,7 +32,7 @@ export function buildBrandedEmailShell({
       <div style="margin:0 auto;max-width:640px;padding:28px 16px;">
         <div style="overflow:hidden;border-radius:24px;border:1px solid #DBE4F0;background:#FFFFFF;box-shadow:0 18px 48px rgba(11,18,32,0.08);">
           <div style="background:#0B1220;padding:26px 28px;color:#F8FAFC;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#46D1BE;">${safeEyebrow}</div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#14C7B7;">${safeEyebrow}</div>
             <h1 style="margin:10px 0 0;font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-0.03em;">${safeTitle}</h1>
             ${safeIntro ? `<p style="margin:12px 0 0;color:#C9D4E5;font-size:15px;line-height:1.6;">${safeIntro}</p>` : ""}
           </div>

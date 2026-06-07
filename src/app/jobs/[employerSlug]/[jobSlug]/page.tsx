@@ -213,24 +213,24 @@ export default async function JobDetailPage({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Header */}
-          <Card className="overflow-hidden border-border/70 bg-[#08111F] text-white shadow-[0_26px_80px_rgba(11,18,32,0.2)]">
+          <Card className="overflow-hidden border-border/70 bg-harbor text-foreground shadow-[0_26px_80px_rgba(11,18,32,0.15)]">
             <div className={`h-1 w-full ${
               j.is_featured
-                ? "bg-[linear-gradient(90deg,rgba(30,99,255,0.95)_0%,rgba(20,199,183,0.95)_100%)]"
-                : "bg-white/12"
+                ? "bg-[linear-gradient(90deg,var(--primary)_0%,var(--secondary)_100%)]"
+                : "bg-border/30"
             }`} />
             <div className="relative overflow-hidden p-6 sm:p-7">
-              <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.24),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.16),transparent_28%)]" />
+              <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.16),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.1),transparent_28%)]" />
               <div className="relative">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-[#46D1BE]">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                   Role signal
                 </p>
               <div className="flex items-start gap-4">
                 <div
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
                     j.is_featured
-                      ? "bg-white/10 ring-1 ring-white/10"
-                      : "bg-white/8"
+                      ? "bg-primary/10 ring-1 ring-primary/10"
+                      : "bg-muted"
                   }`}
                   role="img"
                   aria-label={
@@ -248,7 +248,7 @@ export default async function JobDetailPage({
                       className="rounded-lg object-cover"
                     />
                   ) : (
-                    <span aria-hidden="true" className="text-xl font-semibold text-white/70">
+                    <span aria-hidden="true" className="text-xl font-semibold text-muted-foreground">
                       {j.employers.name.charAt(0)}
                     </span>
                   )}
@@ -257,14 +257,14 @@ export default async function JobDetailPage({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                          <h1 className="text-2xl font-bold tracking-[-0.05em] text-white sm:text-3xl">
+                          <h1 className="text-2xl font-bold tracking-[-0.05em] text-foreground sm:text-3xl">
                           {j.title}
                         </h1>
-                        {j.is_featured ? <Badge variant="accent" className="border-white/10 bg-white/10 text-white">Priority role</Badge> : null}
+                        {j.is_featured ? <Badge variant="accent" className="border-primary/20 bg-primary/10 text-primary">Priority role</Badge> : null}
                       </div>
                       <Link
                         href={`/companies/${j.employers.slug}`}
-                        className="mt-1 text-base text-white/68 transition-colors hover:text-white"
+                        className="mt-1 text-base text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {j.employers.name}
                       </Link>
@@ -279,18 +279,18 @@ export default async function JobDetailPage({
                       <ShareJobButton title={j.title} />
                     </div>
                   </div>
-                  <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-white/72">
-                    <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-2.5 py-1">
+                  <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/30 bg-muted/50 px-2.5 py-1">
                       <MapPin className="h-4 w-4 shrink-0" />
                       {j.location}
                     </span>
-                    <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-2.5 py-1">
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/30 bg-muted/50 px-2.5 py-1">
                       <Briefcase className="h-4 w-4 shrink-0" />
                       {j.job_type}
                     </span>
                     {j.remote_type ? <Badge>{j.remote_type}</Badge> : null}
                     {j.visa_friendly ? <Badge variant="accent">Visa friendly</Badge> : null}
-                    <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-2.5 py-1">
+                    <span className="flex items-center gap-1.5 rounded-full border border-border/30 bg-muted/50 px-2.5 py-1">
                       <Eye className="h-4 w-4 shrink-0" />
                       {j.views} views
                     </span>
@@ -436,8 +436,8 @@ export default async function JobDetailPage({
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-20 space-y-4">
-            <Card className="overflow-hidden border-border/70 bg-surface shadow-[0_18px_55px_rgba(11,18,32,0.08)]">
-              <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.05))] p-5">
+            <Card className="overflow-hidden border-border/70 bg-card shadow-[0_18px_55px_rgba(11,18,32,0.08)]">
+              <div className="border-b border-border/60 bg-primary/5 p-5">
                 <h2 className="text-base font-semibold text-foreground">
                   Apply for this role
                 </h2>
@@ -475,7 +475,7 @@ export default async function JobDetailPage({
             </Card>
 
             {/* Company card */}
-            <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
+            <Card className="overflow-hidden border-border/70 bg-card shadow-sm">
               <div className="p-5">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                   About the Company
