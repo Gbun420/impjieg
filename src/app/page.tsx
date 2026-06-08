@@ -50,20 +50,16 @@ async function StatsSection() {
     .from("employers")
     .select("*", { count: "exact", head: true });
 
-  const { count: candidateCount } = await supabase
-    .from("candidate_profiles")
-    .select("*", { count: "exact", head: true });
-
   return (
     <div className="flex items-center justify-center gap-6 text-sm text-foreground sm:gap-10">
       <div className="text-center">
         <p className="text-2xl font-bold text-foreground sm:text-3xl">{salaryCoverage.activeJobs}</p>
-        <p className="mt-0.5 text-muted-foreground">Active jobs</p>
+        <p className="mt-0.5 text-muted-foreground">Active roles</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
-        <p className="text-2xl font-bold text-primary sm:text-3xl">{salaryCoverage.salaryCoveragePercent}%</p>
-        <p className="mt-0.5 text-muted-foreground">Salary coverage</p>
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">Salary visibility</p>
+        <p className="mt-0.5 text-muted-foreground">Transparent ranges</p>
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
@@ -77,8 +73,8 @@ async function StatsSection() {
       </div>
       <div className="h-8 w-px bg-border" />
       <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">{candidateCount || 0}</p>
-        <p className="mt-0.5 text-muted-foreground">Candidates</p>
+        <p className="text-2xl font-bold text-foreground sm:text-3xl">Direct apply</p>
+        <p className="mt-0.5 text-muted-foreground">No middlemen</p>
       </div>
     </div>
   );
@@ -171,41 +167,41 @@ export default async function HomePage() {
           </div>
 
           <div className="animate-fade-in-up stagger-2">
-            <div className="rounded-[2rem] border border-border/30 bg-card/50 p-4 shadow-[0_28px_90px_rgba(11,18,32,0.15)] backdrop-blur">
-              <div className="rounded-[1.5rem] border border-border/30 bg-background/80 p-4">
-                <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="rounded-[2rem] border border-border/30 bg-card/50 p-3 shadow-[0_28px_90px_rgba(11,18,32,0.15)] backdrop-blur sm:p-4">
+              <div className="rounded-[1.5rem] border border-border/30 bg-background/80 p-3 sm:p-4">
+                <div className="flex items-center justify-between border-b border-border pb-2">
                   <div>
                     <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Marketplace pulse</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Live Malta roles</p>
+                    <p className="mt-0.5 text-sm font-semibold text-foreground">Live Malta roles</p>
                   </div>
                   <span className="rounded-full bg-lagoon/15 px-3 py-1 text-xs font-semibold text-lagoon">Updated</span>
                 </div>
-                <div className="mt-4 space-y-3">
+                <div className="mt-3 space-y-2">
                   {[
                     ["Product designer", "Sliema · Hybrid", "EUR 42k - 55k"],
                     ["Compliance analyst", "St Julian's · On-site", "EUR 36k - 48k"],
                     ["Senior React engineer", "Malta / EU · Remote", "EUR 62k - 78k"],
                   ].map(([title, meta, salary]) => (
-                    <div key={title} className="rounded-2xl border border-border/30 bg-card/50 p-4">
+                    <div key={title} className="rounded-2xl border border-border/30 bg-card/50 p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-foreground">{title}</p>
-                          <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
+                          <p className="mt-0.5 text-sm text-muted-foreground">{meta}</p>
                         </div>
                         <p className="shrink-0 font-mono text-sm font-semibold text-primary">{salary}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 rounded-2xl border border-border/30 bg-card/50 p-4">
-                  <div className="mb-3 flex flex-wrap gap-1.5 text-xs">
+                <div className="mt-3 rounded-2xl border border-border/30 bg-card/50 p-3">
+                  <div className="mb-2 flex flex-wrap gap-1.5 text-xs">
                     <span className="text-muted-foreground">Try filtering by:</span>
                     <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">iGaming</span>
                     <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">Remote</span>
                     <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">€50k+</span>
                     <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-featured">Senior</span>
                   </div>
-                  <Suspense fallback={<Skeleton className="h-28 w-full" />}>
+                  <Suspense fallback={<Skeleton className="h-24 w-full" />}>
                     <SearchFilters />
                   </Suspense>
                 </div>

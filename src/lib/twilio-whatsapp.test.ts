@@ -76,7 +76,7 @@ test("buildImpjiegWhatsAppApplicationMessage includes branded copy and dashboard
   });
 
   assert.match(message, /Impjieg/);
-  assert.match(message, /Malta.*modern jobs marketplace/);
+  assert.match(message, /Malta.*hiring marketplace/);
   assert.match(message, /Candidate: Jane Doe/);
   assert.match(message, /Role: Product Engineer/);
   assert.match(message, /Application ID: app_123/);

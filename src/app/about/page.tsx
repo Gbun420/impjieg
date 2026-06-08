@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Learn more about Impjieg, Malta's modern jobs marketplace for tech, digital, and iGaming talent.",
+    "Learn more about Impjieg, Malta's hiring marketplace for salary, work-mode, and employer clarity.",
 };
 
 export default function AboutPage() {
@@ -26,7 +26,7 @@ export default function AboutPage() {
 
       <div className="prose prose-sm marketplace-panel mt-8 max-w-none rounded-[1.5rem] p-6 text-muted-foreground sm:p-8">
         <p>
-          {SITE.name} is Malta&apos;s modern jobs marketplace, built with a
+          {SITE.name} is Malta&apos;s hiring marketplace, built with a
           simple mission: make job hunting and hiring clearer, faster, and
           easier to trust.
         </p>

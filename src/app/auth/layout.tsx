@@ -19,7 +19,7 @@ export default async function AuthLayout({
                 {SITE.name}
               </span>
               <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">
-                Malta&apos;s modern jobs marketplace
+                Hiring signal
               </span>
             </span>
           </Link>
