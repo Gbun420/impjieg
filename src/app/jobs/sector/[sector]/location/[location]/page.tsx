@@ -164,6 +164,7 @@ export default async function SectorLocationPage({
 
   const relatedSectors = SECTORS.filter((s) => labelToSlug(s) !== sector).slice(0, 6);
   const relatedLocations = LOCATIONS.filter((l) => labelToSlug(l) !== location).slice(0, 6);
+  const hasJobs = typedJobs.length > 0;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
