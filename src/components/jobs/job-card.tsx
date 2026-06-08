@@ -23,14 +23,14 @@ function getInitials(name: string) {
 
 function getAvatarColor(name: string) {
   const colors = [
-    "bg-primary/10 text-primary",
-    "bg-secondary/10 text-secondary",
-    "bg-accent/10 text-accent",
-    "bg-success/10 text-success",
-    "bg-warning/10 text-warning",
-    "bg-purple-500/10 text-purple-500",
-    "bg-pink-500/10 text-pink-500",
-    "bg-orange-500/10 text-orange-500",
+    "bg-primary/15",
+    "bg-secondary/15",
+    "bg-accent/15",
+    "bg-success/15",
+    "bg-warning/15",
+    "bg-purple-500/15",
+    "bg-pink-500/15",
+    "bg-orange-500/15",
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -66,8 +66,10 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 ? "bg-primary/10 ring-1 ring-primary/10"
                 : "bg-muted"
             }`}
-              role="img"
-              aria-label={`${employerName} logo`}
+              {...(job.employers.logo_url
+                ? { role: "img" as const, "aria-label": `${employerName} logo` }
+                : { "aria-hidden": "true" }
+              )}
             >
               {job.employers.logo_url ? (
                 <Image
@@ -79,7 +81,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 />
               ) : (
                 <span
-                  className={`text-base sm:text-lg font-semibold uppercase ${avatarColor}`}
+                  className={`text-base sm:text-lg font-semibold uppercase text-foreground ${avatarColor}`}
                   aria-hidden="true"
                 >
                   {initials}

@@ -208,7 +208,8 @@ export default function SearchFilters() {
                 type="button"
                 variant={showFilters || hasActiveFilters ? "secondary" : "outline"}
                 aria-expanded={showFilters}
-                aria-controls="job-filters-panel"
+                aria-controls="jobs-filter-panel"
+                data-testid="jobs-filter-button"
                 onClick={() => setShowFilters((value) => !value)}
               >
                 <SlidersHorizontal className="mr-1.5 h-4 w-4" />
@@ -226,7 +227,8 @@ export default function SearchFilters() {
       </Card>
 
       <div
-        id="job-filters-panel"
+        id="jobs-filter-panel"
+        data-testid="jobs-filter-panel"
         className={`${showFilters ? "block" : "hidden"} marketplace-panel space-y-5 rounded-[1.75rem] p-4 sm:p-5`}
       >
         <div className="flex items-center justify-between gap-3 lg:hidden">

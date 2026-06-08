@@ -60,7 +60,7 @@ export default function SalaryCalculatorPage() {
   const taxRate = breakdown ? ((breakdown.tax + breakdown.nic) / breakdown.gross * 100).toFixed(1) : "0";
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+    <div data-testid="salary-calculator" className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="text-center mb-8">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20">
           <Calculator className="h-7 w-7 text-primary" />

@@ -1,0 +1,74 @@
+{
+  "auditDate": "2026-06-08T15:00:00+02:00",
+  "totalTests": 40,
+  "totalPassed": 40,
+  "totalFailed": 0,
+  "totalSkipped": 0,
+  "browsers": ["chromium", "Mobile Chrome"],
+  "failures": [],
+  "fixedFailures": [
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "homepage loads and is accessible",
+      "route": "/",
+      "classification": "stale copy",
+      "rootCause": "Test expected heading 'The sharper marketplace for Malta' but actual H1 was 'Jobs with clearer signals.' after brand modernization.",
+      "fix": "Updated test assertion to /Jobs with clearer signals/ to match approved brand copy.",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "salary calculator page loads and works",
+      "route": "/salary-calculator",
+      "classification": "hydration readiness",
+      "rootCause": "Test clicked Calculate button before client-side hydration completed. onSubmit handler not yet bound. Also strict mode violations on ambiguous locators.",
+      "fix": "Added data-testid='salary-calculator' wrapper. Test now waits for wrapper visible + button enabled before interacting. Removed redundant locator assertions.",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "mobile navigation opens and is accessible",
+      "route": "/",
+      "classification": "brittle selector",
+      "rootCause": "Test used CSS selector '.md:hidden nav' and 'Toggle menu' aria-label. Button aria-label now toggles between 'Open menu'/'Close menu'. Mobile nav is conditionally mounted, not CSS-hidden.",
+      "fix": "Added aria-controls='mobile-navigation' to button, id='mobile-navigation' + role='navigation' + aria-label='Mobile navigation' to nav. Test uses getByRole('button', { name: /Open menu/ }) and getByRole('navigation', { name: /mobile/i }). After click, re-queries for 'Close menu' button.",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "theme toggle switches between dark and light",
+      "route": "/",
+      "classification": "hydration readiness",
+      "rootCause": "Theme toggle button is hydration-gated (useHydrated). Server renders placeholder span. Test queried button before hydration completed. Also aria-labels were 'Switch to light/dark mode' which didn't match test regex.",
+      "fix": "Changed aria-label to stable 'Toggle theme' on both desktop and admin headers. Added data-testid='theme-toggle' on button, data-testid='theme-toggle-placeholder' on server placeholder. Test uses getByRole('button', { name: /toggle theme/i }).",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "search filters are accessible",
+      "route": "/jobs",
+      "classification": "hydration readiness",
+      "rootCause": "SearchFilters uses useSearchParams() inside Suspense boundary. Filter button and panel not in initial HTML. Test used getByRole('button', { name: /Show filters/ }) which matched but panel wasn't rendered yet.",
+      "fix": "Added data-testid='jobs-filter-button' to button, data-testid='jobs-filter-panel' + id='jobs-filter-panel' to panel. Updated aria-controls to 'jobs-filter-panel'. Test uses getByTestId with { waitUntil: 'networkidle' }.",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "search filters can be shown and hidden on desktop",
+      "route": "/jobs",
+      "classification": "hydration readiness",
+      "rootCause": "Same as above. Panel CSS 'hidden' class was present but Playwright considered element visible due to Suspense deferral timing.",
+      "fix": "Same as above. Test uses getByTestId('jobs-filter-button') and getByTestId('jobs-filter-panel'). Verifies aria-expanded attribute toggles correctly.",
+      "fixed": true
+    },
+    {
+      "testFile": "tests/e2e/app.spec.ts",
+      "testName": "homepage loads and is accessible + browse jobs page loads",
+      "route": "/ and /jobs",
+      "classification": "real app bug",
+      "rootCause": "axe-core color-contrast violation on decorative company avatar initials. Parent div had role='img' + aria-label causing axe to check contrast of child spans. Brand colors (purple-500, orange-500, warning, secondary, accent) at /10 and /20 opacity failed 4.5:1 WCAG AA threshold.",
+      "fix": "Changed getAvatarColor to return only background classes (no text color). Added text-foreground to the initials span for guaranteed contrast. Removed role='img' + aria-label from parent when no logo URL (initials-only path).",
+      "fixed": true
+    }
+  ]
+}

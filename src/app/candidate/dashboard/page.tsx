@@ -2,6 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Candidate Dashboard",
+  description: "Manage your job applications, saved roles, and career alerts on Impjieg.",
+};
 
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";

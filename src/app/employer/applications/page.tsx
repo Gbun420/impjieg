@@ -3,6 +3,12 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import ApplicationPipeline from "@/components/jobs/application-pipeline";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import type { Application, CandidateProfile, Database, Employer } from "@/lib/supabase/types";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Employer Applications",
+  description: "Review and manage candidate applications for your job listings on Impjieg.",
+};
 import { normalizeApplicationScorecardData } from "@/lib/application-scorecard";
 import { redirect } from "next/navigation";
 

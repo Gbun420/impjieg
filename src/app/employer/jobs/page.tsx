@@ -3,6 +3,12 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { buildEmployerPromotionLinks } from "@/lib/job-promotion";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Employer Jobs",
+  description: "Manage your job listings, track performance, and promote roles on Impjieg.",
+};
 import { deriveJobQuality } from "@/lib/job-quality";
 import { SITE } from "@/lib/constants";
 

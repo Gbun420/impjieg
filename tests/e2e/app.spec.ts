@@ -13,7 +13,7 @@ function buildDevAdminSessionValue() {
 test('homepage loads and is accessible', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Impjieg/);
-  await expect(page.getByRole('heading', { name: /The sharper marketplace for Malta/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Jobs with clearer signals/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
@@ -93,9 +93,12 @@ test('signup page loads and has form', async ({ page }) => {
 test('salary calculator page loads and works', async ({ page }) => {
   await page.goto('/salary-calculator');
   await expect(page.getByRole('heading', { name: /Malta Salary Calculator/ })).toBeVisible();
+  await expect(page.getByTestId('salary-calculator')).toBeVisible();
+  await expect(page.getByRole('button', { name: /calculate/i })).toBeEnabled();
   await page.getByLabel('Gross Annual Salary').fill('35000');
-  await page.getByRole('button', { name: 'Calculate' }).click();
+  await page.getByRole('button', { name: /calculate/i }).click();
   await expect(page.getByText('Net Monthly Take-Home')).toBeVisible();
+  await expect(page.getByText('Breakdown')).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
@@ -103,10 +106,14 @@ test('salary calculator page loads and works', async ({ page }) => {
 test('mobile navigation opens and is accessible', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
   await page.goto('/');
-  const menuButton = page.getByRole('button', { name: /Toggle menu/ });
-  await expect(menuButton).toBeVisible();
-  await menuButton.click();
-  const mobileNav = page.locator('.md\\:hidden nav');
+  const openButton = page.getByRole('button', { name: /Open menu/ });
+  await expect(openButton).toBeVisible();
+  await expect(openButton).toHaveAttribute('aria-expanded', 'false');
+  await openButton.click();
+  const closeButton = page.getByRole('button', { name: /Close menu/ });
+  await expect(closeButton).toHaveAttribute('aria-expanded', 'true');
+  const mobileNav = page.getByRole('navigation', { name: /mobile/i });
+  await expect(mobileNav).toBeVisible();
   await expect(mobileNav.getByRole('link', { name: 'Find jobs' })).toBeVisible();
   await expect(mobileNav.getByRole('link', { name: 'Companies' })).toBeVisible();
   await expect(mobileNav.getByRole('link', { name: 'Hire talent' })).toBeVisible();
@@ -116,18 +123,22 @@ test('mobile navigation opens and is accessible', async ({ page }) => {
 test('theme toggle switches between dark and light', async ({ page }) => {
   await page.goto('/');
   const isMobile = (page.viewportSize()?.width ?? 0) < 768;
-  let themeButton;
-  
+
   if (isMobile) {
-    const menuButton = page.getByRole('button', { name: /Toggle menu/ });
+    const menuButton = page.getByRole('button', { name: /Open menu/ });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
-    themeButton = page.getByRole('button', { name: /Light Mode|Dark Mode/ });
+    const mobileNav = page.getByRole('navigation', { name: /mobile/i });
+    await expect(mobileNav).toBeVisible();
+    const mobileThemeButton = mobileNav.getByRole('button', { name: /Dark Mode|Light Mode/ });
+    await expect(mobileThemeButton).toBeVisible();
+    await mobileThemeButton.click();
   } else {
-    themeButton = page.getByRole('button', { name: /Switch to (light|dark) mode/i });
+    const themeButton = page.getByRole('button', { name: /toggle theme/i });
+    await expect(themeButton).toBeVisible();
+    await themeButton.click();
   }
-  await expect(themeButton).toBeVisible();
-  await themeButton.click();
+
   const htmlClass = await page.locator('html').getAttribute('class');
   expect(htmlClass).toContain('dark');
 });
@@ -148,33 +159,31 @@ test('footer links are accessible', async ({ page }) => {
 });
 
 test('search filters are accessible', async ({ page }) => {
-  await page.goto('/jobs');
-  // Wait for page to load and check if search input exists
-  await expect(page.locator('body')).toBeVisible();
+  await page.goto('/jobs', { waitUntil: 'networkidle' });
   const searchInput = page.getByPlaceholder(/Search by role, company, or skill/);
   await expect(searchInput).toBeVisible({ timeout: 10000 });
   await checkAccessibleNames(page);
-  const filterButton = page.getByRole('button', { name: /Show filters/ });
+  const filterButton = page.getByTestId('jobs-filter-button');
   await expect(filterButton).toBeVisible();
   await filterButton.click();
+  await expect(page.getByTestId('jobs-filter-panel')).toBeVisible();
   await checkAccessibleNames(page);
 });
 
 test('search filters can be shown and hidden on desktop', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/jobs');
+  await page.goto('/jobs', { waitUntil: 'networkidle' });
 
-  await expect(page.locator('body')).toBeVisible();
-  
-  const filterButton = page.getByRole('button', { name: 'Show filters' });
-  const filterPanel = page.locator('#job-filters-panel');
+  const filterButton = page.getByTestId('jobs-filter-button');
+  const filterPanel = page.getByTestId('jobs-filter-panel');
 
   await expect(filterButton).toBeVisible({ timeout: 10000 });
   await expect(filterPanel).toBeHidden();
   await filterButton.click();
-  await expect(page.getByRole('button', { name: 'Hide filters' })).toBeVisible({ timeout: 5000 });
+  await expect(filterButton).toHaveAttribute('aria-expanded', 'true');
   await expect(filterPanel).toBeVisible();
-  await page.getByRole('button', { name: 'Hide filters' }).click();
+  await filterButton.click();
+  await expect(filterButton).toHaveAttribute('aria-expanded', 'false');
   await expect(filterPanel).toBeHidden();
 });
 

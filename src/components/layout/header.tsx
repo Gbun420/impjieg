@@ -129,8 +129,9 @@ export default function Header({
               <button
                 onClick={toggleTheme}
                 className="hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors hover:bg-muted md:flex"
-                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label="Toggle theme"
                 aria-pressed={theme === "dark"}
+                data-testid="theme-toggle"
               >
                 {theme === "dark" ? (
                   <Sun className="h-4 w-4" />
@@ -138,7 +139,9 @@ export default function Header({
                   <Moon className="h-4 w-4" />
                 )}
               </button>
-            ) : null}
+            ) : (
+              <span className="hidden h-9 w-9 md:flex" aria-hidden="true" data-testid="theme-toggle-placeholder" />
+            )}
 
             <Button asChild variant="outline" size="sm">
               <Link href="/">
@@ -188,8 +191,9 @@ export default function Header({
             <button
               onClick={toggleTheme}
               className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-surface/70 text-muted-foreground transition-all hover:bg-surface hover:border-border hover:text-foreground"
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label="Toggle theme"
               aria-pressed={theme === "dark"}
+              data-testid="theme-toggle"
             >
               {theme === "dark" ? (
                 <Sun className="h-4.5 w-4.5" />
@@ -198,7 +202,7 @@ export default function Header({
               )}
             </button>
           ) : (
-            <span className="hidden md:flex h-9 w-9" aria-hidden="true" />
+            <span className="hidden md:flex h-9 w-9" aria-hidden="true" data-testid="theme-toggle-placeholder" />
           )}
 
           <div className="hidden md:flex items-center gap-2">
@@ -233,8 +237,9 @@ export default function Header({
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors"
-            aria-label="Toggle menu"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileOpen ? (
               <X className="h-5 w-5" />
@@ -247,7 +252,7 @@ export default function Header({
 
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background animate-fade-in">
-          <nav className="mx-auto max-w-6xl px-4 py-4 space-y-2">
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="mx-auto max-w-6xl px-4 py-4 space-y-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (

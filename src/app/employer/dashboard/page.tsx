@@ -3,6 +3,12 @@ import { ensureEmployerProfile } from "@/lib/actions/auth";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import { deriveApplicationInsights } from "@/lib/application-insights";
 import { deriveEmployerComplianceSummary } from "@/lib/compliance";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Employer Dashboard",
+  description: "Manage your job listings, track applications, and view hiring analytics on Impjieg.",
+};
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
