@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Suspense } from "react";
-import SearchFilters from "@/components/jobs/search-filters";
 import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,36 +45,25 @@ async function StatsSection() {
     salary_max: number | null;
   }>);
 
-  const { count: employerCount } = await supabase
-    .from("employers")
-    .select("*", { count: "exact", head: true });
+  const stats = [
+    { value: String(salaryCoverage.activeJobs), label: "Active roles", note: "Updated daily", Icon: Building2 },
+    { value: "Salary", label: "Visibility", note: "Transparent ranges", Icon: Banknote },
+    { value: "30d", label: "Freshness window", note: "Expired roles drop off", Icon: Clock },
+    { value: "Direct", label: "Apply", note: "No middlemen", Icon: CheckCircle2 },
+  ];
 
   return (
-    <div className="flex items-center justify-center gap-6 text-sm text-foreground sm:gap-10">
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">{salaryCoverage.activeJobs}</p>
-        <p className="mt-0.5 text-muted-foreground">Active roles</p>
-      </div>
-      <div className="h-8 w-px bg-border" />
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">Salary visibility</p>
-        <p className="mt-0.5 text-muted-foreground">Transparent ranges</p>
-      </div>
-      <div className="h-8 w-px bg-border" />
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">30d</p>
-        <p className="mt-0.5 text-muted-foreground">Freshness window</p>
-      </div>
-      <div className="h-8 w-px bg-border" />
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">{employerCount || 0}</p>
-        <p className="mt-0.5 text-muted-foreground">Employers</p>
-      </div>
-      <div className="h-8 w-px bg-border" />
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foreground sm:text-3xl">Direct apply</p>
-        <p className="mt-0.5 text-muted-foreground">No middlemen</p>
-      </div>
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {stats.map((s) => (
+        <div key={s.label} className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card/70 px-4 py-4 backdrop-blur min-h-[104px]">
+          <s.Icon className="h-4 w-4 text-muted-foreground" />
+          <div className="mt-3">
+            <p className="text-2xl font-bold leading-none text-foreground sm:text-3xl">{s.value}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{s.label}</p>
+            <p className="text-xs leading-5 text-muted-foreground">{s.note}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -178,32 +166,26 @@ export default async function HomePage() {
                 </div>
                 <div className="mt-3 space-y-2">
                   {[
-                    ["Product designer", "Sliema · Hybrid", "EUR 42k - 55k"],
-                    ["Compliance analyst", "St Julian's · On-site", "EUR 36k - 48k"],
-                    ["Senior React engineer", "Malta / EU · Remote", "EUR 62k - 78k"],
+                    ["Product designer", "Sliema · Hybrid", "€42k–55k"],
+                    ["Compliance analyst", "St Julian's · On-site", "€36k–48k"],
+                    ["Senior React engineer", "Malta / EU · Remote", "€62k–78k"],
                   ].map(([title, meta, salary]) => (
-                    <div key={title} className="rounded-2xl border border-border/30 bg-card/50 p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-foreground">{title}</p>
-                          <p className="mt-0.5 text-sm text-muted-foreground">{meta}</p>
-                        </div>
-                        <p className="shrink-0 font-mono text-sm font-semibold text-primary">{salary}</p>
+                    <div key={title} className="flex items-center justify-between gap-3 rounded-2xl border border-border/30 bg-card/50 px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-foreground">{title}</p>
+                        <p className="mt-0.5 text-sm text-muted-foreground">{meta}</p>
                       </div>
+                      <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-primary">{salary}</span>
                     </div>
                   ))}
                 </div>
                 <div className="mt-3 rounded-2xl border border-border/30 bg-card/50 p-3">
-                  <div className="mb-2 flex flex-wrap gap-1.5 text-xs">
-                    <span className="text-muted-foreground">Try filtering by:</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">iGaming</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">Remote</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-foreground">€50k+</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-featured">Senior</span>
+                  <p className="text-sm font-semibold text-foreground">Marketplace search</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Search live Malta roles. Results update automatically.</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-lagoon/15 px-2.5 py-0.5 text-xs font-semibold text-lagoon">Live signal</span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-0.5 text-xs font-semibold text-foreground">Explore</span>
                   </div>
-                  <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-                    <SearchFilters />
-                  </Suspense>
                 </div>
               </div>
             </div>
