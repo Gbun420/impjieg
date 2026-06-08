@@ -1,212 +1,91 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { useState, useCallback } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { formatSalary } from "@/lib/utils";
-import { Calculator, ArrowDownRight, TrendingUp, Wallet } from "lucide-react";
-
-interface TaxBreakdown {
-  gross: number;
-  tax: number;
-  nic: number;
-  netAnnual: number;
-  netMonthly: number;
-}
-
-function calculateMaltaTax(gross: number): TaxBreakdown {
-  let tax = 0;
-
-  if (gross > 60000) {
-    tax += (gross - 60000) * 0.35;
-    tax += (60000 - 19500) * 0.25;
-    tax += (19500 - 14500) * 0.25;
-    tax += (14500 - 9100) * 0.15;
-  } else if (gross > 19500) {
-    tax += (gross - 19500) * 0.25;
-    tax += (19500 - 14500) * 0.25;
-    tax += (14500 - 9100) * 0.15;
-  } else if (gross > 14500) {
-    tax += (gross - 14500) * 0.25;
-    tax += (14500 - 9100) * 0.15;
-  } else if (gross > 9100) {
-    tax += (gross - 9100) * 0.15;
-  }
-
-  const nic = gross * 0.1;
-  const netAnnual = gross - tax - nic;
-
-  return {
-    gross,
-    tax,
-    nic,
-    netAnnual,
-    netMonthly: netAnnual / 12,
-  };
-}
+import { ArrowRight, Briefcase } from "lucide-react";
+import SalaryCalculatorForm from "@/components/salary/salary-calculator-form";
+import SalaryResultCard from "@/components/salary/salary-result-card";
+import SalaryBreakdownCard from "@/components/salary/salary-breakdown-card";
+import SalaryAssumptionsCard from "@/components/salary/salary-assumptions-card";
+import { calculateSalary, validateInput } from "@/lib/salary/salary-calculator";
+import type { CalculatorInput, TaxResult, SalaryPeriod, TaxProfile } from "@/lib/salary/types";
 
 export default function SalaryCalculatorPage() {
-  const [gross, setGross] = useState("");
-  const [breakdown, setBreakdown] = useState<TaxBreakdown | null>(null);
+  const [result, setResult] = useState<TaxResult | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const amount = parseFloat(gross);
-    if (isNaN(amount) || amount <= 0) return;
-    setBreakdown(calculateMaltaTax(amount));
-  }
+  const handleCalculate = useCallback((amount: number, period: SalaryPeriod, profile: TaxProfile, hoursPerWeek: number, weeksPerYear: number) => {
+    const input: CalculatorInput = { amount, period, profile, hoursPerWeek, weeksPerYear };
+    const validationWarnings = validateInput(input);
+    setWarnings(validationWarnings.map((w) => w.message));
 
-  const taxRate = breakdown ? ((breakdown.tax + breakdown.nic) / breakdown.gross * 100).toFixed(1) : "0";
+    if (validationWarnings.some((w) => w.type === "negative")) {
+      setResult(null);
+      return;
+    }
+
+    setResult(calculateSalary(input));
+  }, []);
 
   return (
-    <div data-testid="salary-calculator" className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="text-center mb-8">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20">
-          <Calculator className="h-7 w-7 text-primary" />
+    <div data-testid="salary-calculator">
+      <section className="relative overflow-hidden bg-harbor py-10 text-foreground sm:py-16">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            <Briefcase className="h-3.5 w-3.5" />
+            Salary signal
+          </div>
+          <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-[-0.055em] text-foreground sm:text-5xl">
+            Malta Salary Calculator
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+            Estimate your take-home pay with clearer salary signals.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
+              <Link href="/jobs">
+                Browse jobs with salary <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
+              <Link href="/employer/post-job">
+                Post a role with salary visibility
+              </Link>
+            </Button>
+          </div>
         </div>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Malta Salary{" "}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Calculator
-          </span>
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Calculate your take-home pay after Malta income tax and NIC.
-        </p>
-      </div>
+      </section>
 
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <Input
-          label="Gross Annual Salary"
-          type="number"
-          value={gross}
-          onChange={(e) => setGross(e.target.value)}
-          placeholder="e.g. 35000"
-          required
-          className="flex-1"
-        />
-        <Button type="submit" variant="primary" size="lg" className="self-end">
-          Calculate
-        </Button>
-      </form>
-
-      {breakdown && (
-        <div className="mt-8 space-y-5 animate-fade-in">
-          {/* Net Monthly Card */}
-          <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 to-secondary/10">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              <p className="mt-3 text-sm font-medium text-foreground/80">
-                Net Monthly Take-Home
-              </p>
-              <p className="font-mono text-4xl font-bold text-foreground">
-                {formatSalary(breakdown.netMonthly)}
-              </p>
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Calculate</h2>
+              <SalaryCalculatorForm onCalculate={handleCalculate} />
             </div>
-          </Card>
-
-          {/* Summary Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-4 border-border/60">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10">
-                  <TrendingUp className="h-4 w-4 text-success" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Net Annual</p>
-                  <p className="font-mono text-lg font-bold text-foreground">
-                    {formatSalary(breakdown.netAnnual)}
-                  </p>
-                </div>
-              </div>
-            </Card>
-            <Card className="p-4 border-border/60">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-error/10">
-                  <ArrowDownRight className="h-4 w-4 text-error" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Total Deductions</p>
-                  <p className="font-mono text-lg font-bold text-foreground">
-                    {taxRate}%
-                  </p>
-                </div>
-              </div>
-            </Card>
+            <SalaryAssumptionsCard />
           </div>
 
-          {/* Breakdown */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold text-foreground">
-              Breakdown
-            </h2>
-            <div className="mt-4 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-foreground/75">Gross Annual</span>
-                <span className="font-mono font-medium text-foreground">
-                  {formatSalary(breakdown.gross)}
-                </span>
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            {result ? (
+              <SalaryResultCard result={result} warnings={warnings} />
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center">
+                <p className="text-sm text-muted-foreground">Enter a salary to see your estimated take-home pay.</p>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-foreground/75">Income Tax</span>
-                <span className="font-mono font-medium text-red-600 dark:text-red-400">
-                  -{formatSalary(breakdown.tax)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-foreground/75">
-                  NIC (10%)
-                </span>
-                <span className="font-mono font-medium text-red-600 dark:text-red-400">
-                  -{formatSalary(breakdown.nic)}
-                </span>
-              </div>
-              <div className="border-t border-border/50 pt-3 flex justify-between items-center">
-                <span className="font-semibold text-foreground">Net Annual</span>
-                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                  {formatSalary(breakdown.netAnnual)}
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Tax Brackets */}
-          <Card className="p-6 bg-muted/20">
-            <h2 className="text-sm font-semibold text-foreground/75 uppercase tracking-wider">
-              Tax Brackets (Malta)
-            </h2>
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-foreground/75">€0 - €9,100</span>
-                <span className="font-medium text-emerald-700 dark:text-emerald-400">0%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-foreground/75">€9,101 - €14,500</span>
-                <span className="font-medium text-foreground">15%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-foreground/75">€14,501 - €19,500</span>
-                <span className="font-medium text-foreground">25%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-foreground/75">€19,501 - €60,000</span>
-                <span className="font-medium text-foreground">25%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-foreground/75">€60,001+</span>
-                <span className="font-medium text-red-600 dark:text-red-400">35%</span>
-              </div>
-              <div className="flex justify-between border-t border-border/50 pt-2 mt-2">
-                <span className="text-foreground/75">NIC</span>
-                <span className="font-medium text-foreground">10% of gross</span>
-              </div>
-            </div>
-          </Card>
+            )}
+          </div>
         </div>
-      )}
+
+        {result && (
+          <div className="mt-8">
+            <SalaryBreakdownCard result={result} />
+          </div>
+        )}
+      </section>
     </div>
   );
 }

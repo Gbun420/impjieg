@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Salary Calculator",
-  description: "Calculate your net monthly take-home pay after Malta income tax and NIC contributions.",
+  title: "Malta Salary Calculator 2026 | Gross to Net Pay | Impjieg",
+  description:
+    "Estimate your Malta take-home pay from gross salary using 2026 Malta tax bands, salary period, tax status, and social security assumptions.",
 };
 
 export default function SalaryCalculatorLayout({ children }: { children: React.ReactNode }) {
