@@ -270,8 +270,14 @@ export default async function JobsPage({
 }) {
   const params = await searchParams;
 
+  // Canonical URL for the base /jobs page (without query params)
+  const canonicalUrl = "https://impjieg.vercel.app/jobs";
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <NextMetadata>
+        <link rel="canonical" href={canonicalUrl} />
+      </NextMetadata>
       <div className="mb-8 overflow-hidden rounded-[2rem] border border-border/70 bg-[#08111F] p-6 text-white shadow-[0_22px_70px_rgba(11,18,32,0.18)] sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#46D1BE]">
           Malta marketplace search
@@ -294,6 +300,11 @@ export default async function JobsPage({
             ))}
           </div>
         </div>
+      </div>
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">
+          Browse live Malta roles with salary, work-mode, employer, and freshness signals.
+        </p>
       </div>
       <Suspense fallback={<SearchFiltersSkeleton />}>
         <JobsContent searchParams={params} />
