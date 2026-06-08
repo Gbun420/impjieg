@@ -1,6 +1,7 @@
 /**
  * Quantum Dimensional State Definitions
  * 11-dimensional morph states for the Impjieg logo
+ * Enhanced with Nature Distilled aesthetic
  */
 
 export const DIMENSIONAL_STATES = {
@@ -9,10 +10,11 @@ export const DIMENSIONAL_STATES = {
     id: 'potential',
     name: 'Quantum Potential',
     description: 'Infinite career possibilities visualized as particle field',
-    icon: '⚛️',
     probability: 1.0,
     complexity: 0.3,
-    color: '#6EE7B7',
+    color: '#6EE7B7', // Neon Mint
+    natureColor: '#8B7355', // Warm Stone Brown
+    symbol: 'potential-symbol',
     animation: {
       type: 'particle-field',
       duration: 3000,
@@ -30,10 +32,11 @@ export const DIMENSIONAL_STATES = {
     id: 'focus',
     name: 'Neural Focus',
     description: 'Concentrated attention during job search and evaluation',
-    icon: '🧠',
     probability: 0.9,
     complexity: 0.7,
-    color: '#0EA5E9',
+    color: '#0EA5E9', // Azure Depth
+    natureColor: '#A89475', // Lighter Stone
+    symbol: 'focus-symbol',
     animation: {
       type: 'synaptic-network',
       duration: 2000,
@@ -51,10 +54,11 @@ export const DIMENSIONAL_STATES = {
     id: 'connection',
     name: 'Resonance Connection',
     description: 'Harmonic frequency alignment with potential employers',
-    icon: '🔗',
     probability: 0.8,
     complexity: 0.6,
-    color: '#8B5CF6',
+    color: '#8B5CF6', // Violet Insight
+    natureColor: '#CBB99A', // Light Stone
+    symbol: 'connection-symbol',
     animation: {
       type: 'harmonic-waves',
       duration: 2500,
@@ -72,10 +76,11 @@ export const DIMENSIONAL_STATES = {
     id: 'application',
     name: 'Temporal Application',
     description: 'Time-dilated experience during job application process',
-    icon: '🚀',
     probability: 0.7,
     complexity: 0.8,
-    color: '#F97316',
+    color: '#F97316', // Sunset Orange
+    natureColor: '#DCC9AB', // Very Light Stone
+    symbol: 'application-symbol',
     animation: {
       type: 'time-dilation',
       duration: 1500,
@@ -93,10 +98,11 @@ export const DIMENSIONAL_STATES = {
     id: 'success',
     name: 'Success Cascade',
     description: 'Particle bloom effect representing successful outcomes',
-    icon: '🎯',
     probability: 0.6,
     complexity: 0.9,
-    color: '#10B981',
+    color: '#10B981', // Emerald Growth
+    natureColor: '#E0D5C0', // Off-White Stone
+    symbol: 'success-symbol',
     animation: {
       type: 'particle-bloom',
       duration: 2000,
@@ -114,10 +120,11 @@ export const DIMENSIONAL_STATES = {
     id: 'growth',
     name: 'Growth Spiral',
     description: 'Fibonacci-based expansion representing career progression',
-    icon: '📈',
     probability: 0.5,
     complexity: 0.7,
     color: '#10B981',
+    natureColor: '#8B7355',
+    symbol: 'growth-symbol',
     animation: {
       type: 'fibonacci-spiral',
       duration: 3000,
@@ -135,10 +142,11 @@ export const DIMENSIONAL_STATES = {
     id: 'community',
     name: 'Community Network',
     description: 'Real-time graph visualization of professional networks',
-    icon: '👥',
     probability: 0.4,
     complexity: 0.8,
     color: '#8B5CF6',
+    natureColor: '#A89475',
+    symbol: 'community-symbol',
     animation: {
       type: 'network-graph',
       duration: 2500,
@@ -156,10 +164,11 @@ export const DIMENSIONAL_STATES = {
     id: 'insight',
     name: 'Insight Revelation',
     description: 'Data particles forming meaningful career insights',
-    icon: '💡',
     probability: 0.3,
     complexity: 0.9,
     color: '#F59E0B',
+    natureColor: '#CBB99A',
+    symbol: 'insight-symbol',
     animation: {
       type: 'data-formation',
       duration: 2000,
@@ -177,10 +186,11 @@ export const DIMENSIONAL_STATES = {
     id: 'transition',
     name: 'Transition Vortex',
     description: 'Dimensional fold effect for career transitions and pivots',
-    icon: '🌀',
     probability: 0.2,
     complexity: 1.0,
     color: '#F87171',
+    natureColor: '#DCC9AB',
+    symbol: 'transition-symbol',
     animation: {
       type: 'dimensional-fold',
       duration: 3000,
@@ -198,10 +208,11 @@ export const DIMENSIONAL_STATES = {
     id: 'leadership',
     name: 'Leadership Constellation',
     description: 'Stellar formation representing leadership and influence',
-    icon: '🌟',
     probability: 0.1,
     complexity: 0.9,
     color: '#F59E0B',
+    natureColor: '#E0D5C0',
+    symbol: 'leadership-symbol',
     animation: {
       type: 'stellar-formation',
       duration: 3500,
@@ -219,10 +230,11 @@ export const DIMENSIONAL_STATES = {
     id: 'infinite',
     name: 'Infinite Loop',
     description: 'Fractal recursion symbolizing continuous learning',
-    icon: '♾️',
     probability: 0.05,
     complexity: 1.0,
     color: '#6EE7B7',
+    natureColor: '#8B7355',
+    symbol: 'infinite-symbol',
     animation: {
       type: 'fractal-recursion',
       duration: 4000,

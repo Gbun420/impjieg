@@ -9,6 +9,7 @@ import { useNeuralResponsiveness } from '../../hooks/useNeuralResponsiveness';
 import { useCognitiveAdaptation } from '../../hooks/useCognitiveAdaptation';
 import { dimensionShifter } from '../../utils/dimension-shifter';
 import { entropyCalculator } from '../../utils/entropy-calculator';
+import { DIMENSIONAL_STATES } from './logo-dimensions';
 import styles from './QuantumKineticLogo.module.scss';
 
 /**
@@ -21,7 +22,8 @@ const QuantumKineticLogo = ({
   initialState = 'potential',
   interactive = true,
   biometricEnabled = false,
-  mlEnabled = true
+  mlEnabled = true,
+  natureMode = false
 }) => {
   // State management
   const [currentState, setCurrentState] = useState(initialState);
@@ -54,18 +56,37 @@ const QuantumKineticLogo = ({
   
   // Particle system for quantum effects
   const particles = useMemo(() => {
-    const temp = new Float32Array(3000);
-    for (let i = 0; i < 1000; i++) {
-      const t = Math.random() * 2 * Math.PI;
-      const r = Math.sqrt(Math.random()) * 2;
-      const x = r * Math.cos(t);
-      const y = r * Math.sin(t);
-      temp[i * 3] = x;
-      temp[i * 3 + 1] = y;
-      temp[i * 3 + 2] = Math.random() * 2 - 1;
+    const count = natureMode ? 1200 : 1000;
+    const temp = new Float32Array(count * 3);
+    
+    for (let i = 0; i < count; i++) {
+      if (natureMode) {
+        // Organic Fibonacci spiral distribution
+        const golden_ratio = (1 + Math.sqrt(5)) / 2;
+        const theta = i * 2 * Math.PI * golden_ratio;
+        const radius = Math.sqrt(i / count) * 2;
+        
+        const x = radius * Math.cos(theta);
+        const y = radius * Math.sin(theta);
+        const z = (Math.random() - 0.5) * 0.5;
+        
+        temp[i * 3] = x;
+        temp[i * 3 + 1] = y;
+        temp[i * 3 + 2] = z;
+      } else {
+        // Original distribution
+        const t = Math.random() * 2 * Math.PI;
+        const r = Math.sqrt(Math.random()) * 2;
+        const x = r * Math.cos(t);
+        const y = r * Math.sin(t);
+        
+        temp[i * 3] = x;
+        temp[i * 3 + 1] = y;
+        temp[i * 3 + 2] = Math.random() * 2 - 1;
+      }
     }
     return temp;
-  }, []);
+  }, [natureMode]);
   
   // Native mouse event handlers
   const handleMouseMove = useCallback((e) => {
@@ -154,29 +175,51 @@ const QuantumKineticLogo = ({
     const mesh = useRef();
     const light = useRef();
     
-    useFrame((state) => {
+    useFrame((state, delta) => {
       if (mesh.current) {
-        mesh.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.1;
-        mesh.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+        // Organic movement patterns for nature mode
+        if (natureMode) {
+          mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.15;
+          mesh.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.25;
+          mesh.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
+        } else {
+          // Original movement
+          mesh.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.1;
+          mesh.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+        }
       }
       
       if (light.current) {
-        light.current.position.x = Math.sin(state.clock.elapsedTime) * 5;
-        light.current.position.y = Math.cos(state.clock.elapsedTime) * 5;
+        // Gentle, natural light movement
+        light.current.position.x = Math.sin(state.clock.elapsedTime * 0.4) * 4;
+        light.current.position.y = Math.cos(state.clock.elapsedTime * 0.3) * 3;
+        light.current.position.z = Math.sin(state.clock.elapsedTime * 0.2) * 2;
       }
     });
     
     return (
       <>
-        <ambientLight intensity={0.5} />
-        <pointLight ref={light} position={[10, 10, 10]} intensity={1} />
+        <ambientLight 
+          intensity={natureMode ? 0.5 : 0.4} 
+          color={natureMode ? "#F8F9FA" : "#ffffff"} 
+        />
+        <pointLight 
+          ref={light} 
+          position={[3, 3, 3]} 
+          intensity={natureMode ? 0.9 : 1} 
+          color={natureMode ? "#8B7355" : "#ffffff"} 
+        />
         <Points ref={mesh} positions={particles} stride={3}>
           <PointMaterial
             transparent
-            color={currentState === 'success' ? "#6EE7B7" : "#0EA5E9"}
-            size={0.02}
+            color={natureMode ? 
+              (currentState === 'success' ? "#6EE7B7" : "#8B7355") : 
+              (currentState === 'success' ? "#6EE7B7" : "#0EA5E9")
+            }
+            size={natureMode ? 0.035 : 0.025}
             sizeAttenuation={true}
             depthWrite={false}
+            opacity={natureMode ? 0.7 : 0.8}
           />
         </Points>
       </>
