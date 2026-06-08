@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 
 export default function SalaryAssumptionsCard() {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
+    <div className="rounded-2xl border border-border bg-card p-6" data-testid="salary-assumptions-card">
       <div className="flex items-start gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
           <Info className="h-4 w-4 text-primary" />
@@ -15,7 +15,7 @@ export default function SalaryAssumptionsCard() {
             <p>Last reviewed: <strong className="text-foreground">2026-06-08</strong></p>
           </div>
           <div className="rounded-xl bg-muted/50 p-3">
-            <p className="text-xs leading-relaxed">
+            <p className="text-xs leading-relaxed text-foreground/70">
               This calculator is an estimate for general guidance. It is not tax, payroll, legal, or financial advice.
               Final payroll may vary based on SSC class, fringe benefits, bonuses, residency, part-time rules, and employer payroll setup.
               Employee SSC is estimated at ~10% — exact MTCA Class 1 weekly caps/rates not yet encoded.

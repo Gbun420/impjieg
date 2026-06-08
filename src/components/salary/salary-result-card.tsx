@@ -12,7 +12,7 @@ interface SalaryResultCardProps {
 
 export default function SalaryResultCard({ result, warnings }: SalaryResultCardProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="salary-result-card">
       {warnings.length > 0 && (
         <div className="rounded-xl border border-warning/30 bg-warning/5 p-3">
           {warnings.map((w, i) => (

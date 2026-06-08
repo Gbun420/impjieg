@@ -14,7 +14,7 @@ export default function SalaryBreakdownCard({ result }: SalaryBreakdownCardProps
   const profileLabel = table?.label ?? result.profile;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="salary-breakdown-card">
       <div className="rounded-2xl border border-border bg-card p-6">
         <h2 className="text-lg font-semibold text-foreground">Breakdown</h2>
         <div className="mt-4 space-y-3">
@@ -53,7 +53,7 @@ export default function SalaryBreakdownCard({ result }: SalaryBreakdownCardProps
             return (
               <div key={i} className={`flex justify-between rounded-lg px-2 py-1 ${isActive ? "bg-primary/10 font-semibold" : ""}`}>
                 <span className={isActive ? "text-foreground" : "text-foreground/75"}>{range}</span>
-                <span className={isActive ? "text-primary" : "text-foreground/75"}>
+                <span className={isActive ? "text-foreground" : "text-foreground/75"}>
                   {(band.rate * 100).toFixed(0)}%
                   {band.subtract > 0 && ` (−€${band.subtract.toLocaleString()})`}
                 </span>
