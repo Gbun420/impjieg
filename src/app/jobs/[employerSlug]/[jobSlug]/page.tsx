@@ -76,8 +76,40 @@ export async function generateMetadata({
   };
 }
 
+function mapEmploymentTypeToSchema(type: string | null | undefined): string {
+  if (!type) return "FULL_TIME";
+  const t = type.toLowerCase();
+  if (t.includes("full")) return "FULL_TIME";
+  if (t.includes("part")) return "PART_TIME";
+  if (t.includes("contract")) return "CONTRACTOR";
+  if (t.includes("temp")) return "TEMPORARY";
+  if (t.includes("intern")) return "INTERN";
+  if (t.includes("volunteer")) return "VOLUNTEER";
+  return "OTHER";
+}
+
 async function JobPostingSchema({ job }: { job: JobWithEmployer }) {
   const nonce = (await headers()).get("x-nonce");
+
+  const isRemote = job.remote_type && job.remote_type.toLowerCase() !== "on-site";
+  const jobLocation = isRemote
+    ? {
+        "@type": "Place",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Remote",
+          addressCountry: "MT",
+        },
+      }
+    : {
+        "@type": "Place",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: job.location?.split(",")[0]?.trim() || "Malta",
+          addressCountry: "MT",
+        },
+      };
+
   const schema = {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
@@ -85,20 +117,19 @@ async function JobPostingSchema({ job }: { job: JobWithEmployer }) {
     description: sanitizeJobDescription(job.description),
     datePosted: job.created_at,
     validThrough: job.expires_at || addDaysIso(30),
-    employmentType: job.job_type,
+    employmentType: mapEmploymentTypeToSchema(job.job_type),
     hiringOrganization: {
       "@type": "Organization",
       name: job.employers?.name,
       sameAs: job.employers?.website || undefined,
+      url: job.employers?.website || undefined,
+      logo: job.employers?.logo_url || undefined,
     },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job.location?.split(",")[0]?.trim() || "Malta",
-        addressCountry: "MT",
-      },
-    },
+    jobLocation,
+    ...(isRemote && { jobLocationType: "TELECOMMUTE" }),
+    applicantLocationRequirements: isRemote
+      ? { "@type": "Place", name: "Malta", address: { "@type": "PostalAddress", addressCountry: "MT" } }
+      : undefined,
     baseSalary: job.salary_min
       ? {
           "@type": "MonetaryAmount",
@@ -111,9 +142,12 @@ async function JobPostingSchema({ job }: { job: JobWithEmployer }) {
           },
         }
       : undefined,
-    applicantLocationRequirements: job.remote_type
-      ? { "@type": "Place", name: job.remote_type }
-      : undefined,
+    identifier: {
+      "@type": "PropertyValue",
+      name: "Impjieg",
+      value: job.id,
+    },
+    directApply: true,
     url: `https://impjieg.vercel.app/jobs/${job.employers?.slug}/${job.slug}`,
   };
 
