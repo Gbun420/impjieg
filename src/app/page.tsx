@@ -130,7 +130,7 @@ async function LatestJobs() {
 export default async function HomePage() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden bg-harbor py-16 text-foreground sm:py-24 lg:py-28">
+      <section className="relative isolate overflow-hidden bg-harbor py-10 text-foreground sm:py-16 lg:py-20">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:px-8">
