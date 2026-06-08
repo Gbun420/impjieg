@@ -173,9 +173,11 @@ export default async function SectorLocationPage({
               No {sectorLabel.toLowerCase()} roles in {locationLabel} at the moment. Try another location or sector.
             </p>
             <div className="mt-4">
-              <Link href={`/jobs/sector/${sector}`}>
-                <Button variant="outline">View all {sectorLabel} jobs</Button>
-              </Link>
+              <Button asChild variant="outline">
+                <Link href={`/jobs/sector/${sector}`}>
+                  View all {sectorLabel} jobs
+                </Link>
+              </Button>
             </div>
           </Card>
         ) : (

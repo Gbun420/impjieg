@@ -91,17 +91,17 @@ export default function EmployerGrowthPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Link href="#request-growth">
-                <Button variant="primary" size="lg">
+              <Button asChild variant="primary" size="lg">
+                <Link href="#request-growth">
                   Request a growth sprint
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/pricing">
-                <Button variant="outline" size="lg" className="border-white/15 bg-white/5 text-white hover:bg-white/10">
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="border-white/15 bg-white/5 text-white hover:bg-white/10">
+                <Link href="/pricing">
                   View employer pricing
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">

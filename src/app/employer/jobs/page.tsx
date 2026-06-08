@@ -13,6 +13,9 @@ import { PlusCircle, Eye, Users, Briefcase, TrendingUp, Clock, ExternalLink, Cop
 import { daysUntil } from "@/lib/utils";
 import type { Employer, Job } from "@/lib/supabase/types";
 import { duplicateJob, boostJob, deleteJob } from "@/lib/actions/applications";
+import { BoostJobButton } from "@/components/employer/boost-job-button";
+import { DuplicateJobButton } from "@/components/employer/duplicate-job-button";
+import { DeleteJobButton } from "@/components/employer/delete-job-button";
 
 type EmployerJob = Job & { employers: { slug: string | null } | null };
 
@@ -55,18 +58,18 @@ export default async function EmployerJobsPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">My Jobs</h1>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Link href="/employer/bulk-upload" className="w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+          <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+            <Link href="/employer/bulk-upload">
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
               Bulk Upload
-            </Button>
-          </Link>
-          <Link href="/employer/post-job" className="w-full sm:w-auto">
-            <Button variant="primary" className="w-full sm:w-auto">
+            </Link>
+          </Button>
+          <Button asChild variant="primary" className="w-full sm:w-auto">
+            <Link href="/employer/post-job">
               <PlusCircle className="mr-2 h-4 w-4" />
               Post a Role
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -125,9 +128,11 @@ export default async function EmployerJobsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Post your first job to start receiving applications
           </p>
-          <Link href="/employer/post-job" className="mt-4 inline-block">
-            <Button variant="primary">Post Your First Job</Button>
-          </Link>
+          <Button asChild variant="primary">
+            <Link href="/employer/post-job" className="mt-4 inline-block">
+              Post Your First Job
+            </Link>
+          </Button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -210,48 +215,33 @@ export default async function EmployerJobsPage() {
                   <div className="flex items-center gap-2 self-end sm:self-auto">
                     {promotionLinks && (
                       <>
-                        <Link href={promotionLinks.linkedinUrl} target="_blank">
-                          <Button variant="ghost" size="sm" title="Share on LinkedIn">
+                        <Button asChild variant="ghost" size="sm" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+                          <Link href={promotionLinks.linkedinUrl} target="_blank">
                             <Globe className="h-3.5 w-3.5" />
-                          </Button>
-                        </Link>
-                        <Link href={promotionLinks.emailUrl}>
-                          <Button variant="ghost" size="sm" title="Share by email">
+                          </Link>
+                        </Button>
+                        <Button asChild variant="ghost" size="sm" title="Share by email" aria-label="Share by email">
+                          <Link href={promotionLinks.emailUrl}>
                             <Mail className="h-3.5 w-3.5" />
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       </>
                     )}
-                    <Link href={`/employer/jobs/${job.id}/analytics`}>
-                      <Button variant="ghost" size="sm" title="View analytics">
+                    <Button asChild variant="ghost" size="sm" title="View analytics" aria-label="View analytics">
+                      <Link href={`/employer/jobs/${job.id}/analytics`}>
                         <BarChart3 className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                    {job.status === "active" && !job.is_featured && (
-                      <form action={async () => {
-                        "use server";
-                        await boostJob(job.id);
-                      }}>
-                        <Button variant="outline" size="sm" title="Boost to Featured">
-                          <Zap className="mr-1 h-3.5 w-3.5" />
-                          Boost
-                        </Button>
-                      </form>
-                    )}
-                    <form action={async () => {
-                      "use server";
-                      await duplicateJob(job.id);
-                    }}>
-                      <Button variant="ghost" size="sm" title="Duplicate job">
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    </form>
-                    {promotionLinks && (
-                      <Link href={promotionLinks.jobUrl} target="_blank">
-                        <Button variant="ghost" size="sm" title="View live">
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Button>
                       </Link>
+                    </Button>
+                    {job.status === "active" && !job.is_featured && (
+                      <BoostJobButton jobId={job.id} />
+                    )}
+                    <DuplicateJobButton jobId={job.id} />
+                    {promotionLinks && (
+                      <Button asChild variant="ghost" size="sm" title="View live" aria-label="View live">
+                        <Link href={promotionLinks.jobUrl} target="_blank">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
                     )}
                     {!promotionLinks && (
                       <Button
@@ -259,19 +249,13 @@ export default async function EmployerJobsPage() {
                         size="sm"
                         title="Live link unavailable"
                         disabled
+                        aria-label="Live link unavailable"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
                     )}
                     {job.status !== "deleted" && (
-                      <form action={async () => {
-                        "use server";
-                        await deleteJob(job.id);
-                      }}>
-                        <Button variant="ghost" size="sm" title="Delete job">
-                          <Trash2 className="h-3.5 w-3.5 text-error" />
-                        </Button>
-                      </form>
+                      <DeleteJobButton jobId={job.id} />
                     )}
                   </div>
                 </div>

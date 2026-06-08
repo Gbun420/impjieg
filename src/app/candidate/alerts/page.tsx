@@ -460,10 +460,10 @@ export default function CandidateAlertsPage() {
                       <Button variant="ghost" size="sm" onClick={() => handleToggle(alert.id, alert.is_active ?? false)}>
                         {alert.is_active ? "Pause" : "Resume"}
                       </Button>
-                  <Button variant="ghost" size="sm" onClick={() => startEdit(alert)}>
+                  <Button variant="ghost" size="sm" onClick={() => startEdit(alert)} aria-label="Edit alert">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(alert.id)}>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(alert.id)} aria-label="Delete alert">
                     <Trash2 className="h-4 w-4 text-error" />
                   </Button>
                 </div>

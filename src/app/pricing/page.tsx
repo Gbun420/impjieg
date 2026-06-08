@@ -188,11 +188,11 @@ export default function PricingPage() {
                 <p className="mt-2 text-xs text-muted-foreground">
                   Clean, direct, and built for a single vacancy.
                 </p>
-                <Link href="/employer/post-job" className="mt-6 block">
-                  <Button variant="outline" size="lg" className="w-full">
+                <Button asChild variant="outline" size="lg" className="w-full">
+                  <Link href="/employer/post-job" className="mt-6 block">
                     Start hiring
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
               <ul className="mt-8 space-y-3">
                 {standardFeatures.map((feature) => (
@@ -233,11 +233,11 @@ export default function PricingPage() {
                 <p className="mt-2 text-xs text-muted-foreground">
                   Stronger placement for roles that need more attention.
                 </p>
-                <Link href="/employer/post-job" className="mt-6 block">
-                  <Button variant="primary" size="lg" className="w-full">
+                <Button asChild variant="primary" size="lg" className="w-full">
+                  <Link href="/employer/post-job" className="mt-6 block">
                     Start hiring
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
               <ul className="mt-8 space-y-3">
                 {featuredFeatures.map((feature) => (
@@ -437,12 +437,12 @@ export default function PricingPage() {
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   This is the best fit when SEO is part of your hiring and employer-brand strategy, not just a one-off campaign.
                 </p>
-                <Link href="/employer-growth" className="mt-4 block">
-                  <Button variant="primary" className="w-full">
+                <Button asChild variant="primary" className="w-full">
+                  <Link href="/employer-growth" className="mt-4 block">
                     Request a growth sprint
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </Card>
           </div>
@@ -473,16 +473,16 @@ export default function PricingPage() {
           Post your first role in under 2 minutes. No contracts, no hidden fees.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Link href="/employer/post-job">
-            <Button variant="primary" size="lg">
+          <Button asChild variant="primary" size="lg">
+            <Link href="/employer/post-job">
               Post a role — €{PRICING.standard.price}
-            </Button>
-          </Link>
-          <Link href="/contact">
-            <Button variant="outline" size="lg">
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/contact">
               Contact Sales
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WithdrawApplicationButton } from "@/components/candidate/withdraw-application-button";
 import {
   FileText,
   Eye,
@@ -105,12 +106,12 @@ export default async function CandidateApplicationsPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Start applying to jobs and track your progress here
           </p>
-          <Link href="/jobs" className="mt-6 inline-block">
-            <Button variant="primary">
+          <Button asChild variant="primary">
+            <Link href="/jobs" className="mt-6 inline-block">
               Browse Jobs
               <ExternalLink className="ml-1.5 h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -171,12 +172,7 @@ export default async function CandidateApplicationsPage() {
                       {config.label}
                     </Badge>
                     {app.status === "applied" && (
-                      <form action={withdrawApplication}>
-                        <input type="hidden" name="applicationId" value={app.id} />
-                        <Button variant="ghost" size="sm" title="Withdraw application">
-                          <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
-                        </Button>
-                      </form>
+                      <WithdrawApplicationButton applicationId={app.id} />
                     )}
                   </div>
                 </div>

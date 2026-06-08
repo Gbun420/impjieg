@@ -39,16 +39,18 @@ export function PortalNavGroups({
               const active =
                 pathname === item.href || pathname?.startsWith(`${item.href}/`);
               return (
-                <Link key={item.href} href={item.href} className="shrink-0">
-                  <Button
-                    type="button"
-                    variant={active ? "primary" : "outline"}
-                    size="sm"
-                    className={cn("min-w-max", buttonClassName)}
-                  >
+                <Button
+                  key={item.href}
+                  asChild
+                  type="button"
+                  variant={active ? "primary" : "outline"}
+                  size="sm"
+                  className={cn("min-w-max shrink-0", buttonClassName)}
+                >
+                  <Link href={item.href}>
                     {item.label}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               );
             })}
           </div>

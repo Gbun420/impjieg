@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { RemoveSavedJobButton } from "@/components/candidate/remove-saved-job-button";
 import { MapPin, Briefcase, Clock, Banknote, BookmarkCheck, ArrowRight } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
 import { unsaveJob } from "@/lib/actions/saved-jobs";
@@ -54,12 +55,12 @@ export default async function SavedJobsPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Browse jobs and click the bookmark icon to save them for later
           </p>
-          <Link href="/jobs" className="mt-6 inline-block">
-            <Button variant="primary">
+          <Button asChild variant="primary">
+            <Link href="/jobs" className="mt-6 inline-block">
               Browse Jobs
               <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -140,14 +141,7 @@ export default async function SavedJobsPage() {
               </Link>
 
               <div className="mt-4 flex justify-end">
-                <form action={async () => {
-                  "use server";
-                  await unsaveJob(job.id);
-                }}>
-                  <Button variant="ghost" size="sm">
-                    Remove
-                  </Button>
-                </form>
+                <RemoveSavedJobButton jobId={job.id} />
               </div>
             </Card>
           ))}

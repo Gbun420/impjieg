@@ -185,12 +185,12 @@ function ConsoleAction({
     variant === "primary" ? "primary" : variant;
 
   return (
-    <Link href={href} target={external ? "_blank" : undefined}>
-      <Button variant={buttonVariant} size="sm" className="shadow-none">
+    <Button asChild variant={buttonVariant} size="sm" className="shadow-none">
+      <Link href={href} target={external ? "_blank" : undefined}>
         {label}
         {external ? <ExternalLink className="ml-1 h-3.5 w-3.5" /> : <ArrowRight className="ml-1 h-3.5 w-3.5" />}
-      </Button>
-    </Link>
+      </Link>
+    </Button>
   );
 }
 

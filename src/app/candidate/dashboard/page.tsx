@@ -133,12 +133,12 @@ export default async function CandidateDashboardPage() {
             Track your applications and discover new opportunities
           </p>
         </div>
-        <Link href="/jobs">
-          <Button variant="primary">
+        <Button asChild variant="primary">
+          <Link href="/jobs">
             <Briefcase className="mr-2 h-4 w-4" />
             Browse Jobs
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       {/* Profile Completion Banner */}
@@ -159,12 +159,12 @@ export default async function CandidateDashboardPage() {
                 />
               </div>
             </div>
-            <Link href="/candidate/profile">
-              <Button variant="primary" size="sm">
+            <Button asChild variant="primary" size="sm">
+              <Link href="/candidate/profile">
                 <FileText className="mr-1.5 h-4 w-4" />
                 Edit Profile
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </Card>
       ) : null}
@@ -234,12 +234,12 @@ export default async function CandidateDashboardPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 Application Status
               </h2>
-              <Link href="/candidate/applications">
-                <Button variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/candidate/applications">
                   View All
                   <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
@@ -274,11 +274,11 @@ export default async function CandidateDashboardPage() {
                 <p className="mt-3 text-muted-foreground">
                   No applications yet. Start applying to jobs!
                 </p>
-                <Link href="/jobs" className="mt-4 inline-block">
-                  <Button variant="primary" size="sm">
+                <Button asChild variant="primary" size="sm">
+                  <Link href="/jobs" className="mt-4 inline-block">
                     Find Jobs
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </Card>
             ) : (
               <div className="mt-4 space-y-3">
@@ -347,11 +347,11 @@ export default async function CandidateDashboardPage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   Complete your profile to get personalized job recommendations
                 </p>
-                <Link href="/candidate/profile" className="mt-3 inline-block">
-                  <Button variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/candidate/profile" className="mt-3 inline-block">
                     Edit Profile
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </Card>
             ) : (
               <div className="mt-4 space-y-3">
@@ -390,30 +390,30 @@ export default async function CandidateDashboardPage() {
           <Card className="p-5">
             <h3 className="font-semibold text-foreground">Quick Actions</h3>
             <div className="mt-4 space-y-2">
-              <Link href="/candidate/profile">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+              <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                <Link href="/candidate/profile">
                   <FileText className="mr-2 h-4 w-4" />
                   Edit Profile
-                </Button>
-              </Link>
-              <Link href="/candidate/applications">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                <Link href="/candidate/applications">
                   <Briefcase className="mr-2 h-4 w-4" />
                   My Applications
-                </Button>
-              </Link>
-              <Link href="/candidate/alerts">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                <Link href="/candidate/alerts">
                   <Bell className="mr-2 h-4 w-4" />
                   Job Alerts
-                </Button>
-              </Link>
-              <Link href="/saved-jobs">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+                <Link href="/saved-jobs">
                   <Star className="mr-2 h-4 w-4" />
                   Saved Jobs
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </Card>
 
@@ -422,11 +422,11 @@ export default async function CandidateDashboardPage() {
             <Card className="p-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">Active Alerts</h3>
-                <Link href="/candidate/alerts">
-                  <Button variant="ghost" size="sm">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/candidate/alerts">
                     Manage
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
               <div className="mt-3 space-y-2">
                 {(alerts as CandidateAlert[]).slice(0, 3).map((alert) => (

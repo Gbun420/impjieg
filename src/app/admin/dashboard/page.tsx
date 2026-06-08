@@ -376,12 +376,12 @@ export default async function AdminDashboardPage() {
             </div>
 
             <div className="mt-5">
-              <Link href="/admin/audit-log">
-                <Button variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/audit-log">
                   Open full audit log
                   <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </Card>
@@ -396,12 +396,12 @@ export default async function AdminDashboardPage() {
                 New listings and their current status
               </p>
             </div>
-            <Link href="/admin/jobs">
-              <Button variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/jobs">
                 View jobs
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -429,11 +429,11 @@ export default async function AdminDashboardPage() {
                 <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>{job.views} views</span>
                   <span>{job.applications_count} applications</span>
-                  <Link href={`/employer/jobs/${job.id}/analytics`}>
-                    <Button variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/employer/jobs/${job.id}/analytics`}>
                       Analytics
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -494,12 +494,12 @@ export default async function AdminDashboardPage() {
                 Recent candidates and their current pipeline status
               </p>
             </div>
-            <Link href="/admin/applications">
-              <Button variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/applications">
                 Review pipeline
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -525,11 +525,11 @@ export default async function AdminDashboardPage() {
                     </p>
                   </div>
                   {application.candidate_cv_url ? (
-                    <Link href={application.candidate_cv_url} target="_blank">
-                      <Button variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={application.candidate_cv_url} target="_blank">
                         Open CV
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   ) : (
                     <Badge variant="secondary">No CV uploaded</Badge>
                   )}

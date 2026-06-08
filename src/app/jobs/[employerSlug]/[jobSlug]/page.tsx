@@ -454,19 +454,19 @@ export default async function JobDetailPage({
                     <p className="mb-3 text-xs text-muted-foreground">Or apply directly:</p>
                     <div className="flex flex-wrap gap-2">
                       {j.application_url && (
-                        <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
-                          <Button variant="outline" size="sm">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={j.application_url} target="_blank" rel="noopener noreferrer">
                             <Globe className="mr-1.5 h-3.5 w-3.5" />
                             Company Site
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       )}
                       {j.application_email && (
-                        <Link href={`mailto:${j.application_email}`}>
-                          <Button variant="outline" size="sm">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`mailto:${j.application_email}`}>
                             Email
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       )}
                     </div>
                   </div>

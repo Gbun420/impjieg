@@ -46,9 +46,11 @@ export default function ResetPasswordPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             We&apos;ve sent you a password reset link. It may take a few minutes to arrive.
           </p>
-          <Link href="/auth/login" className="mt-4 inline-block">
-            <Button variant="outline">Back to Sign In</Button>
-          </Link>
+          <Button asChild variant="outline">
+            <Link href="/auth/login" className="mt-4 inline-block">
+              Back to Sign In
+            </Link>
+          </Button>
         </div>
       ) : (
         <form action={handleSubmit} className="space-y-4">

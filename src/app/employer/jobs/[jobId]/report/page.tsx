@@ -73,12 +73,12 @@ export default async function JobReportPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-print-hide>
-        <Link href={`/employer/jobs/${jobId}/analytics`} className="self-start sm:self-auto">
-          <Button variant="ghost" size="sm">
+        <Button asChild variant="ghost" size="sm" className="self-start sm:self-auto">
+          <Link href={`/employer/jobs/${jobId}/analytics`}>
             <ArrowLeft className="mr-1.5 h-4 w-4" />
             Back to Analytics
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <Button variant="outline" onClick={() => window.print()} className="self-start sm:self-auto">
           <Download className="mr-1.5 h-4 w-4" />
           Print / Save PDF

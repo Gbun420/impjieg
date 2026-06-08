@@ -248,9 +248,11 @@ async function JobsContent({
             </div>
             {hasNextPage && (
               <div className="flex justify-center pt-6">
-                <Link href={buildNextPageHref({ ...searchParams, pageSize: String(pageSize) }, page)}>
-                  <Button variant="outline" size="lg">Load More</Button>
-                </Link>
+                <Button asChild variant="outline" size="lg">
+                  <Link href={buildNextPageHref({ ...searchParams, pageSize: String(pageSize) }, page)}>
+                    Load More
+                  </Link>
+                </Button>
               </div>
             )}
           </>

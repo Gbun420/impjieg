@@ -1,0 +1,402 @@
+[
+  {
+    "route": "/candidate/dashboard",
+    "label": "Browse Jobs",
+    "selector": "a[href='/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "Edit Profile",
+    "selector": "a[href='/candidate/profile']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/profile",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "View All (Applications)",
+    "selector": "a[href='/candidate/applications']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/applications",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "My Applications",
+    "selector": "a[href='/candidate/applications']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/applications",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "Job Alerts",
+    "selector": "a[href='/candidate/alerts']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/alerts",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "Saved Jobs",
+    "selector": "a[href='/saved-jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /saved-jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "Manage (Alerts)",
+    "selector": "a[href='/candidate/alerts']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/alerts",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/candidate/dashboard",
+    "label": "Find Jobs (empty state)",
+    "selector": "a[href='/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Sign In Again",
+    "selector": "a[href='/auth/login']",
+    "type": "navigation",
+    "expected result": "Navigate to /auth/login",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Post a New Job",
+    "selector": "a[href='/employer/post-job']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/post-job",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Review active jobs",
+    "selector": "a[href='/employer/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Post a new job",
+    "selector": "a[href='/employer/post-job']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/post-job",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Review pricing",
+    "selector": "a[href='/pricing']",
+    "type": "navigation",
+    "expected result": "Navigate to /pricing",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Open growth sprint",
+    "selector": "a[href='/employer-growth']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer-growth",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "View All (Top Jobs)",
+    "selector": "a[href='/employer/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Post Your First Job (empty)",
+    "selector": "a[href='/employer/post-job']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/post-job",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "View All (Applications)",
+    "selector": "a[href='/employer/applications']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/applications",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "label": "Upgrade Jobs",
+    "selector": "a[href='/employer/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/dashboard/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Bulk Upload",
+    "selector": "a[href='/employer/bulk-upload']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/bulk-upload",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Post a Role",
+    "selector": "a[href='/employer/post-job']",
+    "type": "navigation",
+    "expected result": "Navigate to /employer/post-job",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Share on LinkedIn",
+    "selector": "a[target='_blank']",
+    "type": "external-link",
+    "expected result": "Open LinkedIn share URL in new tab",
+    "actual result": "Fixed: now uses Button asChild Link with aria-label",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Share by email",
+    "selector": "a[href^='mailto:']",
+    "type": "external-link",
+    "expected result": "Open mailto: link",
+    "actual result": "Fixed: now uses Button asChild Link with aria-label",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "View analytics",
+    "selector": "a[href*='/analytics']",
+    "type": "navigation",
+    "expected result": "Navigate to analytics page",
+    "actual result": "Fixed: now uses Button asChild Link with aria-label",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Boost to Featured",
+    "selector": "button[aria-label='Boost to Featured']",
+    "type": "server-action",
+    "expected result": "Boost job to featured, show pending state",
+    "actual result": "Fixed: BoostJobButton with useTransition + confirm",
+    "status": "pass",
+    "likely file": "src/components/employer/boost-job-button.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Duplicate job",
+    "selector": "button[aria-label='Duplicate job']",
+    "type": "server-action",
+    "expected result": "Duplicate job as draft, show pending state",
+    "actual result": "Fixed: DuplicateJobButton with useTransition",
+    "status": "pass",
+    "likely file": "src/components/employer/duplicate-job-button.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "View live",
+    "selector": "a[target='_blank']",
+    "type": "external-link",
+    "expected result": "Open public job page in new tab",
+    "actual result": "Fixed: now uses Button asChild Link with aria-label",
+    "status": "pass",
+    "likely file": "src/app/employer/jobs/page.tsx"
+  },
+  {
+    "route": "/employer/jobs",
+    "label": "Delete/Close job",
+    "selector": "button[aria-label='Close job']",
+    "type": "server-action",
+    "expected result": "Close job with confirmation dialog",
+    "actual result": "Fixed: DeleteJobButton with confirm + useTransition",
+    "status": "pass",
+    "likely file": "src/components/employer/delete-job-button.tsx"
+  },
+  {
+    "route": "/candidate/applications",
+    "label": "Browse Jobs (empty state)",
+    "selector": "a[href='/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/applications/page.tsx"
+  },
+  {
+    "route": "/candidate/applications",
+    "label": "Withdraw application",
+    "selector": "button[aria-label='Withdraw application']",
+    "type": "server-action",
+    "expected result": "Withdraw application with confirmation",
+    "actual result": "Fixed: WithdrawApplicationButton with confirm + useTransition",
+    "status": "pass",
+    "likely file": "src/components/candidate/withdraw-application-button.tsx"
+  },
+  {
+    "route": "/candidate/recommendations",
+    "label": "Edit Profile (empty state)",
+    "selector": "a[href='/candidate/profile']",
+    "type": "navigation",
+    "expected result": "Navigate to /candidate/profile",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/recommendations/page.tsx"
+  },
+  {
+    "route": "/candidate/recommendations",
+    "label": "Browse All Jobs (empty state)",
+    "selector": "a[href='/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/candidate/recommendations/page.tsx"
+  },
+  {
+    "route": "/saved-jobs",
+    "label": "Browse Jobs (empty state)",
+    "selector": "a[href='/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/saved-jobs/page.tsx"
+  },
+  {
+    "route": "/saved-jobs",
+    "label": "Remove saved job",
+    "selector": "button",
+    "type": "server-action",
+    "expected result": "Remove saved job with confirmation",
+    "actual result": "Fixed: RemoveSavedJobButton with confirm + useTransition",
+    "status": "pass",
+    "likely file": "src/components/candidate/remove-saved-job-button.tsx"
+  },
+  {
+    "route": "/candidate/alerts",
+    "label": "Edit alert",
+    "selector": "button[aria-label='Edit alert']",
+    "type": "modal",
+    "expected result": "Open edit form",
+    "actual result": "Added aria-label",
+    "status": "pass",
+    "likely file": "src/app/candidate/alerts/page.tsx"
+  },
+  {
+    "route": "/candidate/alerts",
+    "label": "Delete alert",
+    "selector": "button[aria-label='Delete alert']",
+    "type": "server-action",
+    "expected result": "Delete alert",
+    "actual result": "Added aria-label",
+    "status": "pass",
+    "likely file": "src/app/candidate/alerts/page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "label": "Open full audit log",
+    "selector": "a[href='/admin/audit-log']",
+    "type": "navigation",
+    "expected result": "Navigate to /admin/audit-log",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/admin/dashboard/page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "label": "View jobs",
+    "selector": "a[href='/admin/jobs']",
+    "type": "navigation",
+    "expected result": "Navigate to /admin/jobs",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/admin/dashboard/page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "label": "Analytics (per job)",
+    "selector": "a[href*='/analytics']",
+    "type": "navigation",
+    "expected result": "Navigate to analytics page",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/admin/dashboard/page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "label": "Review pipeline",
+    "selector": "a[href='/admin/applications']",
+    "type": "navigation",
+    "expected result": "Navigate to /admin/applications",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/admin/dashboard/page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "label": "Open CV",
+    "selector": "a[target='_blank']",
+    "type": "external-link",
+    "expected result": "Open CV URL in new tab",
+    "actual result": "Fixed: now uses Button asChild Link",
+    "status": "pass",
+    "likely file": "src/app/admin/dashboard/page.tsx"
+  }
+]

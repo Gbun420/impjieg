@@ -631,17 +631,17 @@ export default function ApplicationsPage({
                       Reviewed, Shortlisted, Interview, Offered, Hired, and Rejected as your pipeline grows.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
-                      <Link href="/employer/post-job">
-                        <Button variant="primary" size="sm">
+                      <Button asChild variant="primary" size="sm">
+                        <Link href="/employer/post-job">
                           Post a Role
-                        </Button>
-                      </Link>
-                      <Link href="/employer/jobs">
-                        <Button variant="outline" size="sm">
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href="/employer/jobs">
                           View My Jobs
                           <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -39,18 +39,18 @@ export function AdminDataErrorState({
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href={retryHref}>
-            <Button variant="primary">
+          <Button asChild variant="primary">
+            <Link href={retryHref}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Retry
-            </Button>
-          </Link>
-          <Link href="/admin/dashboard">
-            <Button variant="outline">Open dashboard</Button>
-          </Link>
-          <Link href="/">
-            <Button variant="ghost">Open public site</Button>
-          </Link>
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/dashboard">Open dashboard</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/">Open public site</Link>
+          </Button>
         </div>
       </div>
     </Card>

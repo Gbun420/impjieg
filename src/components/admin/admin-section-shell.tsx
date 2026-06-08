@@ -82,18 +82,18 @@ export function AdminSectionShell({
             </p>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
-            <Link href="/admin/dashboard">
-              <Button variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/admin/dashboard">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Open overview
-              </Button>
-            </Link>
-            <Link href="/">
-              <Button variant="ghost" size="sm">
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/">
                 Open public site
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -112,16 +112,18 @@ export function AdminSectionShell({
                 {group.items.map((item) => {
                   const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
                   return (
-                    <Link key={item.href} href={item.href} className="shrink-0">
-                      <Button
-                        type="button"
-                        variant={active ? "primary" : "outline"}
-                        size="sm"
-                        className="min-w-max"
-                      >
+                    <Button
+                      key={item.href}
+                      asChild
+                      type="button"
+                      variant={active ? "primary" : "outline"}
+                      size="sm"
+                      className="min-w-max shrink-0"
+                    >
+                      <Link href={item.href}>
                         {item.label}
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   );
                 })}
               </div>

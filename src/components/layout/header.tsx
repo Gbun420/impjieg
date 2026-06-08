@@ -140,11 +140,11 @@ export default function Header({
               </button>
             ) : null}
 
-            <Link href="/">
-              <Button variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/">
                 Open public site
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
@@ -204,12 +204,12 @@ export default function Header({
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
               <>
-                <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
-                  <Button variant="ghost" size="sm" className="gap-2">
+                <Button asChild variant="ghost" size="sm" className="gap-2">
+                  <Link href={isEmployer ? "/employer/dashboard" : "/candidate/dashboard"}>
                     <LayoutDashboard className="h-3.5 w-3.5" />
                     <span>Dashboard</span>
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
                 <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
                   <LogOut className="h-3.5 w-3.5" />
                   <span>Sign Out</span>
@@ -217,15 +217,15 @@ export default function Header({
               </>
             ) : (
               <>
-                <Link href="/auth/login">
-                  <Button variant="ghost" size="sm">Sign in</Button>
-                </Link>
-                <Link href="/employer/post-job">
-                  <Button variant="primary" size="sm" className="gap-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/auth/login">Sign in</Link>
+                </Button>
+                <Button asChild variant="primary" size="sm" className="gap-2">
+                  <Link href="/employer/post-job">
                     <Briefcase className="h-3.5 w-3.5" />
                     <span>Post a role</span>
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </>
             )}
           </div>

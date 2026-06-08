@@ -200,11 +200,11 @@ export default function PostJobPage() {
                 </p>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">See pricing</span>
-                  <Link href="/pricing">
-                    <Button type="button" variant="outline" size="sm">
+                  <Button asChild type="button" variant="outline" size="sm">
+                    <Link href="/pricing">
                       Open pricing
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>

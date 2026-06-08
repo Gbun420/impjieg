@@ -74,24 +74,24 @@ export default async function JobAnalyticsPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
-          <Link href="/employer/jobs" className="shrink-0">
-            <Button variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="shrink-0">
+            <Link href="/employer/jobs">
               <ArrowLeft className="mr-1.5 h-4 w-4" />
               Back
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div className="min-w-0">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">{j.title}</h1>
             <p className="text-sm text-muted-foreground">Performance analytics</p>
           </div>
           {j.is_featured && <Badge variant="default">Featured</Badge>}
         </div>
-        <Link href={`/employer/jobs/${jobId}/report`} className="self-start sm:self-auto">
-          <Button variant="outline" size="sm">
+        <Button asChild variant="outline" size="sm" className="self-start sm:self-auto">
+          <Link href={`/employer/jobs/${jobId}/report`}>
             <FileText className="mr-1.5 h-3.5 w-3.5" />
             Export Report
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

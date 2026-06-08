@@ -71,18 +71,18 @@ export function CandidatePortalShell({ children }: CandidatePortalShellProps) {
             </p>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
-            <Link href="/jobs">
-              <Button variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/jobs">
                 <Briefcase className="mr-2 h-4 w-4" />
                 Browse jobs
-              </Button>
-            </Link>
-            <Link href="/candidate/profile">
-              <Button variant="ghost" size="sm">
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/candidate/profile">
                 Open profile
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
 

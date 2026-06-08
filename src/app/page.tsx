@@ -143,20 +143,20 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/jobs">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+              <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
+                <Link href="/jobs">
                   <span className="flex items-center gap-2">
                     Find roles
                   </span>
-                </Button>
-              </Link>
-              <Link href="/employer/post-job">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
+                <Link href="/employer/post-job">
                   <span className="flex items-center gap-2">
                     Post a role
                   </span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <div className="mt-10">
@@ -277,16 +277,16 @@ export default async function HomePage() {
                 Publish polished roles, surface salary and work-mode expectations, boost urgent vacancies, and review applicants from one clean employer workspace.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link href="/employer/post-job">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto">
+                <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
+                  <Link href="/employer/post-job">
                     Start Hiring
-                  </Button>
-                </Link>
-                <Link href="/pricing">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Link href="/pricing">
                     View Pricing
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
 
@@ -505,11 +505,11 @@ export default async function HomePage() {
             Reach Malta&apos;s best-fit candidates with salary clarity, stronger visibility, and a cleaner application flow.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Link href="/employer/post-job">
-              <Button variant="primary" size="lg">
+            <Button asChild variant="primary" size="lg">
+              <Link href="/employer/post-job">
                 Start Hiring Free
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
             First listing free · No card required · 30-day listing

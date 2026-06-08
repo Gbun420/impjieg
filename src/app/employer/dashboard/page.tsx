@@ -32,9 +32,9 @@ export default async function EmployerDashboardPage() {
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">Unable to load your employer profile.</p>
-          <Link href="/auth/login" className="mt-4 inline-block">
-            <Button variant="outline">Sign In Again</Button>
-          </Link>
+          <Button asChild variant="outline">
+            <Link href="/auth/login">Sign In Again</Link>
+          </Button>
         </div>
       </div>
     );
@@ -89,12 +89,12 @@ export default async function EmployerDashboardPage() {
             Here&apos;s an overview of your hiring activity
           </p>
         </div>
-        <Link href="/employer/post-job" className="self-start sm:self-auto">
-          <Button variant="primary">
+        <Button asChild variant="primary" className="self-start sm:self-auto">
+          <Link href="/employer/post-job">
             <PlusCircle className="mr-2 h-4 w-4" />
             Post a New Job
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -211,16 +211,16 @@ export default async function EmployerDashboardPage() {
               : "This check is based on live jobs with both salary fields completed. It does not certify legal compliance."}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/employer/jobs">
-              <Button variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/employer/jobs">
                 Review active jobs
-              </Button>
-            </Link>
-            <Link href="/employer/post-job">
-              <Button variant="primary" size="sm">
+              </Link>
+            </Button>
+            <Button asChild variant="primary" size="sm">
+              <Link href="/employer/post-job">
                 Post a new job
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </Card>
@@ -267,16 +267,16 @@ export default async function EmployerDashboardPage() {
             Use any available credits on your next job, or review pricing if you need more visibility.
           </p>
           <div className="mt-4 flex flex-col gap-2">
-            <Link href="/employer/post-job">
-              <Button variant="primary" className="w-full">
+            <Button asChild variant="primary" className="w-full">
+              <Link href="/employer/post-job">
                 Post a new job
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="outline" className="w-full">
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/pricing">
                 Review pricing
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
           {entitlements?.activePlan ? (
             <div className="mt-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
@@ -308,17 +308,17 @@ export default async function EmployerDashboardPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:min-w-[220px]">
-            <Link href="/employer-growth">
-              <Button variant="primary" className="w-full">
+            <Button asChild variant="primary" className="w-full">
+              <Link href="/employer-growth">
                 Open growth sprint
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="outline" className="w-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+              <Link href="/pricing">
                 Review pricing
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
@@ -371,20 +371,22 @@ export default async function EmployerDashboardPage() {
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Top Performing Jobs</h2>
-            <Link href="/employer/jobs">
-              <Button variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/employer/jobs">
                 View All
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           {topJobs.length === 0 ? (
             <Card className="mt-4 p-8 text-center">
               <p className="text-muted-foreground">No jobs posted yet.</p>
-              <Link href="/employer/post-job" className="mt-4 inline-block">
-                <Button variant="primary">Post Your First Job</Button>
-              </Link>
+              <Button asChild variant="primary">
+                <Link href="/employer/post-job" className="mt-4 inline-block">
+                  Post Your First Job
+                </Link>
+              </Button>
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
@@ -430,12 +432,12 @@ export default async function EmployerDashboardPage() {
         <div>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Recent Applications</h2>
-            <Link href="/employer/applications">
-              <Button variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/employer/applications">
                 View All
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           {recentApps.slice(0, 5).length === 0 ? (
@@ -483,12 +485,12 @@ export default async function EmployerDashboardPage() {
                 Featured jobs get 3x more views and appear at the top of search results.
               </p>
             </div>
-            <Link href="/employer/jobs">
-              <Button variant="primary" size="sm">
+            <Button asChild variant="primary" size="sm">
+              <Link href="/employer/jobs">
                 <Zap className="mr-1.5 h-4 w-4" />
                 Upgrade Jobs
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </Card>
       )}

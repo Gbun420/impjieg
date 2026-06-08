@@ -42,12 +42,12 @@ export default function AdminError({
         <Button variant="primary" onClick={() => reset()}>
           Retry
         </Button>
-        <Link href="/admin/dashboard">
-          <Button variant="outline">Dashboard</Button>
-        </Link>
-        <Link href="/">
-          <Button variant="ghost">Public site</Button>
-        </Link>
+        <Button asChild variant="outline">
+          <Link href="/admin/dashboard">Dashboard</Link>
+        </Button>
+        <Button asChild variant="ghost">
+          <Link href="/">Public site</Link>
+        </Button>
       </div>
     </div>
   );

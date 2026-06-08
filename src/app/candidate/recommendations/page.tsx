@@ -131,11 +131,11 @@ export default async function RecommendationsPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Add your skills, preferred sectors, and job types to get personalized recommendations
           </p>
-          <Link href="/candidate/profile" className="mt-6 inline-block">
-            <Button variant="primary">
+          <Button asChild variant="primary">
+            <Link href="/candidate/profile" className="mt-6 inline-block">
               Edit Profile
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </Card>
       ) : scoredJobs.length === 0 ? (
         <Card className="p-12 text-center">
@@ -146,11 +146,11 @@ export default async function RecommendationsPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             You&apos;ve seen all matching jobs. Try broadening your preferences.
           </p>
-          <Link href="/jobs" className="mt-6 inline-block">
-            <Button variant="outline">
+          <Button asChild variant="outline">
+            <Link href="/jobs" className="mt-6 inline-block">
               Browse All Jobs
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </Card>
       ) : (
         <div className="space-y-3">

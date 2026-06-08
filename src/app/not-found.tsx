@@ -14,12 +14,12 @@ export default function NotFound() {
         The page you&apos;re looking for doesn&apos;t exist.
       </p>
       <div className="mt-8 flex gap-3">
-        <Link href="/jobs">
-          <Button variant="primary">Browse Jobs</Button>
-        </Link>
-        <Link href="/">
-          <Button variant="outline">Home</Button>
-        </Link>
+        <Button asChild variant="primary">
+          <Link href="/jobs">Browse Jobs</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/">Home</Link>
+        </Button>
       </div>
     </div>
   );

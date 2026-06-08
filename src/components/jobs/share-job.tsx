@@ -92,7 +92,7 @@ export function ShareJobButton({ title }: { title: string }) {
           <Card className="mx-4 w-full max-w-sm p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Share this job</h3>
-              <button onClick={() => setIsOpen(false)} className="rounded-lg p-1 hover:bg-muted/50">
+              <button onClick={() => setIsOpen(false)} className="rounded-lg p-1 hover:bg-muted/50" aria-label="Close share dialog">
                 <X className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>

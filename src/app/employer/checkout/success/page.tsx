@@ -65,18 +65,18 @@ export default async function CheckoutSuccessPage({
               : "We couldn't verify this checkout session yet. Return to your dashboard to confirm the listing status."}
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link href={isScreeningOrder ? "/employer/applications" : "/employer/dashboard"} className="flex-1">
-            <Button variant={verified ? "outline" : "primary"} className="w-full">
+          <Button asChild variant={verified ? "outline" : "primary"} className="w-full flex-1">
+            <Link href={isScreeningOrder ? "/employer/applications" : "/employer/dashboard"}>
               <LayoutDashboard className="mr-2 h-4 w-4" />
               {isScreeningOrder ? "Applications" : "Dashboard"}
-            </Button>
-          </Link>
-          <Link href="/employer/post-job" className="flex-1">
-            <Button variant={verified ? "primary" : "outline"} className="w-full">
+            </Link>
+          </Button>
+          <Button asChild variant={verified ? "primary" : "outline"} className="w-full flex-1">
+            <Link href="/employer/post-job">
               <PlusCircle className="mr-2 h-4 w-4" />
               Post Another
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </Card>
     </div>
