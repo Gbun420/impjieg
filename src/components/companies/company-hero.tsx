@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { MapPin, Users, Building2, Globe, ShieldCheck } from "lucide-react";
 import type { Employer } from "@/lib/supabase/types";
 
@@ -145,19 +144,21 @@ export default function CompanyHero({
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href={heroCtaHref}>{heroCtaLabel}</Link>
-            </Button>
+            <Link
+              href={heroCtaHref}
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#174FD1_100%)] px-6 text-base font-medium text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]"
+            >
+              {heroCtaLabel}
+            </Link>
             {heroSecondaryLabel && heroSecondaryHref && (
-              <Button asChild variant="outline" size="lg">
-                <a
-                  href={heroSecondaryHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {heroSecondaryLabel}
-                </a>
-              </Button>
+              <a
+                href={heroSecondaryHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-surface/90 px-6 text-base font-medium text-foreground shadow-[0_8px_20px_rgba(11,18,32,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
+              >
+                {heroSecondaryLabel}
+              </a>
             )}
           </div>
         </div>

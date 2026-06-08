@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
 import type { CompanyProfileDisplay } from "@/lib/company-profile-display";
@@ -40,14 +39,18 @@ export default function CompanyOpenRoles({
             This employer does not currently have active jobs on Impjieg.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <Button asChild variant="default">
-              <Link href="/candidate/alerts">Create job alert</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href={display.sectorLinkHref}>
-                {display.sectorLinkLabel}
-              </Link>
-            </Button>
+            <Link
+              href="/candidate/alerts"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#174FD1_100%)] px-4 text-sm font-medium text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]"
+            >
+              Create job alert
+            </Link>
+            <Link
+              href={display.sectorLinkHref}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface/90 px-4 text-sm font-medium text-foreground shadow-[0_8px_20px_rgba(11,18,32,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
+            >
+              {display.sectorLinkLabel}
+            </Link>
           </div>
         </Card>
       ) : (

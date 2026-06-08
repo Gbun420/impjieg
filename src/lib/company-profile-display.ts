@@ -25,7 +25,7 @@ type TrustSignals = {
 
 type ProfileCompleteness = {
   score: number;
-  level: "high" | "medium" | "low";
+  level: string;
   missing: string[];
 };
 
