@@ -1,0 +1,101 @@
+[
+  {
+    "severity": "P1",
+    "route": "/",
+    "viewport": "320x568",
+    "theme": "light",
+    "problem": "Broken image: http://localhost:3000/logo-icon.svg",
+    "whyItMatters": "Image failed to load",
+    "recommendedFix": "Check URL/format",
+    "likelyFile": "/",
+    "timestamp": "2026-06-08T08:39:58.823Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "1440x900",
+    "theme": "light",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:41:39.620Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "1920x1080",
+    "theme": "light",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:42:03.600Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "320x568",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:42:24.429Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "375x812",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:42:45.412Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "768x1024",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:43:07.452Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "1280x800",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:43:30.286Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "1440x900",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:43:53.702Z"
+  },
+  {
+    "severity": "P2",
+    "route": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "problem": "Button without label: <button class=\"inline-flex items-center justify-center font-medium tracking-tigh",
+    "whyItMatters": "a11y: screen readers can't identify",
+    "recommendedFix": "Add aria-label or text",
+    "likelyFile": "/jobs/evolution-gaming/business-development-manager-igaming",
+    "timestamp": "2026-06-08T08:44:18.031Z"
+  }
+]

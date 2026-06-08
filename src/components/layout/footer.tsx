@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { SITE } from "@/lib/constants";
 
 const jobSeekerLinks = [
@@ -30,7 +29,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-              <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
+              <img src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
               <span className="flex flex-col leading-none">
                 <span className="font-display text-[1.05rem] font-semibold tracking-[-0.04em] text-white">
                   {SITE.name}

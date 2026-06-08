@@ -67,6 +67,7 @@ export function ShareJobButton({ title }: { title: string }) {
         }}
         className="h-8 w-8 p-0"
         title="Share this job"
+        aria-label="Share this job"
       >
         <Share2 className="h-4 w-4" />
       </Button>
@@ -81,6 +82,7 @@ export function ShareJobButton({ title }: { title: string }) {
         onClick={() => setIsOpen(true)}
         className="h-8 w-8 p-0"
         title="Share this job"
+        aria-label="Share this job"
       >
         <Share2 className="h-4 w-4" />
       </Button>
