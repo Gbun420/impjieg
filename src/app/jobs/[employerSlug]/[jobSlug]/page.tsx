@@ -54,6 +54,8 @@ export async function generateMetadata({
   const job = jobData as {
     title: string;
     description: string;
+    created_at: string;
+    expires_at: string;
     employers: Array<{ name: string; logo_url: string | null; website: string | null; slug: string }> | null;
   } | null;
 
