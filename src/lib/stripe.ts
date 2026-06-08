@@ -6,7 +6,7 @@ let stripeInstance: Stripe | null = null;
 export function getStripe(): Stripe {
   if (!stripeInstance) {
     stripeInstance = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
-      apiVersion: "2026-04-22.dahlia",
+      apiVersion: "2026-05-27.dahlia",
       typescript: true,
     });
   }
