@@ -39,10 +39,33 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
   const sectorLabel = slugToLabel(sector);
-  return {
+  const canonicalUrl = `https://impjieg.vercel.app/jobs/sector/${sector}`;
+  const hasJobs = await checkSectorHasJobs(sectorLabel);
+
+  const metadata: Metadata = {
     title: `${sectorLabel} Jobs in Malta | Impjieg`,
-    description: `Browse ${sectorLabel.toLowerCase()} jobs in Malta. Find full-time, part-time, remote and hybrid roles with verified salaries. Apply directly.`,
+    description: `Browse ${sectorLabel.toLowerCase()} jobs in Malta with salary, work-mode, employer, and freshness signals. Apply directly.`,
+    alternates: {
+      canonical: canonicalUrl,
+    },
   };
+
+  if (!hasJobs) {
+    metadata.robots = { noindex: true, follow: true };
+  }
+
+  return metadata;
+}
+
+async function checkSectorHasJobs(sectorLabel: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "active")
+    .eq("sector", sectorLabel)
+    .gte("expires_at", new Date().toISOString());
+  return (count ?? 0) > 0;
 }
 
 export default async function SectorPage({
