@@ -163,7 +163,7 @@ export default function Header({
             <span className="font-display text-xl font-semibold tracking-[-0.04em] text-foreground group-hover:text-primary transition-colors">
               {SITE.name}
             </span>
-            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-foreground/60">
               Hiring signal
             </span>
           </span>

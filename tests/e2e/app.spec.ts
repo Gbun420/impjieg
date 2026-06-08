@@ -94,11 +94,27 @@ test('salary calculator page loads and works', async ({ page }) => {
   await page.goto('/salary-calculator');
   await expect(page.getByRole('heading', { name: /Malta Salary Calculator/ })).toBeVisible();
   await expect(page.getByTestId('salary-calculator')).toBeVisible();
-  await expect(page.getByRole('button', { name: /calculate/i })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /Calculate take-home/ })).toBeEnabled();
+
   await page.getByLabel('Gross Annual Salary').fill('35000');
-  await page.getByRole('button', { name: /calculate/i }).click();
+  await page.getByRole('button', { name: /Calculate take-home/ }).click();
+
+  await expect(page.getByTestId('salary-result-card')).toBeVisible();
   await expect(page.getByText('Net Monthly Take-Home')).toBeVisible();
-  await expect(page.getByText('Breakdown')).toBeVisible();
+
+  await expect(page.getByTestId('salary-breakdown-card')).toHaveCount(1);
+  await expect(page.getByText('Income tax', { exact: true })).toBeVisible();
+  await expect(page.getByText('Employee SSC (estimated)')).toBeVisible();
+
+  await expect(page.getByTestId('salary-assumptions-card')).toHaveCount(1);
+  await page.getByTestId('salary-assumptions-card').scrollIntoViewIfNeeded();
+  await expect(page.getByText('Tax year:')).toBeVisible();
+  await expect(page.getByText('Malta Tax and Customs Administration')).toBeVisible();
+
+  const bodyText = await page.locator('body').textContent();
+  expect(bodyText).not.toContain('NaN');
+  expect(bodyText).not.toContain('Infinity');
+
   await checkA11y(page);
   await checkHeadingHierarchy(page);
 });
