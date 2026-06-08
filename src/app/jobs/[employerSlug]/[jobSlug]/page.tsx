@@ -46,7 +46,7 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: jobData } = await supabase
     .from("jobs")
-    .select("title, description, employers(name)")
+    .select("title, description, employers(name, logo_url, website, slug)")
     .eq("slug", jobSlug)
     .eq("status", "active")
     .gte("expires_at", new Date().toISOString())
@@ -54,7 +54,7 @@ export async function generateMetadata({
   const job = jobData as {
     title: string;
     description: string;
-    employers: Array<{ name: string }> | null;
+    employers: Array<{ name: string; logo_url: string | null; website: string | null; slug: string }> | null;
   } | null;
 
   if (!job) {
@@ -62,17 +62,47 @@ export async function generateMetadata({
   }
 
   const employerRelation = job.employers as
-    | { name?: string }
-    | Array<{ name?: string }>
+    | { name?: string; logo_url?: string | null; website?: string | null; slug?: string }
+    | Array<{ name?: string; logo_url?: string | null; website?: string | null; slug?: string }>
     | null
     | undefined;
   const employerName = Array.isArray(employerRelation)
     ? employerRelation[0]?.name
     : employerRelation?.name;
+  const employerLogo = Array.isArray(employerRelation)
+    ? employerRelation[0]?.logo_url
+    : employerRelation?.logo_url;
+  const employerSlug = Array.isArray(employerRelation)
+    ? employerRelation[0]?.slug
+    : employerRelation?.slug;
+
+  const pageTitle = employerName ? `${job.title} at ${employerName}` : job.title;
+  const pageDescription = sanitizeJobDescriptionForMetadata(job.description);
+  const pageUrl = employerSlug
+    ? `https://impjieg.vercel.app/jobs/${employerSlug}/${jobSlug}`
+    : undefined;
 
   return {
-    title: employerName ? `${job.title} at ${employerName}` : job.title,
-    description: sanitizeJobDescriptionForMetadata(job.description),
+    title: pageTitle,
+    description: pageDescription,
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      type: "article",
+      url: pageUrl,
+      siteName: "Impjieg",
+      images: employerLogo ? [{ url: employerLogo, width: 1200, height: 630, alt: employerName || "Company logo" }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pageTitle,
+      description: pageDescription,
+      images: employerLogo ? [employerLogo] : [],
+    },
+    other: {
+      "job:posted": job.created_at || "",
+      "job:expires": job.expires_at || "",
+    },
   };
 }
 
