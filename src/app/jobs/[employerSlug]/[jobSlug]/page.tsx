@@ -46,7 +46,7 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: jobData } = await supabase
     .from("jobs")
-    .select("title, description, employers(name, logo_url, website, slug)")
+    .select("title, description, created_at, expires_at, employers(name, logo_url, website, slug)")
     .eq("slug", jobSlug)
     .eq("status", "active")
     .gte("expires_at", new Date().toISOString())
