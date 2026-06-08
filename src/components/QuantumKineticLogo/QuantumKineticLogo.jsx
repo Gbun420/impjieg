@@ -41,6 +41,9 @@ const QuantumKineticLogo = ({
   const neuralResponse = useNeuralResponsiveness(biometricEnabled);
   const cognitiveAdaptation = useCognitiveAdaptation();
   
+  // Destructure neural response
+  const { cognitiveLoad } = neuralResponse;
+  
   // Animation springs
   const [{ scale, rotation, opacity }, api] = useSpring(() => ({
     scale: 1,
@@ -67,7 +70,7 @@ const QuantumKineticLogo = ({
   // Gesture handling
   const bind = useGesture({
     onHover: ({ hovering }) => setHovered(hovering),
-    onDrag: ({ active }) => setActive(pressed),
+    onDrag: ({ active }) => setActive(active),
     onMove: ({ xy: [x, y] }) => {
       // Calculate entropy based on movement patterns
       const newEntropy = entropyCalculator.calculate(x, y);
