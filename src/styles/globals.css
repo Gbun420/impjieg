@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./quantum-colors.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -9,19 +8,19 @@
   --font-display: "Sora", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
 
-  /* Dark-Ink Mediterranean-Tech Palette */
+  /* Impjieg Brand Palette */
   --color-ink: #0B1220;
   --color-ink-light: #121A2B;
   --color-harbor: #08111F;
-  --color-limestone: #F7F4EC;
-  --color-cerulean: #1E63FF;
+  --color-signal-blue: #2563EB;
   --color-lagoon: #14C7B7;
+  --color-deep-lagoon: #0F766E;
   --color-saffron: #FFB020;
-  --color-coral: #FF6B57;
+  --color-limestone: #F7F4EC;
   --color-mist: #F5F8FC;
   --color-surface: #FFFFFF;
-  --color-slate: #334155;
-  --color-muted: #64748B;
+  --color-deep-slate: #334155;
+  --color-slate: #64748B;
   --color-emerald: #12B76A;
   --color-rose: #E5484D;
   --color-border: #DBE4F0;
@@ -30,21 +29,21 @@
   color-scheme: light;
   --background: var(--color-mist);
   --foreground: var(--color-ink);
-  --primary: var(--color-cerulean);
+  --primary: var(--color-signal-blue);
   --primary-foreground: #FFFFFF;
-  --primary-hover: #174FD1;
+  --primary-hover: #1D4ED8;
   --secondary: var(--color-lagoon);
   --secondary-foreground: var(--color-ink);
   --accent: var(--color-saffron);
   --accent-foreground: var(--color-ink);
   --muted: #EAF0F6;
-  --muted-foreground: var(--color-muted);
+  --muted-foreground: var(--color-slate);
   --card: var(--color-surface);
   --card-foreground: var(--color-ink);
   --card-hover: #F0F6FC;
   --border: var(--color-border);
   --border-hover: #B8C6D8;
-  --ring: var(--color-cerulean);
+  --ring: var(--color-signal-blue);
   --success: var(--color-emerald);
   --success-foreground: #FFFFFF;
   --warning: var(--color-saffron);

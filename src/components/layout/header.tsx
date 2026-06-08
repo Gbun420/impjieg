@@ -13,7 +13,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, Briefcase, Building2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { SITE } from "@/lib/constants";
-import QuantumKineticLogo from "@/components/QuantumKineticLogo/QuantumKineticLogo";
+import { ImpjiegLogo, ImpjiegMark } from "@/components/brand";
 
 const navLinks = [
   { label: "Find jobs", href: "/jobs", icon: Briefcase },
@@ -109,13 +109,13 @@ export default function Header({
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <QuantumKineticLogo size={36} className="shrink-0" interactive={false} />
+            <ImpjiegMark size={36} />
             <span className="flex flex-col leading-none">
               <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
                 {SITE.name}
               </span>
               <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
-                Malta&apos;s modern jobs marketplace
+                Admin console
               </span>
             </span>
           </Link>
@@ -154,16 +154,14 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-          <div className="relative">
-            <QuantumKineticLogo size={42} className="shrink-0" />
-          </div>
+        <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg homepage">
+          <ImpjiegMark size={42} />
           <span className="flex flex-col leading-none">
-            <span className="font-display text-xl font-semibold tracking-[-0.03em] text-foreground group-hover:text-primary transition-colors">
+            <span className="font-display text-xl font-semibold tracking-[-0.04em] text-foreground group-hover:text-primary transition-colors">
               {SITE.name}
             </span>
-            <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
-              {SITE.tagline}
+            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Hiring signal
             </span>
           </span>
         </Link>

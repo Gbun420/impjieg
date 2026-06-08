@@ -32,16 +32,16 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
               <Image src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
               <span className="flex flex-col leading-none">
-                <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-white">
+                <span className="font-display text-[1.05rem] font-semibold tracking-[-0.04em] text-white">
                   {SITE.name}
                 </span>
-                <span className="text-[0.68rem] font-medium tracking-[0.18em] text-white/55">
-                  Malta&apos;s modern jobs marketplace
+                <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+                  Hiring signal
                 </span>
               </span>
             </Link>
             <p className="mt-3 text-sm leading-6 text-white/64">
-              Malta&apos;s modern jobs marketplace for tech, digital, and iGaming talent.
+              Malta&apos;s hiring marketplace for salary, work-mode, and employer clarity.
             </p>
             <span className="mt-3 inline-flex rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#46D1BE]">
               Malta hiring signal
@@ -107,7 +107,7 @@ export default function Footer() {
           <p>
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <p className="text-xs text-white/45">Premium hiring signals for Malta&apos;s growth sectors.</p>
+          <p className="text-xs text-white/45">Jobs with clearer signals.</p>
         </div>
       </div>
     </footer>
