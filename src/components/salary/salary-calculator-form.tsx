@@ -51,7 +51,7 @@ export default function SalaryCalculatorForm({ onCalculate }: SalaryCalculatorFo
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <label htmlFor="salary-amount" className="block text-sm font-medium text-foreground mb-1.5">
-          Gross salary
+          Gross Annual Salary
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">€</span>
