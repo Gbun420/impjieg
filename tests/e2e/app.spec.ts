@@ -20,7 +20,7 @@ test('homepage loads and is accessible', async ({ page }) => {
 
 test('browse jobs page loads', async ({ page }) => {
   await page.goto('/jobs');
-  await expect(page).toHaveTitle(/Browse Malta Jobs/);
+  await expect(page).toHaveTitle(/Malta Jobs.*Impjieg/);
   await expect(page.getByRole('heading', { name: /Browse roles with the signals that matter/ })).toBeVisible();
   await checkA11y(page);
   await checkHeadingHierarchy(page);
