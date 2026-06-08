@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
+import { Metadata as NextMetadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Browse Malta Jobs",
+  title: "Malta Jobs | Tech, iGaming, Finance & Compliance Roles | Impjieg",
   description:
-    "Browse Malta tech, digital, and iGaming roles with salary signals, work-mode clarity, and direct applications.",
+    "Browse Malta jobs with clearer salary, work-mode, employer, and freshness signals on Impjieg.",
 };
 
 const DEFAULT_JOBS_PER_PAGE = 20;
