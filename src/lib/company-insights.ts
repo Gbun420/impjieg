@@ -32,17 +32,32 @@ export function deriveCompanyInsights(jobs: JobInsightSource[]) {
     .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))[0]
     ?.created_at ?? null;
 
+  const activeRoles = jobs.length;
+  const salaryTransparentRoles = jobs.filter(
+    (job) => job.salary_min || job.salary_max
+  ).length;
+
   return {
-    activeRoles: jobs.length,
+    activeRoles,
     featuredRoles: jobs.filter((job) => job.is_featured).length,
-    salaryTransparentRoles: jobs.filter((job) => job.salary_min || job.salary_max).length,
+    salaryTransparentRoles,
     topSectors,
     averageSalaryMin: salaryMins.length
-      ? Math.round(salaryMins.reduce((sum, value) => sum + value, 0) / salaryMins.length)
+      ? Math.round(
+          salaryMins.reduce((sum, value) => sum + value, 0) / salaryMins.length
+        )
       : null,
     averageSalaryMax: salaryMaxs.length
-      ? Math.round(salaryMaxs.reduce((sum, value) => sum + value, 0) / salaryMaxs.length)
+      ? Math.round(
+          salaryMaxs.reduce((sum, value) => sum + value, 0) / salaryMaxs.length
+        )
       : null,
     latestPostingDate,
+    hasActiveJobs: activeRoles > 0,
+    hasSalaryData: salaryTransparentRoles > 0,
+    salaryCoveragePercent:
+      activeRoles > 0
+        ? Math.round((salaryTransparentRoles / activeRoles) * 100)
+        : 0,
   };
 }

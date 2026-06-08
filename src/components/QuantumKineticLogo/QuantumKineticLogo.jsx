@@ -236,8 +236,33 @@ const QuantumKineticLogo = ({
       }
     };
     
+    // Nature Distilled color palette
+    const colors = natureMode
+      ? { primary: '#8B7355', secondary: '#A89475', tertiary: '#CBB99A', accent: '#6EE7B7' }
+      : { primary: '#6EE7B7', secondary: '#0EA5E9', tertiary: '#F87171', accent: '#6EE7B7' };
+    
     switch (currentState) {
       case 'potential':
+        if (natureMode) {
+          // Organic ripple — concentric circles like water ripples
+          return (
+            <animated.svg {...dimensionProps} viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke={colors.primary} strokeWidth="1.5" opacity="0.4">
+                <animate attributeName="r" values="38;42;38" dur="4s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="50" cy="50" r="32" fill="none" stroke={colors.secondary} strokeWidth="1" opacity="0.5">
+                <animate attributeName="r" values="28;32;28" dur="3.5s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="50" cy="50" r="22" fill="none" stroke={colors.tertiary} strokeWidth="1" opacity="0.6">
+                <animate attributeName="r" values="18;22;18" dur="3s" repeatCount="indefinite" />
+              </circle>
+              {/* Growth ring detail */}
+              <circle cx="50" cy="50" r="12" fill="none" stroke={colors.accent} strokeWidth="0.5" opacity="0.3">
+                <animate attributeName="r" values="10;12;10" dur="2.5s" repeatCount="indefinite" />
+              </circle>
+            </animated.svg>
+          );
+        }
         return (
           <animated.svg {...dimensionProps} viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#6EE7B7" strokeWidth="2">
@@ -253,6 +278,30 @@ const QuantumKineticLogo = ({
         );
         
       case 'focus':
+        if (natureMode) {
+          // Fibonacci spiral — golden ratio path
+          const phi = 1.618;
+          const spiralPoints = [];
+          for (let t = 0; t < 4 * Math.PI; t += 0.15) {
+            const r = 3 * Math.pow(phi, t / (2 * Math.PI));
+            const x = 50 + r * Math.cos(t);
+            const y = 50 + r * Math.sin(t);
+            if (x >= 2 && x <= 98 && y >= 2 && y <= 98) {
+              spiralPoints.push(`${x},${y}`);
+            }
+          }
+          const spiralPath = `M${spiralPoints.join(' L')}`;
+          return (
+            <animated.svg {...dimensionProps} viewBox="0 0 100 100">
+              <path d={spiralPath} fill="none" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" opacity="0.7">
+                <animate attributeName="stroke-dasharray" values="0,500;500,0" dur="4s" repeatCount="indefinite" />
+              </path>
+              <circle cx="50" cy="50" r="3" fill={colors.accent} opacity="0.8">
+                <animate attributeName="r" values="2;4;2" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </animated.svg>
+          );
+        }
         return (
           <animated.svg {...dimensionProps} viewBox="0 0 100 100">
             <polygon points="50,15 85,85 15,85" fill="none" stroke="#0EA5E9" strokeWidth="2">
@@ -275,6 +324,36 @@ const QuantumKineticLogo = ({
         );
         
       case 'success':
+        if (natureMode) {
+          // Organic leaf vein — branching paths
+          return (
+            <animated.svg {...dimensionProps} viewBox="0 0 100 100">
+              <path 
+                d="M20,80 Q50,20 80,80" 
+                fill="none" 
+                stroke={colors.accent} 
+                strokeWidth="2"
+                strokeLinecap="round"
+                opacity="0.8"
+              >
+                <animate attributeName="stroke-dasharray" values="0,200;200,0" dur="1.5s" fill="freeze" />
+              </path>
+              <path 
+                d="M30,75 Q50,35 70,75" 
+                fill="none" 
+                stroke={colors.secondary} 
+                strokeWidth="1"
+                strokeLinecap="round"
+                opacity="0.5"
+              >
+                <animate attributeName="stroke-dasharray" values="0,150;150,0" dur="1.2s" fill="freeze" />
+              </path>
+              <circle cx="50" cy="50" r="3" fill={colors.accent} opacity="0.9">
+                <animate attributeName="r" values="2;5;2" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </animated.svg>
+          );
+        }
         return (
           <animated.svg {...dimensionProps} viewBox="0 0 100 100">
             <path 
@@ -298,6 +377,43 @@ const QuantumKineticLogo = ({
         );
         
       default:
+        if (natureMode) {
+          // Organic seed — expanding growth rings
+          return (
+            <animated.svg {...dimensionProps} viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="35" fill="none" stroke={colors.secondary} strokeWidth="1" opacity="0.4">
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  from="0 50 50"
+                  to="360 50 50"
+                  dur="20s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle cx="50" cy="50" r="25" fill="none" stroke={colors.primary} strokeWidth="1" opacity="0.5">
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  from="360 50 50"
+                  to="0 50 50"
+                  dur="15s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle cx="50" cy="50" r="15" fill="none" stroke={colors.accent} strokeWidth="1" opacity="0.6">
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  from="0 50 50"
+                  to="360 50 50"
+                  dur="10s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+            </animated.svg>
+          );
+        }
         return (
           <animated.svg {...dimensionProps} viewBox="0 0 100 100">
             <rect x="10" y="10" width="80" height="80" rx="10" fill="none" stroke="#0EA5E9" strokeWidth="2">
@@ -322,7 +438,7 @@ const QuantumKineticLogo = ({
   return (
     <div 
       ref={logoRef}
-      className={`${styles.quantumKineticLogo} ${className}`}
+      className={`${styles.quantumKineticLogo} ${natureMode ? styles.natureMode : ''} ${className}`}
       style={{ width: size, height: size }}
       onMouseMove={interactive ? handleMouseMove : undefined}
       onMouseEnter={interactive ? handleMouseEnter : undefined}
