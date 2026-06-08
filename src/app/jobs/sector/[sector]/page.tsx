@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MapPin, Briefcase, Clock, Banknote, ArrowRight } from "lucide-react";
@@ -49,11 +48,8 @@ export async function generateMetadata({
     alternates: {
       canonical: canonicalUrl,
     },
+    robots: hasJobs ? undefined : "noindex, follow",
   };
-
-  if (!hasJobs) {
-    metadata.robots = { noindex: true, follow: true };
-  }
 
   return metadata;
 }
@@ -106,11 +102,6 @@ export default async function SectorPage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      {!hasJobs && (
-        <Metadata>
-          <meta name="robots" content="noindex, follow" />
-        </Metadata>
-      )}
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link href="/jobs" className="hover:text-foreground">Jobs</Link>
         <span className="mx-2">/</span>

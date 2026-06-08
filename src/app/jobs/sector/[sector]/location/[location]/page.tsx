@@ -47,10 +47,34 @@ export async function generateMetadata({
   }
   const sectorLabel = slugToLabel(sector);
   const locationLabel = slugToLabel(location);
-  return {
+  const canonicalUrl = `https://impjieg.vercel.app/jobs/sector/${sector}/location/${location}`;
+  const hasJobs = await checkSectorLocationHasJobs(sectorLabel, locationLabel);
+
+  const metadata: Metadata = {
     title: `${sectorLabel} Jobs in ${locationLabel}, Malta | Impjieg`,
-    description: `Browse ${sectorLabel.toLowerCase()} jobs in ${locationLabel}, Malta. Find full-time, part-time, remote and hybrid roles with verified salaries. Apply directly.`,
+    description: `Browse ${sectorLabel.toLowerCase()} jobs in ${locationLabel}, Malta with salary, work-mode, employer, and freshness signals. Apply directly.`,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: hasJobs ? undefined : "noindex, follow",
   };
+
+  return metadata;
+}
+
+async function checkSectorLocationHasJobs(
+  sectorLabel: string,
+  locationLabel: string
+): Promise<boolean> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "active")
+    .eq("sector", sectorLabel)
+    .ilike("location", `%${locationLabel}%`)
+    .gte("expires_at", new Date().toISOString());
+  return (count ?? 0) > 0;
 }
 
 async function JobPostingSchema({ job }: { job: JobWithEmployer }) {
