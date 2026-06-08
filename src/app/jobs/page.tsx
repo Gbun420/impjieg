@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
-import { Metadata as NextMetadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +14,9 @@ export const metadata: Metadata = {
   title: "Malta Jobs | Tech, iGaming, Finance & Compliance Roles | Impjieg",
   description:
     "Browse Malta jobs with clearer salary, work-mode, employer, and freshness signals on Impjieg.",
+  alternates: {
+    canonical: "https://impjieg.vercel.app/jobs",
+  },
 };
 
 const DEFAULT_JOBS_PER_PAGE = 20;
@@ -270,14 +272,8 @@ export default async function JobsPage({
 }) {
   const params = await searchParams;
 
-  // Canonical URL for the base /jobs page (without query params)
-  const canonicalUrl = "https://impjieg.vercel.app/jobs";
-
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <NextMetadata>
-        <link rel="canonical" href={canonicalUrl} />
-      </NextMetadata>
       <div className="mb-8 overflow-hidden rounded-[2rem] border border-border/70 bg-[#08111F] p-6 text-white shadow-[0_22px_70px_rgba(11,18,32,0.18)] sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#46D1BE]">
           Malta marketplace search
