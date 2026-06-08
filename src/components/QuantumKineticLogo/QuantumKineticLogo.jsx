@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSpring, animated, config } from '@react-spring/web';
-import { useGesture } from '@use-gesture/react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -34,6 +33,7 @@ const QuantumKineticLogo = ({
   // Refs
   const logoRef = useRef();
   const particleRef = useRef();
+  const lastMousePos = useRef({ x: 0, y: 0 });
   
   // Custom hooks
   const quantumBehavior = useQuantumBehavior(mlEnabled);
@@ -67,21 +67,30 @@ const QuantumKineticLogo = ({
     return temp;
   }, []);
   
-  // Gesture handling
-  const bind = useGesture({
-    onHover: ({ hovering }) => setHovered(hovering),
-    onDrag: ({ active }) => setActive(active),
-    onMove: ({ xy: [x, y] }) => {
-      // Calculate entropy based on movement patterns
-      const newEntropy = entropyCalculator.calculate(x, y);
-      setEntropy(newEntropy);
-      
-      // Update neural response
-      if (biometricEnabled) {
-        neuralResponse.update(x, y);
-      }
+  // Native mouse event handlers
+  const handleMouseMove = useCallback((e) => {
+    const rect = logoRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Calculate entropy based on movement patterns
+    const newEntropy = entropyCalculator.calculate(x, y);
+    setEntropy(newEntropy);
+    
+    // Update neural response
+    if (biometricEnabled) {
+      neuralResponse.update(x, y);
     }
-  });
+    
+    lastMousePos.current = { x, y };
+  }, [biometricEnabled, neuralResponse]);
+  
+  const handleMouseEnter = useCallback(() => setHovered(true), []);
+  const handleMouseLeave = useCallback(() => setHovered(false), []);
+  const handleMouseDown = useCallback(() => setActive(true), []);
+  const handleMouseUp = useCallback(() => setActive(false), []);
   
   // State transition handler
   const transitionToState = useCallback((newState, options = {}) => {
@@ -272,7 +281,11 @@ const QuantumKineticLogo = ({
       ref={logoRef}
       className={`${styles.quantumKineticLogo} ${className}`}
       style={{ width: size, height: size }}
-      {...(interactive ? bind() : {})}
+      onMouseMove={interactive ? handleMouseMove : undefined}
+      onMouseEnter={interactive ? handleMouseEnter : undefined}
+      onMouseLeave={interactive ? handleMouseLeave : undefined}
+      onMouseDown={interactive ? handleMouseDown : undefined}
+      onMouseUp={interactive ? handleMouseUp : undefined}
     >
       {/* Quantum Particle Background */}
       <div className={styles.quantumParticles}>
