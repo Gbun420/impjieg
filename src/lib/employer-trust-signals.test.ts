@@ -171,5 +171,5 @@ test("deriveEmployerTrustSignals counts only stale new applications", () => {
   });
 
   assert.equal(result.staleNewApplications, 1);
-  assert.equal(result.responseBadge, "Moderate response time");
+  assert.equal(result.responseBadge, "Slow to respond");
 });
