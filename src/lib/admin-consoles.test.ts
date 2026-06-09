@@ -21,6 +21,7 @@ test("admin console nav includes the wired live consoles", () => {
       "Alerts",
       "Subscriptions",
       "Grants",
+      "Legal receipts",
       "Audit log",
     ]
   );
