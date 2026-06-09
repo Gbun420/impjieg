@@ -614,7 +614,7 @@ async function main() {
   // --- 6. Candidate applications (candidate side) ---
   console.log("\n6. Creating candidate-side applications...");
 
-  const candAppRows = buildCandidateApplications();
+  const candAppRows = buildCandidateApplications(candidateUserId);
   const { error: candAppError } = await supabase
     .from("candidate_applications")
     .upsert(candAppRows as never, { onConflict: "id" });
