@@ -628,7 +628,7 @@ async function main() {
   // --- 7. Saved jobs ---
   console.log("\n7. Creating saved jobs...");
 
-  const savedJobRows = buildSavedJobs();
+  const savedJobRows = buildSavedJobs(candidateUserId);
   const { error: savedError } = await supabase
     .from("saved_jobs")
     .upsert(savedJobRows as never, { onConflict: "user_id,job_id" });
@@ -642,7 +642,7 @@ async function main() {
   // --- 8. Candidate alerts ---
   console.log("\n8. Creating candidate alerts...");
 
-  const candAlertRows = buildCandidateAlerts();
+  const candAlertRows = buildCandidateAlerts(candidateUserId);
   const { error: candAlertError } = await supabase
     .from("candidate_alerts")
     .upsert(candAlertRows as never, { onConflict: "id" });
