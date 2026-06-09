@@ -119,9 +119,10 @@ export async function signup(formData: FormData) {
   // If needsConfirmation, tell the client to show check-email
   if (result.needsConfirmation) {
     return {
-      success: true,
-      needsConfirmation: true,
+      success: true as const,
+      needsConfirmation: true as const,
       email: result.email,
+      error: undefined as undefined,
     };
   }
 
