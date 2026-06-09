@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { readAdminMfaChallengeCookie, buildAdminOtpAuthUri } from "@/lib/admin-mfa";
 import { hasValidAdminSession } from "@/lib/admin-session";
+import { generateQrCodeSvg, formatSecretForDisplay } from "@/lib/qr-code";
 import AdminMfaForm from "./admin-mfa-form";
 
 export default async function AdminMfaPage() {
@@ -14,8 +15,12 @@ export default async function AdminMfaPage() {
     redirect("/admin/login");
   }
 
-  const qrCodeUri = challenge.mode === "setup" && challenge.secret
-    ? buildAdminOtpAuthUri({ email: challenge.email, secret: challenge.secret })
+  const qrCodeSvg = challenge.mode === "setup" && challenge.secret
+    ? await generateQrCodeSvg(buildAdminOtpAuthUri({ email: challenge.email, secret: challenge.secret }))
+    : undefined;
+
+  const formattedSecret = challenge.mode === "setup" && challenge.secret
+    ? formatSecretForDisplay(challenge.secret)
     : undefined;
 
   return (
@@ -23,7 +28,8 @@ export default async function AdminMfaPage() {
       <AdminMfaForm 
         mode={challenge.mode} 
         email={challenge.email} 
-        qrCodeUri={qrCodeUri}
+        qrCodeSvg={qrCodeSvg}
+        formattedSecret={formattedSecret}
       />
     </div>
   );
