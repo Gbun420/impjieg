@@ -368,16 +368,16 @@ function buildCandidateApplications() {
   ];
 }
 
-function buildSavedJobs() {
+function buildSavedJobs(candidateUserId: string) {
   return [
     {
       id: stableUuid("qa-saved-job:frontend"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       job_id: JOB_IDS.frontend,
     },
     {
       id: stableUuid("qa-saved-job:compliance"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       job_id: JOB_IDS.compliance,
     },
   ];
