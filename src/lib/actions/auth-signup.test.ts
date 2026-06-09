@@ -77,6 +77,7 @@ test("signupWithAutoConfirm creates a confirmed employer user and signs them in"
   assert.deepEqual(result, {
     success: true,
     needsConfirmation: false,
+    userId: "user_1",
     redirectTo: "/employer/dashboard",
   });
 });

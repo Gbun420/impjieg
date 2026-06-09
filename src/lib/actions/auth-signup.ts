@@ -11,8 +11,8 @@ type SignupInput = {
 };
 
 type SignupResult =
-  | { success: true; needsConfirmation: false; redirectTo: string; error?: undefined }
-  | { error: string; success?: undefined; needsConfirmation?: undefined; redirectTo?: undefined };
+  | { success: true; needsConfirmation: false; redirectTo: string; userId: string; error?: undefined }
+  | { error: string; success?: undefined; needsConfirmation?: undefined; redirectTo?: undefined; userId?: undefined };
 
 type UserClient = {
   auth: {
@@ -207,6 +207,7 @@ export async function signupWithAutoConfirm({
   return {
     success: true,
     needsConfirmation: false,
+    userId,
     redirectTo:
       input.accountType === "employer" ? "/employer/dashboard" : "/candidate/dashboard",
   };

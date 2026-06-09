@@ -83,16 +83,19 @@ export async function signup(formData: FormData) {
   });
 
   // Record legal acceptance after successful signup
-  if (result?.success) {
+  if (result?.success && result.userId) {
     const eventType =
       data.accountType === "candidate"
         ? LEGAL_EVENT_TYPES.SIGNUP_CANDIDATE
         : LEGAL_EVENT_TYPES.SIGNUP_EMPLOYER;
 
     recordLegalAcceptance({
+      userId: result.userId,
       email: data.email,
       accountType: data.accountType,
       eventType,
+      relatedEntityType: "auth_user",
+      relatedEntityId: result.userId,
       termsAccepted: true,
       privacyNoticeAcknowledged: true,
       marketingConsent: data.marketingConsent,
