@@ -3,11 +3,24 @@ import { createHmac } from 'node:crypto';
 import { checkA11y, checkAccessibleNames, checkImageAlts, checkHeadingHierarchy } from '../helpers/a11y';
 
 const ADMIN_SESSION_COOKIE = 'impjieg_admin_session';
-const ADMIN_SESSION_MESSAGE = 'impjieg-admin-session';
 const DEV_ADMIN_TOKEN = 'local-admin';
 
+function toBase64Url(value: Buffer | string) {
+  return Buffer.from(value).toString('base64url');
+}
+
 function buildDevAdminSessionValue() {
-  return createHmac('sha256', DEV_ADMIN_TOKEN).update(ADMIN_SESSION_MESSAGE).digest('hex');
+  const now = Date.now();
+  const payload = {
+    userId: 'e2e-admin-user',
+    email: 'admin@impjieg.test',
+    issuedAt: now,
+    expiresAt: now + 8 * 60 * 60 * 1000,
+    nonce: 'e2e-test-nonce',
+  };
+  const encoded = toBase64Url(JSON.stringify(payload));
+  const signature = createHmac('sha256', DEV_ADMIN_TOKEN).update(encoded).digest('base64url');
+  return `${encoded}.${signature}`;
 }
 
 test('homepage loads and is accessible', async ({ page }) => {
