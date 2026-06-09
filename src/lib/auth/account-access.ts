@@ -99,7 +99,7 @@ export async function requireEmployerAccess(): Promise<{ user: User; employerId:
     .from("employers")
     .select("id")
     .eq("user_id", context.user.id)
-    .maybeSingle();
+    .maybeSingle<{ id: string }>();
 
   if (!employer) {
     return { user: null as any, employerId: "", error: "Employer profile not found" };
