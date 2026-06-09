@@ -7,6 +7,8 @@ export type EmailSendOptions = {
   html: string;
   text?: string;
   replyTo?: string | string[];
+  cc?: string | string[];
+  bcc?: string | string[];
   from?: string;
 };
 
@@ -63,20 +65,31 @@ export async function sendEmail(options: EmailSendOptions): Promise<EmailSendRes
       return { success: false, error: "No recipients provided", category: "invalid_input" };
     }
 
+    const payload: Record<string, unknown> = {
+      from,
+      to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+      reply_to: options.replyTo,
+    };
+
+    if (options.cc) {
+      const ccRecipients = Array.isArray(options.cc) ? options.cc : [options.cc];
+      payload.cc = ccRecipients;
+    }
+    if (options.bcc) {
+      const bccRecipients = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
+      payload.bcc = bccRecipients;
+    }
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${resendApiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from,
-        to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-        reply_to: options.replyTo,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();

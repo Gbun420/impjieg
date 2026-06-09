@@ -10,6 +10,8 @@ import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
+import { recordLegalAcceptance } from "@/lib/legal/receipts";
+import { LEGAL_EVENT_TYPES, CONSENT_TEXT } from "@/lib/legal/constants";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -38,10 +40,21 @@ export async function signup(formData: FormData) {
       (formData.get("accountType") as "candidate" | "employer" | null) ?? "employer",
     fullName: String(formData.get("fullName") ?? "").trim(),
     companyName: String(formData.get("companyName") ?? "").trim(),
+    termsAccepted: formData.get("legal-terms") === "on",
+    privacyAccepted: formData.get("legal-privacy") === "on",
+    marketingConsent: formData.get("legal-marketing") === "on",
   };
 
   if (!data.email || !data.password || !data.accountType) {
     return { error: "All fields are required" };
+  }
+
+  // Validate legal acceptance
+  if (!data.termsAccepted) {
+    return { error: "You must accept the Terms of Service" };
+  }
+  if (!data.privacyAccepted) {
+    return { error: "You must acknowledge the Privacy Notice" };
   }
 
   const passwordError = validatePasswordPolicy(data.password);
@@ -62,12 +75,44 @@ export async function signup(formData: FormData) {
     return { error: "Company name is required for employer accounts" };
   }
 
-  return signupWithAutoConfirm({
+  const result = await signupWithAutoConfirm({
     adminClient: serviceSupabase,
     userClient: supabase,
     serviceClient: serviceSupabase,
     input: data,
   });
+
+  // Record legal acceptance after successful signup
+  if (result?.success) {
+    const eventType =
+      data.accountType === "candidate"
+        ? LEGAL_EVENT_TYPES.SIGNUP_CANDIDATE
+        : LEGAL_EVENT_TYPES.SIGNUP_EMPLOYER;
+
+    recordLegalAcceptance({
+      email: data.email,
+      accountType: data.accountType,
+      eventType,
+      termsAccepted: true,
+      privacyNoticeAcknowledged: true,
+      marketingConsent: data.marketingConsent,
+      consentTextSnapshot: [
+        `terms: ${CONSENT_TEXT.terms}`,
+        `privacy: ${CONSENT_TEXT.privacy}`,
+        data.marketingConsent ? `marketing: ${CONSENT_TEXT.marketing}` : "marketing: not accepted",
+      ].join("; "),
+      sourceRoute: "/auth/signup",
+      metadata: {
+        accountType: data.accountType,
+        fullName: data.fullName || undefined,
+        companyName: data.companyName || undefined,
+      },
+    }).catch((err) => {
+      console.error("[LegalReceipt] Failed to record signup acceptance:", err);
+    });
+  }
+
+  return result;
 }
 
 export async function login(formData: FormData) {

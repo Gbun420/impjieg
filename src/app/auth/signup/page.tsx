@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, Mail, Lock, User, Briefcase, AlertCircle, Loader2 } from "lucide-react";
+import { LegalAcknowledgementCheckboxes } from "@/components/legal/legal-acknowledgement-checkboxes";
 
 type AccountType = "candidate" | "employer";
 
@@ -16,6 +17,8 @@ function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<AccountType>("employer");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
@@ -155,12 +158,20 @@ function SignupForm() {
             At least 8 characters with uppercase, lowercase, number, and special character.
           </p>
         </div>
+        <LegalAcknowledgementCheckboxes
+          audience={accountType === "candidate" ? "candidate" : "employer"}
+          requireTerms
+          requirePrivacyNotice
+          allowMarketingConsent
+          onTermsChange={setTermsAccepted}
+          onPrivacyChange={setPrivacyAccepted}
+        />
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full"
-          disabled={isLoading}
+          disabled={isLoading || !termsAccepted || !privacyAccepted}
         >
           {isLoading ? (
             <>
