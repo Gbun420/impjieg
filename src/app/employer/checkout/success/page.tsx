@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, PlusCircle, LayoutDashboard, AlertCircle } from "lucide-react";
 import { getStripe } from "@/lib/stripe";
+import { recordLegalAcceptance } from "@/lib/legal/receipts";
+import { LEGAL_EVENT_TYPES, CONSENT_TEXT } from "@/lib/legal/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +28,32 @@ export default async function CheckoutSuccessPage({
       if (metadata.serviceType) {
         isScreeningOrder = true;
         serviceLabel = metadata.serviceLabel || "Screening order";
+      }
+
+      // Record legal acceptance for checkout
+      if (verified && metadata.employerId) {
+        recordLegalAcceptance({
+          email: session.customer_details?.email || "",
+          accountType: "employer",
+          eventType: LEGAL_EVENT_TYPES.CHECKOUT_COMPLETED,
+          termsAccepted: true,
+          privacyNoticeAcknowledged: true,
+          consentTextSnapshot: [
+            `terms: ${CONSENT_TEXT.terms}`,
+            `privacy: ${CONSENT_TEXT.privacy}`,
+          ].join("; "),
+          sourceRoute: "/employer/checkout/success",
+          metadata: {
+            stripeSessionId: sessionId,
+            paymentAmount: session.amount_total,
+            paymentCurrency: session.currency,
+            listingType: metadata.listingType || null,
+            planType: metadata.planType || null,
+            packType: metadata.packType || null,
+          },
+        }).catch((err) => {
+          console.error("[LegalReceipt] Failed to record checkout acceptance:", err);
+        });
       }
     } catch (error) {
       console.error("Failed to verify checkout session:", error);

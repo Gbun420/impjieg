@@ -623,6 +623,63 @@ function AuditLogConsole({ data }: { data: AdminConsoleData }) {
   );
 }
 
+function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
+  const totalReceipts = data.legalReceipts.length;
+  const signupEvents = data.legalReceipts.filter((r) => r.event_type.startsWith("account_signup")).length;
+  const checkoutEvents = data.legalReceipts.filter((r) => r.event_type === "employer_checkout_completed").length;
+  const withMarketing = data.legalReceipts.filter((r) => r.marketing_consent).length;
+
+  function eventTypeLabel(eventType: string): string {
+    switch (eventType) {
+      case "account_signup_candidate":
+        return "Candidate signup";
+      case "account_signup_employer":
+        return "Employer signup";
+      case "job_application_submitted":
+        return "Job application";
+      case "employer_checkout_completed":
+        return "Checkout completed";
+      case "talent_directory_opt_in":
+        return "Talent Directory opt-in";
+      case "talent_directory_opt_out":
+        return "Talent Directory opt-out";
+      default:
+        return eventType;
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <SummaryGrid
+        metrics={[
+          { label: "Total receipts", value: totalReceipts, note: "Legal acceptance events recorded" },
+          { label: "Signups", value: signupEvents, note: "Account creation acceptances" },
+          { label: "Checkouts", value: checkoutEvents, note: "Payment acceptances" },
+          { label: "Marketing opt-ins", value: withMarketing, note: "Users who accepted marketing" },
+        ]}
+      />
+
+      <Panel title="Legal acceptance receipts" description="Consent records and receipt delivery status">
+        {data.legalReceipts.map((receipt) => (
+          <SectionItem
+            key={receipt.id}
+            title={eventTypeLabel(receipt.event_type)}
+            subtitle={receipt.email}
+            meta={`${receipt.account_type} · ${receipt.source_route} · ${daysAgo(receipt.created_at)}`}
+            badge={
+              receipt.terms_accepted && receipt.privacy_notice_acknowledged ? (
+                <Badge variant="success">Consented</Badge>
+              ) : (
+                <Badge variant="warning">Partial</Badge>
+              )
+            }
+          />
+        ))}
+      </Panel>
+    </div>
+  );
+}
+
 function CommercialGrantsConsole({
   grants,
   loadError,
@@ -719,6 +776,7 @@ export function AdminConsoleSectionView({
         />
       ) : null}
       {section === "audit-log" ? <AuditLogConsole data={data} /> : null}
+      {section === "legal-receipts" ? <LegalReceiptsConsole data={data} /> : null}
     </div>
   );
 }

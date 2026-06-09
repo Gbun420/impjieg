@@ -5,6 +5,7 @@ import { submitApplication } from "@/lib/actions/apply";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { LegalAcknowledgementCheckboxes } from "@/components/legal/legal-acknowledgement-checkboxes";
 import { CheckCircle2 } from "lucide-react";
 
 export default function ApplyForm({
@@ -19,6 +20,7 @@ export default function ApplyForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [applicationProcessingAccepted, setApplicationProcessingAccepted] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
@@ -93,12 +95,19 @@ export default function ApplyForm({
         className="min-h-[120px]"
       />
 
+      <LegalAcknowledgementCheckboxes
+        audience="applicant"
+        requireApplicationProcessing
+        onApplicationProcessingChange={setApplicationProcessingAccepted}
+      />
+
       <Button
         type="submit"
         variant="primary"
         size="lg"
         className="w-full"
         isLoading={isSubmitting}
+        disabled={!applicationProcessingAccepted}
       >
         {isSubmitting ? (
           "Submitting..."

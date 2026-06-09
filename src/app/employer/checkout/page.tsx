@@ -8,6 +8,7 @@ import { PRICING, PROMOTION_BUNDLES } from "@/lib/constants";
 import { getEmployerEntitlements } from "@/lib/actions/monetization";
 import { selectBestCommercialDiscount } from "@/lib/monetization/admin-grants/resolver";
 import type { ResolvedEmployerCommercialEntitlements } from "@/lib/monetization/admin-grants/types";
+import { LegalAcknowledgementCheckboxes } from "@/components/legal/legal-acknowledgement-checkboxes";
 import { Tag } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export default function CheckoutPage({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [entitlements, setEntitlements] = useState<ResolvedEmployerCommercialEntitlements | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const jobId = params.jobId;
   const listingType = params.listingType || "standard";
@@ -202,12 +204,20 @@ export default function CheckoutPage({
         </Card>
       ) : null}
 
+      <LegalAcknowledgementCheckboxes
+        audience="employer"
+        requireTerms
+        requirePrivacyNotice
+        onTermsChange={setTermsAccepted}
+      />
+
       <Button
         variant="primary"
         size="lg"
         className="w-full"
         onClick={handleMainCheckout}
         isLoading={isLoading}
+        disabled={!termsAccepted}
       >
         {finalPrice === 0
           ? isLoading

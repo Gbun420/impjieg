@@ -25,6 +25,7 @@ export type AdminConsoleSection =
   | "alerts"
   | "subscriptions"
   | "commercial-grants"
+  | "legal-receipts"
   | "audit-log";
 
 export type AdminConsoleNavItem = {
@@ -53,6 +54,7 @@ export const adminConsoleSections: Array<{
   { slug: "alerts", href: "/admin/alerts", label: "Alerts" },
   { slug: "subscriptions", href: "/admin/subscriptions", label: "Subscriptions" },
   { slug: "commercial-grants", href: "/admin/commercial-grants", label: "Grants" },
+  { slug: "legal-receipts", href: "/admin/legal-receipts", label: "Legal receipts" },
   { slug: "audit-log", href: "/admin/audit-log", label: "Audit log" },
 ] as const;
 
@@ -89,7 +91,7 @@ export const adminConsoleNavGroups: AdminConsoleNavGroup[] = [
     label: "Security",
     description: "Audit and operational safety controls.",
     items: adminConsoleNavItems.filter((item) =>
-      ["/admin/audit-log"].includes(item.href)
+      ["/admin/legal-receipts", "/admin/audit-log"].includes(item.href)
     ),
   },
 ];
@@ -170,6 +172,12 @@ export function getAdminConsoleSectionMeta(section: AdminConsoleSection) {
         "Manage manual commercial entitlements, complimentary access, and discounts.",
       eyebrow: "Revenue operations",
     },
+    "legal-receipts": {
+      title: "Legal acceptance receipts",
+      description:
+        "Review legal acceptance events, consent records, and receipt delivery status across all user interactions.",
+      eyebrow: "Compliance operations",
+    },
     "audit-log": {
       title: "Security audit log",
       description:
@@ -215,6 +223,25 @@ type AdminAuditRow = {
   created_at: string;
 };
 
+type LegalReceiptRow = {
+  id: string;
+  user_id: string | null;
+  email: string;
+  account_type: string;
+  event_type: string;
+  related_entity_type: string | null;
+  related_entity_id: string | null;
+  terms_accepted: boolean;
+  privacy_notice_acknowledged: boolean;
+  marketing_consent: boolean;
+  consent_text_snapshot: string;
+  source_route: string;
+  ip_hash: string | null;
+  user_agent_hash: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
 export type AdminConsoleData = Awaited<ReturnType<typeof getAdminDashboardData>> & {
   aggregationSources: LatestAggregationSource[];
   aggregationRuns: LatestAggregationRun[];
@@ -225,6 +252,7 @@ export type AdminConsoleData = Awaited<ReturnType<typeof getAdminDashboardData>>
   candidateApplications: LatestCandidateApplication[];
   candidateAlerts: LatestCandidateAlert[];
   auditLogs: AdminAuditRow[];
+  legalReceipts: LegalReceiptRow[];
 };
 
 function createAdminServiceClient() {
@@ -502,6 +530,45 @@ function getDemoAdminConsoleData() {
     },
   ] as AdminAuditRow[];
 
+  const legalReceipts = [
+    {
+      id: "demo-legal-1",
+      user_id: "demo-user-1",
+      email: "mia@example.com",
+      account_type: "candidate",
+      event_type: "account_signup_candidate",
+      related_entity_type: null,
+      related_entity_id: null,
+      terms_accepted: true,
+      privacy_notice_acknowledged: true,
+      marketing_consent: true,
+      consent_text_snapshot: "terms: accepted; privacy: accepted; marketing: accepted",
+      source_route: "/auth/signup",
+      ip_hash: "abc123",
+      user_agent_hash: "def456",
+      metadata: { accountType: "candidate" },
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: "demo-legal-2",
+      user_id: "demo-user-2",
+      email: "liam@example.com",
+      account_type: "employer",
+      event_type: "employer_checkout_completed",
+      related_entity_type: "payment",
+      related_entity_id: "demo-payment-1",
+      terms_accepted: true,
+      privacy_notice_acknowledged: true,
+      marketing_consent: false,
+      consent_text_snapshot: "terms: accepted; privacy: accepted; marketing: not accepted",
+      source_route: "/employer/checkout/success",
+      ip_hash: "ghi789",
+      user_agent_hash: "jkl012",
+      metadata: { paymentAmount: 59, paymentCurrency: "eur" },
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+    },
+  ] as LegalReceiptRow[];
+
   const dashboard = {
     stats: [
       { label: "Total Jobs", value: 42, note: "31 active · 9 featured" },
@@ -621,6 +688,7 @@ function getDemoAdminConsoleData() {
       },
     ] as LatestSubscription[],
     recentAuditLogs: auditLogs,
+    legalReceipts,
   };
 
   const allPayments = dashboard.recentPayments;
@@ -783,6 +851,14 @@ export async function getAdminConsoleData() {
         .order("created_at", { ascending: false })
         .limit(12)
     ),
+    safeRowsQuery<LegalReceiptRow>(
+      "legal acceptance receipts",
+      supabase
+        .from("legal_acceptance_events")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20)
+    ),
   ]);
 
   return {
@@ -796,6 +872,7 @@ export async function getAdminConsoleData() {
     candidateApplications,
     candidateAlerts,
     auditLogs,
+    legalReceipts,
   };
 }
 
