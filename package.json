@@ -18,6 +18,7 @@
     "legal:check-tables": "node --env-file=.env.local --import tsx scripts/legal-check-tables.ts",
     "legal:check-workflow": "node --env-file=.env.local --import tsx scripts/legal-check-workflow.ts",
     "legal:seed-docs": "node --env-file=.env.local --import tsx scripts/seed-legal-documents.ts",
+    "legal:dispatch-receipts": "node --env-file=.env.local --import tsx scripts/dispatch-legal-receipts.ts",
     "predeploy:legal": "node --env-file=.env.local --import tsx scripts/predeploy-legal.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

@@ -180,8 +180,8 @@ export async function signup(formData: FormData) {
               .from("legal_email_receipts")
               .update({
                 status: userResult.success ? "sent" : "failed",
-                provider_message_id: userResult.messageId || null,
-                error: userResult.error || null,
+                provider_message_id: userResult.success ? userResult.messageId : null,
+                error: userResult.success ? null : userResult.error,
                 sent_at: userResult.success ? new Date().toISOString() : null,
               })
               .eq("id", userReceiptId);
@@ -191,8 +191,8 @@ export async function signup(formData: FormData) {
               .insert({
                 receipt_id: userReceiptId,
                 status: userResult.success ? "sent" : "failed",
-                provider_message_id: userResult.messageId || null,
-                error: userResult.error || null,
+                provider_message_id: userResult.success ? userResult.messageId : null,
+                error: userResult.success ? null : userResult.error,
               });
           } catch (err: any) {
             console.error("[LegalReceipt] User receipt email failed:", err?.message || err);
@@ -230,8 +230,8 @@ export async function signup(formData: FormData) {
               .from("legal_email_receipts")
               .update({
                 status: archiveResult.success ? "sent" : "failed",
-                provider_message_id: archiveResult.messageId || null,
-                error: archiveResult.error || null,
+                provider_message_id: archiveResult.success ? archiveResult.messageId : null,
+                error: archiveResult.success ? null : archiveResult.error,
                 sent_at: archiveResult.success ? new Date().toISOString() : null,
               })
               .eq("id", archiveReceiptId);
@@ -241,8 +241,8 @@ export async function signup(formData: FormData) {
               .insert({
                 receipt_id: archiveReceiptId,
                 status: archiveResult.success ? "sent" : "failed",
-                provider_message_id: archiveResult.messageId || null,
-                error: archiveResult.error || null,
+                provider_message_id: archiveResult.success ? archiveResult.messageId : null,
+                error: archiveResult.success ? null : archiveResult.error,
               });
           } catch (err: any) {
             console.error("[LegalReceipt] Archive receipt email failed:", err?.message || err);
