@@ -232,7 +232,7 @@ async function main() {
   console.log("\n5. Deleting auth users...");
   for (const [email, userId] of qaUserIds) {
     // Use SQL to delete auth user (admin API may not work)
-    const { error } = await supabase.rpc("exec_sql", {
+    const { error } = await supabaseAny.rpc("exec_sql", {
       query: `DELETE FROM auth.users WHERE id = '${userId}'`,
     });
     if (error) {
