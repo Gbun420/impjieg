@@ -339,11 +339,11 @@ function buildApplications(employerId: string) {
   ];
 }
 
-function buildCandidateApplications() {
+function buildCandidateApplications(candidateUserId: string) {
   return [
     {
       id: stableUuid("qa-candidate-app:applied"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       job_id: JOB_IDS.frontend,
       application_id: stableUuid("qa-application:candidate-applied"),
       status: "applied" as const,
@@ -351,7 +351,7 @@ function buildCandidateApplications() {
     },
     {
       id: stableUuid("qa-candidate-app:shortlisted"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       job_id: JOB_IDS.compliance,
       application_id: stableUuid("qa-application:candidate-shortlisted"),
       status: "shortlisted" as const,
@@ -359,7 +359,7 @@ function buildCandidateApplications() {
     },
     {
       id: stableUuid("qa-candidate-app:rejected"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       job_id: JOB_IDS.operations,
       application_id: stableUuid("qa-application:candidate-rejected"),
       status: "rejected" as const,
