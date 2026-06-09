@@ -53,7 +53,7 @@ export function ContactRequestsList({ requests }: { requests: ContactRequest[] }
         setExpandedId(null);
         setResponseMessage("");
       } else {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
     });
   };
@@ -131,7 +131,7 @@ export function ContactRequestsList({ requests }: { requests: ContactRequest[] }
                       <Button
                         onClick={() => handleRespond(req.id, "rejected")}
                         disabled={isPending}
-                        variant="destructive"
+                        variant="danger"
                         size="sm"
                       >
                         <XCircle className="mr-1 h-4 w-4" />

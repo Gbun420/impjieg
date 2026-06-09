@@ -35,7 +35,7 @@ export default async function CandidateTalentDirectoryPage() {
     .from("candidate_directory_profiles" as any)
     .select("*")
     .eq("candidate_user_id", user.id)
-    .maybeSingle();
+    .maybeSingle() as { data: any };
 
   // Get candidate profile for preview
   const { data: candidateProfile } = await supabase

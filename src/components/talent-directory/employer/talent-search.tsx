@@ -62,11 +62,11 @@ export function TalentSearch({ employerId }: { employerId: string }) {
       if (filters.remotePreference) input.remotePreference = filters.remotePreference as any;
 
       const result = await searchTalentDirectory(input);
-      if (result.ok) {
+      if (result.ok && result.data) {
         setResults(result.data.profiles);
         setTotal(result.data.total);
       } else {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
     });
   };

@@ -127,7 +127,7 @@ export const legalAcceptanceInputSchema = z.object({
   sourceRoute: z.string().min(1),
   ipHash: z.string().optional(),
   userAgentHash: z.string().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type LegalAcceptanceInputValidated = z.infer<

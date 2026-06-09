@@ -85,7 +85,6 @@ export function hasActiveTalentAccess(
 ): boolean {
   if (!access) return false;
   if (access.status !== "active" && access.status !== "trialing") return false;
-  if (access.expires_at && new Date(access.expires_at) < new Date()) return false;
   return true;
 }
 
@@ -94,9 +93,9 @@ export function getCreditBalance(
 ): CreditBalance | null {
   if (!access) return null;
   return {
-    total: access.contact_credits_total,
-    used: access.contact_credits_used,
-    remaining: access.contact_credits_total - access.contact_credits_used,
+    total: access.credits_total,
+    used: access.credits_used,
+    remaining: access.credits_total - access.credits_used,
     planKey: access.plan_key,
     status: access.status,
   };

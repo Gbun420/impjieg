@@ -7,13 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 import {
   Eye,
   EyeOff,
@@ -103,13 +97,17 @@ export function DirectorySettingsForm({
       setMessage(null);
       const result = await optInToDirectory({
         ...form,
+        remotePreference: form.remotePreference as "On-site" | "Remote" | "Hybrid" | undefined,
+        experienceYears: form.experienceYears ?? undefined,
+        desiredSalaryMin: form.desiredSalaryMin ?? undefined,
+        desiredSalaryMax: form.desiredSalaryMax ?? undefined,
         consentToDirectory: true as const,
       });
       if (result.ok) {
         setMessage({ type: "success", text: result.message ?? "Opted in successfully" });
         setForm((prev) => ({ ...prev, consentToDirectory: true }));
       } else {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
     });
   };
@@ -122,7 +120,7 @@ export function DirectorySettingsForm({
         setMessage({ type: "success", text: result.message ?? "Paused" });
         setForm((prev) => ({ ...prev, consentToDirectory: false }));
       } else {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
     });
   };
@@ -135,7 +133,7 @@ export function DirectorySettingsForm({
         setMessage({ type: "success", text: result.message ?? "Left directory" });
         setForm((prev) => ({ ...prev, consentToDirectory: false }));
       } else {
-        setMessage({ type: "error", text: result.error });
+        setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
     });
   };
@@ -153,18 +151,16 @@ export function DirectorySettingsForm({
           <div>
             <label className="text-sm font-medium text-foreground">Display Mode</label>
             <Select
+              label="Display Mode"
+              options={[
+                { value: "anonymous", label: "Anonymous (hidden name)" },
+                { value: "first_name", label: "First name only" },
+                { value: "full_name", label: "Full name" },
+              ]}
               value={form.displayMode}
-              onValueChange={(v) => setForm((prev) => ({ ...prev, displayMode: v as DisplayMode }))}
-            >
-              <SelectTrigger className="mt-1.5">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="anonymous">Anonymous (hidden name)</SelectItem>
-                <SelectItem value="first_name">First name only</SelectItem>
-                <SelectItem value="full_name">Full name</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(e) => setForm((prev) => ({ ...prev, displayMode: e.target.value as DisplayMode }))}
+              className="mt-1.5"
+            />
           </div>
 
           {/* Headline */}
@@ -283,14 +279,14 @@ export function DirectorySettingsForm({
                   <Button
                     onClick={() => setShowConfirmLeave(true)}
                     disabled={isPending}
-                    variant="destructive"
+                    variant="danger"
                   >
                     Leave Directory
                   </Button>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                    <Button onClick={handleLeave} disabled={isPending} variant="destructive" size="sm">
+                    <AlertTriangle className="h-4 w-4 text-error" />
+                    <Button onClick={handleLeave} disabled={isPending} variant="danger" size="sm">
                       Confirm Leave
                     </Button>
                     <Button onClick={() => setShowConfirmLeave(false)} variant="ghost" size="sm">

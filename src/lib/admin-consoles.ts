@@ -776,6 +776,7 @@ export async function getAdminConsoleData() {
     candidateApplications,
     candidateAlerts,
     auditLogs,
+    legalReceipts,
   ] = await Promise.all([
     safeRowsQuery<LatestAggregationSource>(
       "aggregation sources",

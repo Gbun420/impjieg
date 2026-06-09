@@ -37,7 +37,7 @@ export default async function EmployerTalentPage() {
     .from("employers")
     .select("id, name")
     .eq("user_id", user.id)
-    .maybeSingle();
+    .maybeSingle() as { data: { id: string; name: string } | null };
 
   if (!employer) {
     redirect("/employer/dashboard");

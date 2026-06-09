@@ -98,14 +98,14 @@ export async function optInToDirectory(
       .from("candidate_directory_profiles" as any)
       .select("id, slug")
       .eq("candidate_user_id", ctx.user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: { id: string; slug: string } | null };
 
     // Get candidate_profile for reference
     const { data: candidateProfile } = await supabase
       .from("candidate_profiles")
       .select("id")
       .eq("user_id", ctx.user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: { id: string } | null };
 
     const now = new Date().toISOString();
     const slug = existing?.slug ?? generateDirectorySlug(ctx.user.email ?? "candidate");

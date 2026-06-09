@@ -84,8 +84,16 @@ export type CandidateDirectoryAuditLog = {
 export type CandidateDirectoryAuditLogInsert = Omit<CandidateDirectoryAuditLog, "id" | "created_at">;
 
 // ============================================================================
-// Derived Types
+// Action Result
 // ============================================================================
+
+export type TalentDirectoryActionResult = {
+  ok: boolean;
+  error?: string;
+  message?: string;
+  fieldErrors?: Record<string, string[]>;
+  data?: Record<string, unknown>;
+};
 
 /** Safe profile visible to employers (no PII) */
 export type EmployerVisibleProfile = {
