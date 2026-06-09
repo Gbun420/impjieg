@@ -29,10 +29,25 @@ import type {
 } from "./types";
 import type { Json } from "@/lib/supabase/types";
 
+export type AdminGrantActionResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; fieldErrors: Record<string, string> };
+
 function isExpired(grant: AdminCommercialGrantRow, now = new Date()) {
   return Boolean(
     grant.expires_at && new Date(grant.expires_at).getTime() <= now.getTime()
   );
+}
+
+function extractFieldErrors(zodError: { issues: Array<{ path: Array<string | number | symbol>; message: string }> }): Record<string, string> {
+  const fieldErrors: Record<string, string> = {};
+  for (const issue of zodError.issues) {
+    const field = issue.path.filter((p): p is string | number => typeof p === "string" || typeof p === "number").join(".");
+    if (field && !fieldErrors[field]) {
+      fieldErrors[field] = issue.message;
+    }
+  }
+  return fieldErrors;
 }
 
 type CommercialGrantQueryResult<T> = Promise<{
@@ -201,19 +216,43 @@ async function assertGrantAccess(
   return user;
 }
 
-export async function createAdminCommercialGrant(input: unknown) {
-  const payload = createAdminCommercialGrantSchema.parse(input);
-  const user = await assertAdminUser();
+export async function createAdminCommercialGrant(
+  input: unknown
+): Promise<AdminGrantActionResult<AdminCommercialGrantRow>> {
+  const parsed = createAdminCommercialGrantSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "Validation failed. Check the highlighted fields.",
+      fieldErrors: extractFieldErrors(parsed.error),
+    };
+  }
+
+  let user;
+  try {
+    user = await assertAdminUser();
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Admin session required",
+      fieldErrors: {},
+    };
+  }
+
   const client = createAdminGrantsServiceClient();
   const grantsTable = getCommercialGrantsTable(client);
 
   const { data, error } = await grantsTable
-    .insert([await buildAdminCommercialGrantInsertRow(payload, user.id)])
+    .insert([await buildAdminCommercialGrantInsertRow(parsed.data, user.id)])
     .select("*")
     .single();
 
   if (error || !data) {
-    throw new Error(error?.message ?? "Failed to create commercial grant");
+    return {
+      ok: false,
+      error: error?.message ?? "Failed to create commercial grant",
+      fieldErrors: {},
+    };
   }
 
   await logCommercialGrantAction(client, {
@@ -229,48 +268,79 @@ export async function createAdminCommercialGrant(input: unknown) {
   });
 
   revalidatePath("/admin/commercial-grants");
-  return data;
+  return { ok: true, data };
 }
 
-export async function updateAdminCommercialGrant(grantId: string, input: unknown) {
-  const payload = updateAdminCommercialGrantSchema.parse({ grantId, ...(input as object) });
-  const user = await assertAdminUser();
+export async function updateAdminCommercialGrant(
+  grantId: string,
+  input: unknown
+): Promise<AdminGrantActionResult<AdminCommercialGrantRow>> {
+  const parsed = updateAdminCommercialGrantSchema.safeParse({ grantId, ...(input as object) });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "Validation failed. Check the highlighted fields.",
+      fieldErrors: extractFieldErrors(parsed.error),
+    };
+  }
+
+  let user;
+  try {
+    user = await assertAdminUser();
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Admin session required",
+      fieldErrors: {},
+    };
+  }
+
   const client = createAdminGrantsServiceClient();
   const grantsTable = getCommercialGrantsTable(client);
   const existing = await getGrantOrThrow(grantId, client);
 
   const { data, error } = await grantsTable
     .update({
-      employer_id: payload.employerId ?? existing.employer_id,
-      grant_type: payload.grantType ?? existing.grant_type,
-      product_id: payload.productId ?? existing.product_id,
-      entitlement_key: payload.entitlementKey ?? existing.entitlement_key,
-      plan_key: payload.planKey ?? existing.plan_key,
-      credits_total: payload.creditsTotal ?? existing.credits_total,
+      employer_id: parsed.data.employerId ?? existing.employer_id,
+      grant_type: parsed.data.grantType ?? existing.grant_type,
+      product_id: parsed.data.productId ?? existing.product_id,
+      entitlement_key: parsed.data.entitlementKey ?? existing.entitlement_key,
+      plan_key: parsed.data.planKey ?? existing.plan_key,
+      credits_total: parsed.data.creditsTotal ?? existing.credits_total,
       discount_percent:
-        payload.discountPercent === undefined ? existing.discount_percent : payload.discountPercent,
+        parsed.data.discountPercent === undefined
+          ? existing.discount_percent
+          : parsed.data.discountPercent,
       discount_amount_cents:
-        payload.discountAmountCents === undefined
+        parsed.data.discountAmountCents === undefined
           ? existing.discount_amount_cents
-          : payload.discountAmountCents,
-      currency: payload.currency ?? existing.currency,
-      starts_at: payload.startsAt ? payload.startsAt.toISOString() : existing.starts_at,
+          : parsed.data.discountAmountCents,
+      currency: parsed.data.currency ?? existing.currency,
+      starts_at: parsed.data.startsAt
+        ? parsed.data.startsAt.toISOString()
+        : existing.starts_at,
       expires_at:
-        payload.expiresAt === undefined
+        parsed.data.expiresAt === undefined
           ? existing.expires_at
-          : payload.expiresAt?.toISOString() ?? null,
-      status: payload.status ?? existing.status,
-      reason: payload.reason ?? existing.reason,
+          : parsed.data.expiresAt?.toISOString() ?? null,
+      status: parsed.data.status ?? existing.status,
+      reason: parsed.data.reason ?? existing.reason,
       internal_notes:
-        payload.internalNotes === undefined ? existing.internal_notes : payload.internalNotes,
-      metadata: (payload.metadata ?? existing.metadata) as Json,
+        parsed.data.internalNotes === undefined
+          ? existing.internal_notes
+          : parsed.data.internalNotes,
+      metadata: (parsed.data.metadata ?? existing.metadata) as Json,
     })
     .eq("id", grantId)
     .select("*")
     .single();
 
   if (error || !data) {
-    throw new Error(error?.message ?? "Failed to update commercial grant");
+    return {
+      ok: false,
+      error: error?.message ?? "Failed to update commercial grant",
+      fieldErrors: {},
+    };
   }
 
   await logCommercialGrantAction(client, {
@@ -285,12 +355,33 @@ export async function updateAdminCommercialGrant(grantId: string, input: unknown
   });
 
   revalidatePath("/admin/commercial-grants");
-  return data;
+  return { ok: true, data };
 }
 
-export async function revokeAdminCommercialGrant(grantId: string, reason: string) {
-  const payload = revokeAdminCommercialGrantSchema.parse({ grantId, reason });
-  const user = await assertAdminUser();
+export async function revokeAdminCommercialGrant(
+  grantId: string,
+  reason: string
+): Promise<AdminGrantActionResult<AdminCommercialGrantRow>> {
+  const parsed = revokeAdminCommercialGrantSchema.safeParse({ grantId, reason });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "Validation failed. Check the highlighted fields.",
+      fieldErrors: extractFieldErrors(parsed.error),
+    };
+  }
+
+  let user;
+  try {
+    user = await assertAdminUser();
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Admin session required",
+      fieldErrors: {},
+    };
+  }
+
   const client = createAdminGrantsServiceClient();
   const grantsTable = getCommercialGrantsTable(client);
   const existing = await getGrantOrThrow(grantId, client);
@@ -300,14 +391,18 @@ export async function revokeAdminCommercialGrant(grantId: string, reason: string
       status: "revoked",
       revoked_at: new Date().toISOString(),
       revoked_by: user.id,
-      revoke_reason: payload.reason,
+      revoke_reason: parsed.data.reason,
     })
     .eq("id", grantId)
     .select("*")
     .single();
 
   if (error || !data) {
-    throw new Error(error?.message ?? "Failed to revoke commercial grant");
+    return {
+      ok: false,
+      error: error?.message ?? "Failed to revoke commercial grant",
+      fieldErrors: {},
+    };
   }
 
   await logCommercialGrantAction(client, {
@@ -317,12 +412,12 @@ export async function revokeAdminCommercialGrant(grantId: string, reason: string
     action: "grant_revoked",
     metadata: {
       previousStatus: existing.status,
-      reason: payload.reason,
+      reason: parsed.data.reason,
     },
   });
 
   revalidatePath("/admin/commercial-grants");
-  return data;
+  return { ok: true, data };
 }
 
 export async function listEmployerCommercialGrants(employerId: string) {

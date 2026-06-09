@@ -14,6 +14,7 @@
     "qa:admin-totp": "tsx scripts/generate-admin-qa-totp.ts",
     "qa:check-admin-env": "tsx scripts/check-supabase-admin-env.ts",
     "admin:check-mfa-table": "tsx scripts/check-admin-mfa-table.ts",
+    "admin:check-commercial-grants": "tsx scripts/check-commercial-grants-tables.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

@@ -59,7 +59,10 @@ export function GrantsList({ grants }: { grants: AdminCommercialGrantRow[] }) {
 
     setRevokingId(grantId);
     try {
-      await revokeAdminCommercialGrant(grantId, "Manually revoked via admin console");
+      const result = await revokeAdminCommercialGrant(grantId, "Manually revoked via admin console");
+      if (!result.ok) {
+        alert(result.error);
+      }
     } catch (error: unknown) {
       alert(error instanceof Error ? error.message : "Failed to revoke grant");
     } finally {

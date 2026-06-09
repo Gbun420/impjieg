@@ -10,7 +10,6 @@ import { createAdminCommercialGrant } from "@/lib/monetization/admin-grants/acti
 import { GRANT_TYPES } from "@/lib/monetization/admin-grants/constants";
 import { ShieldCheck } from "lucide-react";
 import type { AdminCommercialGrantEmployerOption } from "@/lib/monetization/admin-grants/types";
-
 type GrantType = (typeof GRANT_TYPES)[number];
 
 type GrantTypeMeta = {
@@ -148,55 +147,55 @@ const grantTypeMeta: Record<GrantType, GrantTypeMeta> = {
   free_trial: {
     label: "Free trial",
     description: "Temporary access for onboarding, evaluation, or a negotiated trial.",
-    requirements: "Requires an expiry date.",
+    requirements: "Requires an expiry date. No credits or discounts.",
     badge: "secondary",
   },
   plan_access: {
     label: "Temporary plan access",
     description: "Gives an employer access to a plan for a fixed period.",
-    requirements: "Does not create a paid Stripe subscription.",
+    requirements: "Requires an expiry date. Does not create a paid Stripe subscription.",
     badge: "secondary",
   },
   job_credit: {
     label: "Job posting credits",
     description: "Lets an employer publish jobs without checkout until the credits are used.",
-    requirements: "Provide a positive credit total.",
+    requirements: "Requires a positive credit total.",
     badge: "success",
   },
   featured_credit: {
     label: "Featured listing credits",
     description: "Lets an employer feature jobs for free while credits remain.",
-    requirements: "Provide a positive credit total.",
+    requirements: "Requires a positive credit total.",
     badge: "success",
   },
   boost_credit: {
     label: "Boost credits",
     description: "Lets an employer boost listings without checkout while credits remain.",
-    requirements: "Provide a positive credit total.",
+    requirements: "Requires a positive credit total.",
     badge: "success",
   },
   ai_screening_credit: {
     label: "AI screening credits",
     description: "Lets an employer activate paid screening support on selected jobs.",
-    requirements: "Provide a positive credit total.",
+    requirements: "Requires a positive credit total.",
     badge: "success",
   },
   percent_discount: {
     label: "Percentage discount",
     description: "Applies a percentage discount at checkout.",
-    requirements: "Use a clear expiry date and only one discount value.",
+    requirements: "Requires a discount percent value. Optional expiry date.",
     badge: "warning",
   },
   fixed_discount: {
     label: "Fixed discount",
     description: "Applies a fixed euro discount at checkout.",
-    requirements: "The discount should not exceed the order total.",
+    requirements: "Requires a discount amount in cents. Optional expiry date.",
     badge: "warning",
   },
   custom_entitlement: {
     label: "Custom entitlement",
     description: "Use only for manually agreed commercial arrangements.",
-    requirements: "Include a clear reason.",
+    requirements: "Include a clear reason (min 10 characters).",
     badge: "accent",
   },
 };
@@ -209,17 +208,22 @@ export function CreateGrantForm({
   const formRef = useRef<HTMLFormElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState<string | null>(null);
   const [selectedGrantType, setSelectedGrantType] =
     useState<GrantType>(DEFAULT_GRANT_TYPE);
   const [pickerResetKey, setPickerResetKey] = useState(0);
 
   const meta = grantTypeMeta[selectedGrantType];
+  const isCreditGrant = ["job_credit", "featured_credit", "boost_credit", "ai_screening_credit"].includes(selectedGrantType);
+  const isDiscountGrant = ["percent_discount", "fixed_discount"].includes(selectedGrantType);
+  const isPlanGrant = ["free_trial", "plan_access"].includes(selectedGrantType);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    setFieldErrors({});
     setSuccess(null);
 
     const formData = new FormData(event.currentTarget);
@@ -257,11 +261,16 @@ export function CreateGrantForm({
     };
 
     try {
-      await createAdminCommercialGrant(data);
-      formRef.current?.reset();
-      setPickerResetKey((current) => current + 1);
-      setSelectedGrantType(DEFAULT_GRANT_TYPE);
-      setSuccess("Grant created successfully.");
+      const result = await createAdminCommercialGrant(data);
+      if (result.ok) {
+        formRef.current?.reset();
+        setPickerResetKey((current) => current + 1);
+        setSelectedGrantType(DEFAULT_GRANT_TYPE);
+        setSuccess("Grant created successfully.");
+      } else {
+        setError(result.error);
+        setFieldErrors(result.fieldErrors);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to create grant");
     } finally {
@@ -357,6 +366,9 @@ export function CreateGrantForm({
             </p>
 
             <EmployerPicker key={pickerResetKey} employers={employers} />
+            {fieldErrors.employerId ? (
+              <p className="text-xs text-error">{fieldErrors.employerId}</p>
+            ) : null}
           </div>
         </section>
 
@@ -386,6 +398,9 @@ export function CreateGrantForm({
                   </option>
                 ))}
               </select>
+              {fieldErrors.grantType ? (
+                <p className="text-xs text-error">{fieldErrors.grantType}</p>
+              ) : null}
               <p id="grant-type-help" className="text-xs leading-5 text-muted-foreground">
                 Choose the grant type first. The requirements panel updates to show the fields that matter most.
               </p>
@@ -414,7 +429,20 @@ export function CreateGrantForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Input name="startsAt" type="datetime-local" label="Starts at" />
-            <Input name="expiresAt" type="datetime-local" label="Expiry date" />
+            <div className="space-y-1">
+              <Input
+                name="expiresAt"
+                type="datetime-local"
+                label={`Expiry date${isPlanGrant || isDiscountGrant ? " *" : ""}`}
+                required={isPlanGrant || isDiscountGrant}
+                aria-describedby={fieldErrors.expiresAt ? "grant-expires-at-error" : undefined}
+              />
+              {fieldErrors.expiresAt ? (
+                <p id="grant-expires-at-error" className="text-xs text-error">
+                  {fieldErrors.expiresAt}
+                </p>
+              ) : null}
+            </div>
           </div>
         </section>
 
@@ -425,28 +453,59 @@ export function CreateGrantForm({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input
-              name="creditsTotal"
-              type="number"
-              label="Credits total"
-              placeholder="e.g. 5"
-            />
-            <Input
-              name="discountPercent"
-              type="number"
-              label="Discount percent"
-              placeholder="e.g. 20"
-            />
-            <Input
-              name="discountAmountCents"
-              type="number"
-              label="Discount amount (cents)"
-              placeholder="e.g. 5000"
-            />
+            <div className="space-y-1">
+              <Input
+                name="creditsTotal"
+                type="number"
+                label={`Credits total${isCreditGrant ? " *" : ""}`}
+                placeholder="e.g. 5"
+                required={isCreditGrant}
+                aria-describedby={fieldErrors.creditsTotal ? "grant-credits-total-error" : undefined}
+              />
+              {fieldErrors.creditsTotal ? (
+                <p id="grant-credits-total-error" className="text-xs text-error">
+                  {fieldErrors.creditsTotal}
+                </p>
+              ) : null}
+            </div>
+            <div className="space-y-1">
+              <Input
+                name="discountPercent"
+                type="number"
+                label={`Discount percent${selectedGrantType === "percent_discount" ? " *" : ""}`}
+                placeholder="e.g. 20"
+                required={selectedGrantType === "percent_discount"}
+                aria-describedby={fieldErrors.discountPercent ? "grant-discount-percent-error" : undefined}
+              />
+              {fieldErrors.discountPercent ? (
+                <p id="grant-discount-percent-error" className="text-xs text-error">
+                  {fieldErrors.discountPercent}
+                </p>
+              ) : null}
+            </div>
+            <div className="space-y-1">
+              <Input
+                name="discountAmountCents"
+                type="number"
+                label={`Discount amount (cents)${selectedGrantType === "fixed_discount" ? " *" : ""}`}
+                placeholder="e.g. 5000"
+                required={selectedGrantType === "fixed_discount"}
+                aria-describedby={fieldErrors.discountAmountCents ? "grant-discount-amount-error" : undefined}
+              />
+              {fieldErrors.discountAmountCents ? (
+                <p id="grant-discount-amount-error" className="text-xs text-error">
+                  {fieldErrors.discountAmountCents}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <p className="text-xs leading-5 text-muted-foreground">
-            Only use the fields that match the selected grant type. Credit grants need a positive total; discount grants need either a percent or a fixed amount.
+            {isCreditGrant
+              ? "Credit grants require a positive total. Credits are consumed when the employer uses them."
+              : isDiscountGrant
+                ? "Discount grants require either a percent or a fixed amount, but not both."
+                : "Only use the fields that match the selected grant type."}
           </p>
         </section>
 
@@ -457,17 +516,22 @@ export function CreateGrantForm({
           </div>
 
           <div className="space-y-4">
-            <Textarea
-              name="reason"
-              label="Grant reason"
-              required
-              placeholder="Why is this grant being issued?"
-              id="grant-reason"
-              aria-describedby="grant-reason-help"
-              className="min-h-[110px]"
-            />
+            <div className="space-y-1">
+              <Textarea
+                name="reason"
+                label="Grant reason *"
+                required
+                placeholder="Why is this grant being issued?"
+                id="grant-reason"
+                aria-describedby="grant-reason-help"
+                className="min-h-[110px]"
+              />
+              {fieldErrors.reason ? (
+                <p className="text-xs text-error">{fieldErrors.reason}</p>
+              ) : null}
+            </div>
             <p id="grant-reason-help" className="text-xs leading-5 text-muted-foreground">
-              Keep this short, specific, and suitable for audit review.
+              Keep this short, specific, and suitable for audit review. Minimum 10 characters.
             </p>
             <Textarea
               name="internalNotes"
