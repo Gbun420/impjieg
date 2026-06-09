@@ -20,7 +20,7 @@ export function SaveJobButton({
     return (
       <Link
         href={`/auth/login?redirect=${encodeURIComponent(redirectTo)}`}
-        className={`inline-flex items-center justify-center rounded-lg border border-border bg-transparent font-medium text-foreground transition-all duration-150 hover:border-border-hover hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        className={`inline-flex items-center justify-center rounded-xl border border-border bg-surface/90 font-medium text-foreground transition-all duration-150 hover:border-border-hover hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
           compact ? "h-8 px-3 text-sm" : "h-10 px-4 text-sm"
         }`}
       >

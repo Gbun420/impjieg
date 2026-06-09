@@ -390,7 +390,7 @@ export function CreateGrantForm({
                   setSelectedGrantType(event.target.value as GrantType)
                 }
                 aria-describedby="grant-type-help"
-                className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-11 w-full rounded-xl border border-border bg-surface/90 px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {GRANT_TYPES.map((type) => (
                   <option key={type} value={type}>

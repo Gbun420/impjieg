@@ -87,21 +87,21 @@ export default function CookieConsentBanner() {
               <button
                 type="button"
                 onClick={rejectAll}
-                className="rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="rounded-xl border border-border bg-surface/90 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Reject All
               </button>
               <button
                 type="button"
                 onClick={() => setShowDetails(true)}
-                className="rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="rounded-xl border border-border bg-surface/90 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Customize
               </button>
               <button
                 type="button"
                 onClick={acceptAll}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors"
               >
                 Accept All
               </button>
@@ -168,7 +168,7 @@ export default function CookieConsentBanner() {
               <button
                 type="button"
                 onClick={handleSaveCustom}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors"
               >
                 Save Preferences
               </button>

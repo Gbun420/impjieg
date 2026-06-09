@@ -288,7 +288,7 @@ export default function PostJobPage() {
                 {biasResult.issues.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {biasResult.issues.map((issue, i) => (
-                      <div key={i} className="rounded-md border border-border/50 bg-background p-3">
+                      <div key={i} className="rounded-xl border border-border/50 bg-surface/80 p-3">
                         <div className="flex items-center gap-2">
                           <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
                             issue.severity === "high"

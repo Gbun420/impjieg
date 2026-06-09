@@ -280,7 +280,7 @@ export default function CandidateAlertsPage() {
                 id={remoteTypeId}
                 value={formData.remote_type}
                 onChange={(e) => setFormData({ ...formData, remote_type: e.target.value })}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-border bg-surface/90 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
               >
                 <option value="">Any</option>
                 {REMOTE_OPTIONS.map((opt) => (
@@ -296,7 +296,7 @@ export default function CandidateAlertsPage() {
                 id={frequencyId}
                 value={formData.frequency}
                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-border bg-surface/90 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
               >
                 {FREQUENCIES.map((f) => (
                   <option key={f.value} value={f.value}>{f.label}</option>
