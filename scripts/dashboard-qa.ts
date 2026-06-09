@@ -331,14 +331,15 @@ async function runLighthouse(url: string, authCookie?: { name: string; value: st
 
     await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
-    const { report } = await lighthouse(url, {
+    const result = await lighthouse(url, {
       port: new URL(browser.wsEndpoint()).port,
       output: "json",
       logLevel: "error",
     });
 
     await browser.close();
-    return JSON.parse(report);
+    if (!result?.report) return null;
+    return typeof result.report === "string" ? JSON.parse(result.report) : result.report;
   } catch {
     return null;
   }
