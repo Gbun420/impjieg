@@ -242,6 +242,32 @@ type LegalReceiptRow = {
   created_at: string;
 };
 
+type LegalEmailReceiptRow = {
+  id: string;
+  acceptance_event_id: string;
+  recipient_email: string;
+  copy_type: string;
+  subject: string;
+  html_hash: string | null;
+  text_hash: string | null;
+  provider: string;
+  provider_message_id: string | null;
+  status: string;
+  error: string | null;
+  created_at: string;
+  sent_at: string | null;
+};
+
+type LegalDeliveryAttemptRow = {
+  id: string;
+  receipt_id: string;
+  provider: string;
+  status: string;
+  provider_message_id: string | null;
+  error: string | null;
+  attempted_at: string;
+};
+
 export type AdminConsoleData = Awaited<ReturnType<typeof getAdminDashboardData>> & {
   aggregationSources: LatestAggregationSource[];
   aggregationRuns: LatestAggregationRun[];
@@ -253,6 +279,8 @@ export type AdminConsoleData = Awaited<ReturnType<typeof getAdminDashboardData>>
   candidateAlerts: LatestCandidateAlert[];
   auditLogs: AdminAuditRow[];
   legalReceipts: LegalReceiptRow[];
+  legalEmailReceipts: LegalEmailReceiptRow[];
+  legalDeliveryAttempts: LegalDeliveryAttemptRow[];
 };
 
 function createAdminServiceClient() {
@@ -569,6 +597,75 @@ function getDemoAdminConsoleData() {
     },
   ] as LegalReceiptRow[];
 
+  const legalEmailReceipts = [
+    {
+      id: "demo-email-1",
+      acceptance_event_id: "demo-legal-1",
+      recipient_email: "mia@example.com",
+      copy_type: "user_receipt",
+      subject: "Your Impjieg legal receipt",
+      html_hash: "abc123",
+      text_hash: null,
+      provider: "resend",
+      provider_message_id: "msg_abc123",
+      status: "sent",
+      error: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: "demo-email-2",
+      acceptance_event_id: "demo-legal-1",
+      recipient_email: "legal@impjieg.com",
+      copy_type: "internal_archive",
+      subject: "Impjieg legal receipt copy",
+      html_hash: "def456",
+      text_hash: null,
+      provider: "resend",
+      provider_message_id: "msg_def456",
+      status: "sent",
+      error: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: "demo-email-3",
+      acceptance_event_id: "demo-legal-2",
+      recipient_email: "liam@example.com",
+      copy_type: "user_receipt",
+      subject: "Your Impjieg legal receipt",
+      html_hash: "ghi789",
+      text_hash: null,
+      provider: "resend",
+      provider_message_id: null,
+      status: "failed",
+      error: "inbox full",
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+      sent_at: null,
+    },
+  ] as LegalEmailReceiptRow[];
+
+  const legalDeliveryAttempts = [
+    {
+      id: "demo-attempt-1",
+      receipt_id: "demo-email-1",
+      provider: "resend",
+      status: "sent",
+      provider_message_id: "msg_abc123",
+      error: null,
+      attempted_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: "demo-attempt-2",
+      receipt_id: "demo-email-3",
+      provider: "resend",
+      status: "failed",
+      provider_message_id: null,
+      error: "inbox full",
+      attempted_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+    },
+  ] as LegalDeliveryAttemptRow[];
+
   const dashboard = {
     stats: [
       { label: "Total Jobs", value: 42, note: "31 active · 9 featured" },
@@ -748,6 +845,9 @@ function getDemoAdminConsoleData() {
     candidateApplications,
     candidateAlerts,
     auditLogs,
+    legalReceipts,
+    legalEmailReceipts,
+    legalDeliveryAttempts,
   };
 }
 
@@ -777,6 +877,8 @@ export async function getAdminConsoleData() {
     candidateAlerts,
     auditLogs,
     legalReceipts,
+    legalEmailReceipts,
+    legalDeliveryAttempts,
   ] = await Promise.all([
     safeRowsQuery<LatestAggregationSource>(
       "aggregation sources",
@@ -860,6 +962,22 @@ export async function getAdminConsoleData() {
         .order("created_at", { ascending: false })
         .limit(20)
     ),
+    safeRowsQuery<LegalEmailReceiptRow>(
+      "legal email receipts",
+      supabase
+        .from("legal_email_receipts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(40)
+    ),
+    safeRowsQuery<LegalDeliveryAttemptRow>(
+      "legal delivery attempts",
+      supabase
+        .from("legal_email_delivery_attempts")
+        .select("*")
+        .order("attempted_at", { ascending: false })
+        .limit(80)
+    ),
   ]);
 
   return {
@@ -874,6 +992,8 @@ export async function getAdminConsoleData() {
     candidateAlerts,
     auditLogs,
     legalReceipts,
+    legalEmailReceipts,
+    legalDeliveryAttempts,
   };
 }
 

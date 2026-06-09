@@ -674,12 +674,35 @@ function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
         ]}
       />
 
-      <Panel title="Legal acceptance events" description="Consent records indexed by creation time. Latest 20 events.">
+      <Panel title="Table health" description="Legal receipt table availability and status.">
+        <SectionItem
+          title="legal_acceptance_events"
+          subtitle={`${data.legalReceipts.length} events`}
+          badge={<Badge variant="success">Available</Badge>}
+        />
+        <SectionItem
+          title="legal_email_receipts"
+          subtitle={`${data.legalEmailReceipts.length} records`}
+          badge={<Badge variant="success">Available</Badge>}
+        />
+        <SectionItem
+          title="legal_email_delivery_attempts"
+          subtitle={`${data.legalDeliveryAttempts.length} attempts`}
+          badge={<Badge variant="success">Available</Badge>}
+        />
+        <SectionItem
+          title="Latest receipt"
+          subtitle={data.legalEmailReceipts[0] ? `${daysAgo(data.legalEmailReceipts[0].created_at)}` : "No receipts yet"}
+          badge={<Badge variant="secondary">Rls enabled</Badge>}
+        />
+      </Panel>
+
+      <Panel title="Legal acceptance events" description="Consent records with related entity data. Latest 20 events.">
         {data.legalReceipts.length === 0 ? (
           <SectionItem
             title="No events recorded yet"
             subtitle="Legal acceptance events will appear here after the migration is applied and users interact with legal consent flows."
-            badge={<Badge variant="warning">Pending migration</Badge>}
+            badge={<Badge variant="info">Empty</Badge>}
           />
         ) : (
           data.legalReceipts.map((receipt) => (
@@ -687,7 +710,7 @@ function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
               key={receipt.id}
               title={eventTypeLabel(receipt.event_type)}
               subtitle={receipt.email}
-              meta={`${receipt.account_type} · ${receipt.source_route} · ${daysAgo(receipt.created_at)}`}
+              meta={`${receipt.account_type} · ${receipt.source_route} · ${receipt.related_entity_type ? `${receipt.related_entity_type}:${(receipt.related_entity_id || "").slice(0, 8)}` : "no entity"} · ${daysAgo(receipt.created_at)}`}
               badge={
                 receipt.terms_accepted && receipt.privacy_notice_acknowledged ? (
                   <Badge variant="success">{consentBadge(receipt)}</Badge>
@@ -700,12 +723,38 @@ function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
         )}
       </Panel>
 
-      <Panel title="Delivery status" description="Email receipt delivery tracking (requires legal_email_receipts table)">
-        <SectionItem
-          title="Delivery tracking available after migration"
-          subtitle="The legal_email_receipts and legal_email_delivery_attempts tables must be created (see XXX_legal_receipt_workflow.sql) before per-receipt delivery status is visible here."
-          badge={<Badge variant="info">Planned</Badge>}
-        />
+      <Panel title="Receipt delivery status" description="Email receipt delivery tracking for legal acceptance events.">
+        {data.legalEmailReceipts.length === 0 ? (
+          <SectionItem
+            title="No receipt deliveries yet"
+            subtitle="Email receipts will appear here after legal acceptance events are created and dispatched."
+            badge={<Badge variant="info">Empty</Badge>}
+          />
+        ) : (
+          data.legalEmailReceipts.map((r) => {
+            const attempts = data.legalDeliveryAttempts.filter((a) => a.receipt_id === r.id);
+            const latestAttempt = attempts[0];
+            const statusBadge =
+              r.status === "sent" ? <Badge variant="success">SENT</Badge> :
+              r.status === "failed" ? <Badge variant="error">FAILED</Badge> :
+              r.status === "pending" ? <Badge variant="warning">PENDING</Badge> :
+              <Badge variant="secondary">{r.status.toUpperCase()}</Badge>;
+
+            const safeError = r.error
+              ? r.error.length > 80 ? r.error.slice(0, 80) + "…" : r.error
+              : null;
+
+            return (
+              <SectionItem
+                key={r.id}
+                title={`${r.copy_type === "user_receipt" ? "User receipt" : "Internal archive"} → ${r.recipient_email}`}
+                subtitle={safeError ? `Error: ${safeError}` : r.provider_message_id ? `Msg: ${r.provider_message_id}` : "No provider message"}
+                meta={`${r.status} · ${attempts.length} attempt(s)${r.sent_at ? ` · sent ${daysAgo(r.sent_at)}` : ""} · ${daysAgo(r.created_at)}`}
+                badge={statusBadge}
+              />
+            );
+          })
+        )}
       </Panel>
     </div>
   );
