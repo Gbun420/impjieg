@@ -47,21 +47,19 @@ async function StatsSection() {
 
   const stats = [
     { value: String(salaryCoverage.activeJobs), label: "Active roles", note: "Updated daily", Icon: Building2 },
-    { value: "Salary", label: "Visibility", note: "Transparent ranges", Icon: Banknote },
-    { value: "30d", label: "Freshness window", note: "Expired roles drop off", Icon: Clock },
+    { value: `${salaryCoverage.salaryCoveragePercent}%`, label: "Salary shown", note: "Transparent ranges", Icon: Banknote },
+    { value: "30d", label: "Freshness", note: "Expired roles drop off", Icon: Clock },
     { value: "Direct", label: "Apply", note: "No middlemen", Icon: CheckCircle2 },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-4 gap-2 sm:gap-3">
       {stats.map((s) => (
-        <div key={s.label} className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card/70 px-4 py-4 backdrop-blur min-h-[104px]">
-          <s.Icon className="h-4 w-4 text-muted-foreground" />
-          <div className="mt-3">
-            <p className="text-2xl font-bold leading-none text-foreground sm:text-3xl">{s.value}</p>
-            <p className="mt-1 text-sm font-semibold text-foreground">{s.label}</p>
-            <p className="text-xs leading-5 text-muted-foreground">{s.note}</p>
-          </div>
+        <div key={s.label} className="flex flex-col items-center gap-1 rounded-xl border border-border/40 bg-card/60 px-2 py-3 text-center backdrop-blur sm:px-3 sm:py-4">
+          <s.Icon className="h-4 w-4 text-primary" />
+          <p className="text-lg font-bold leading-none text-foreground sm:text-xl">{s.value}</p>
+          <p className="text-xs font-medium text-foreground">{s.label}</p>
+          <p className="text-[0.65rem] leading-tight text-muted-foreground hidden sm:block">{s.note}</p>
         </div>
       ))}
     </div>
