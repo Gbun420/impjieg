@@ -28,10 +28,8 @@ export const candidateDirectorySettingsSchema = z.object({
   allowContactRequests: z.boolean().default(true),
   allowCvRequests: z.boolean().default(false),
   allowDirectCvDownload: z.boolean().default(false),
-  consentToDirectory: z.literal(true, {
-    errorMap: () => ({
-      message: "You must consent to be listed in the Talent Directory",
-    }),
+  consentToDirectory: z.literal(true).refine((val) => val === true, {
+    message: "You must consent to be listed in the Talent Directory",
   }),
 });
 

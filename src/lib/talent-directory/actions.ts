@@ -200,7 +200,7 @@ export async function pauseDirectory(): Promise<TalentDirectoryActionResult> {
       .from("candidate_directory_profiles" as any)
       .select("id")
       .eq("candidate_user_id", ctx.user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!profile) {
       return { ok: false, error: "No directory profile found" };
@@ -227,7 +227,7 @@ export async function pauseDirectory(): Promise<TalentDirectoryActionResult> {
       action: "candidate_paused_visibility",
     });
 
-    return { ok: true, data: null, message: "Your directory profile is now paused" };
+    return { ok: true, message: "Your directory profile is now paused" };
   } catch (error) {
     console.error("[TalentDirectory] pauseDirectory error:", error);
     return { ok: false, error: "An unexpected error occurred" };
@@ -245,7 +245,7 @@ export async function leaveDirectory(): Promise<TalentDirectoryActionResult> {
       .from("candidate_directory_profiles" as any)
       .select("id")
       .eq("candidate_user_id", ctx.user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!profile) {
       return { ok: false, error: "No directory profile found" };
@@ -272,7 +272,7 @@ export async function leaveDirectory(): Promise<TalentDirectoryActionResult> {
       action: "candidate_left_directory",
     });
 
-    return { ok: true, data: null, message: "You have left the Talent Directory" };
+    return { ok: true, message: "You have left the Talent Directory" };
   } catch (error) {
     console.error("[TalentDirectory] leaveDirectory error:", error);
     return { ok: false, error: "An unexpected error occurred" };
@@ -298,7 +298,7 @@ export async function searchTalentDirectory(
       .from("employers")
       .select("id")
       .eq("user_id", ctx.user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!employer) {
       return { ok: false, error: "Employer profile not found" };
@@ -347,7 +347,7 @@ export async function sendContactRequest(
       .select("id")
       .eq("user_id", ctx.user.id)
       .eq("id", data.employerId)
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!employer) {
       return { ok: false, error: "Employer profile not found" };
@@ -369,7 +369,7 @@ export async function sendContactRequest(
       .select("id, candidate_user_id")
       .eq("id", data.candidateDirectoryProfileId)
       .eq("visibility_status", "searchable")
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!targetProfile) {
       return { ok: false, error: "Candidate profile not found or not searchable" };
@@ -382,7 +382,7 @@ export async function sendContactRequest(
       .eq("employer_id", employer.id)
       .eq("candidate_user_id", targetProfile.candidate_user_id)
       .eq("status", "pending")
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (existingRequest) {
       return { ok: false, error: "You already have a pending request with this candidate" };
@@ -417,7 +417,7 @@ export async function sendContactRequest(
       metadata: { targetProfileId: targetProfile.id },
     });
 
-    return { ok: true, data: null, message: "Contact request sent" };
+    return { ok: true, message: "Contact request sent" };
   } catch (error) {
     if (error instanceof Error && error.message === "Talent Directory is not enabled") {
       return { ok: false, error: "Talent Directory is not currently available" };
@@ -455,7 +455,7 @@ export async function respondToContactRequest(
       .eq("id", data.requestId)
       .eq("candidate_user_id", ctx.user.id)
       .eq("status", "pending")
-      .maybeSingle();
+      .maybeSingle() as { data: any };
 
     if (!request) {
       return { ok: false, error: "Request not found or already responded" };
@@ -483,7 +483,7 @@ export async function respondToContactRequest(
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .limit(1)
-        .maybeSingle();
+        .maybeSingle() as { data: any };
 
       if (access) {
         await serviceSupabase
@@ -532,7 +532,6 @@ export async function respondToContactRequest(
 
     return {
       ok: true,
-      data: null,
       message: data.status === "accepted"
         ? "Request accepted. The employer can now see your contact details."
         : "Request rejected.",
