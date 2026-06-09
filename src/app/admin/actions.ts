@@ -22,6 +22,17 @@ type AdminMfaFactor = {
   enabled: boolean | null;
 };
 
+const MFA_TABLE_MISSING_ERROR =
+  "Admin MFA table is missing. Apply the admin_mfa_factors migration.";
+
+function isMissingTableError(error: { message?: string } | null) {
+  return (
+    error?.message?.includes("Could not find the table") ||
+    error?.message?.includes("relation") && error?.message?.includes("does not exist") ||
+    error?.message?.includes("schema cache")
+  );
+}
+
 function normalizeCode(code: string) {
   return code.replace(/\s+/g, "").trim();
 }
@@ -69,11 +80,15 @@ export async function adminLogin(formData: FormData) {
   }
 
   const serviceSupabase = createServiceClient(getSupabaseUrl(), getSupabaseServiceKey());
-  const { data: mfaFactor } = await serviceSupabase
+  const { data: mfaFactor, error: mfaQueryError } = await serviceSupabase
     .from("admin_mfa_factors")
     .select("enabled")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  if (isMissingTableError(mfaQueryError)) {
+    return { error: MFA_TABLE_MISSING_ERROR };
+  }
 
   const { generateAdminMfaSecret, setAdminMfaChallengeCookie } = await import("@/lib/admin-mfa");
 
@@ -176,6 +191,10 @@ export async function adminVerifyMfa(formData: FormData) {
       { onConflict: "user_id" }
     );
 
+    if (isMissingTableError(error)) {
+      return { error: MFA_TABLE_MISSING_ERROR };
+    }
+
     if (error) {
       return { error: error.message };
     }
@@ -193,14 +212,18 @@ export async function adminVerifyMfa(formData: FormData) {
     return { success: true };
   }
 
-  const { data: factor, error } = await serviceSupabase
+  const { data: factor, error: factorError } = await serviceSupabase
     .from("admin_mfa_factors")
     .select("user_id, email, secret_encrypted, enabled")
     .eq("user_id", challenge.userId)
     .maybeSingle();
 
-  if (error) {
-    return { error: error.message };
+  if (isMissingTableError(factorError)) {
+    return { error: MFA_TABLE_MISSING_ERROR };
+  }
+
+  if (factorError) {
+    return { error: factorError.message };
   }
 
   if (!factor || factor.enabled === false) {
