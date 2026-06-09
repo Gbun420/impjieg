@@ -32,8 +32,13 @@ yarn-error.log*
 
 # generated audit output
 output/
+!output/qa-dashboard-credentials.example.md
 playwright-report/
 test-results/
+
+# QA credentials (local only, never commit)
+output/qa-dashboard-credentials.local.md
+output/qa-dashboard-credentials.local.json
 
 # env files (can opt-in for committing if needed)
 .env*
