@@ -10,7 +10,6 @@ import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
-import { recordLegalAcceptance } from "@/lib/legal/receipts";
 import { LEGAL_EVENT_TYPES, CONSENT_TEXT } from "@/lib/legal/constants";
 import type { Database, Employer } from "@/lib/supabase/types";
 
@@ -83,37 +82,46 @@ export async function signup(formData: FormData) {
   });
 
   // Record legal acceptance whenever a user was created (userId present)
-  // This fires for both auto-confirmed signups and needs-confirmation signups
+  // Uses the existing service client (proven to work) instead of
+  // recordLegalAcceptance which creates its own client internally
   if (result.userId) {
     const eventType =
       data.accountType === "candidate"
         ? LEGAL_EVENT_TYPES.SIGNUP_CANDIDATE
         : LEGAL_EVENT_TYPES.SIGNUP_EMPLOYER;
 
-    recordLegalAcceptance({
-      userId: result.userId,
-      email: data.email,
-      accountType: data.accountType,
-      eventType,
-      relatedEntityType: "auth_user",
-      relatedEntityId: result.userId,
-      termsAccepted: true,
-      privacyNoticeAcknowledged: true,
-      marketingConsent: data.marketingConsent,
-      consentTextSnapshot: [
-        `terms: ${CONSENT_TEXT.terms}`,
-        `privacy: ${CONSENT_TEXT.privacy}`,
-        data.marketingConsent ? `marketing: ${CONSENT_TEXT.marketing}` : "marketing: not accepted",
-      ].join("; "),
-      sourceRoute: "/auth/signup",
-      metadata: {
-        accountType: data.accountType,
-        fullName: data.fullName || undefined,
-        companyName: data.companyName || undefined,
-      },
-    }).catch((err) => {
-      console.error("[LegalReceipt] Failed to record signup acceptance:", err);
-    });
+    try {
+      const { error: legalError } = await (serviceSupabase as any)
+        .from("legal_acceptance_events")
+        .insert({
+          user_id: result.userId,
+          email: data.email,
+          account_type: data.accountType,
+          event_type: eventType,
+          related_entity_type: "auth_user",
+          related_entity_id: result.userId,
+          document_version_ids: [],
+          terms_accepted: true,
+          privacy_notice_acknowledged: true,
+          marketing_consent: data.marketingConsent,
+          consent_text_snapshot: [
+            `terms: ${CONSENT_TEXT.terms}`,
+            `privacy: ${CONSENT_TEXT.privacy}`,
+            data.marketingConsent ? `marketing: ${CONSENT_TEXT.marketing}` : "marketing: not accepted",
+          ].join("; "),
+          source_route: "/auth/signup",
+          metadata: {
+            accountType: data.accountType,
+            fullName: data.fullName || undefined,
+            companyName: data.companyName || undefined,
+          },
+        });
+      if (legalError) {
+        console.error("[LegalReceipt] Failed to record signup acceptance:", legalError.message);
+      }
+    } catch (err: any) {
+      console.error("[LegalReceipt] Failed to record signup acceptance:", err?.message || err);
+    }
   }
 
   // If needsConfirmation, tell the client to show check-email
