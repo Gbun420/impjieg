@@ -1,39 +1,87 @@
-import type { Database } from "@/lib/supabase/types";
-
 // ============================================================================
-// Table Row Types (derived from Supabase schema)
+// Table Row Types (using any until migration is applied)
 // ============================================================================
 
-export type CandidateDirectoryProfile =
-  Database["public"]["Tables"]["candidate_directory_profiles"]["Row"];
-export type CandidateDirectoryProfileInsert =
-  Database["public"]["Tables"]["candidate_directory_profiles"]["Insert"];
-export type CandidateDirectoryProfileUpdate =
-  Database["public"]["Tables"]["candidate_directory_profiles"]["Update"];
+export type CandidateDirectoryProfile = {
+  id: string;
+  candidate_user_id: string;
+  slug: string;
+  display_mode: string;
+  visibility_status: string;
+  headline: string | null;
+  summary: string | null;
+  location: string | null;
+  skills: string[];
+  sectors: string[];
+  job_types: string[];
+  remote_preference: string | null;
+  experience_years: number | null;
+  desired_salary_min: number | null;
+  desired_salary_max: number | null;
+  availability: string | null;
+  allow_contact_requests: boolean;
+  allow_cv_requests: boolean;
+  consent_to_directory: boolean;
+  consent_recorded_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
-export type CandidateDirectoryCvAsset =
-  Database["public"]["Tables"]["candidate_directory_cv_assets"]["Row"];
-export type CandidateDirectoryCvAssetInsert =
-  Database["public"]["Tables"]["candidate_directory_cv_assets"]["Insert"];
+export type CandidateDirectoryProfileInsert = Omit<CandidateDirectoryProfile, "id" | "created_at" | "updated_at">;
+export type CandidateDirectoryProfileUpdate = Partial<CandidateDirectoryProfileInsert>;
 
-export type EmployerTalentAccess =
-  Database["public"]["Tables"]["employer_talent_access"]["Row"];
-export type EmployerTalentAccessInsert =
-  Database["public"]["Tables"]["employer_talent_access"]["Insert"];
-export type EmployerTalentAccessUpdate =
-  Database["public"]["Tables"]["employer_talent_access"]["Update"];
+export type CandidateDirectoryCvAsset = {
+  id: string;
+  profile_id: string;
+  file_url: string;
+  file_name: string;
+  file_size_bytes: number | null;
+  mime_type: string | null;
+  created_at: string;
+};
 
-export type CandidateContactRequest =
-  Database["public"]["Tables"]["candidate_contact_requests"]["Row"];
-export type CandidateContactRequestInsert =
-  Database["public"]["Tables"]["candidate_contact_requests"]["Insert"];
-export type CandidateContactRequestUpdate =
-  Database["public"]["Tables"]["candidate_contact_requests"]["Update"];
+export type CandidateDirectoryCvAssetInsert = Omit<CandidateDirectoryCvAsset, "id" | "created_at">;
 
-export type CandidateDirectoryAuditLog =
-  Database["public"]["Tables"]["candidate_directory_audit_logs"]["Row"];
-export type CandidateDirectoryAuditLogInsert =
-  Database["public"]["Tables"]["candidate_directory_audit_logs"]["Insert"];
+export type EmployerTalentAccess = {
+  id: string;
+  employer_id: string;
+  plan_key: string;
+  credits_total: number;
+  credits_used: number;
+  status: string;
+  stripe_subscription_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EmployerTalentAccessInsert = Omit<EmployerTalentAccess, "id" | "created_at" | "updated_at">;
+export type EmployerTalentAccessUpdate = Partial<EmployerTalentAccessInsert>;
+
+export type CandidateContactRequest = {
+  id: string;
+  candidate_user_id: string;
+  employer_id: string;
+  directory_profile_id: string;
+  status: string;
+  message: string | null;
+  responded_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CandidateContactRequestInsert = Omit<CandidateContactRequest, "id" | "created_at" | "updated_at">;
+export type CandidateContactRequestUpdate = Partial<CandidateContactRequestInsert>;
+
+export type CandidateDirectoryAuditLog = {
+  id: string;
+  candidate_user_id: string;
+  employer_id: string | null;
+  action: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+export type CandidateDirectoryAuditLogInsert = Omit<CandidateDirectoryAuditLog, "id" | "created_at">;
 
 // ============================================================================
 // Derived Types

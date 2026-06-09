@@ -52,7 +52,7 @@ function logAuditEvent(params: {
     getSupabaseServiceKey()
   );
 
-  serviceSupabase.from("candidate_directory_audit_logs").insert({
+  serviceSupabase.from("candidate_directory_audit_logs" as any).insert({
     actor_user_id: params.actorUserId ?? null,
     actor_type: params.actorType,
     candidate_user_id: params.candidateUserId ?? null,
@@ -95,7 +95,7 @@ export async function optInToDirectory(
 
     // Get existing profile
     const { data: existing } = await supabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .select("id, slug")
       .eq("candidate_user_id", ctx.user.id)
       .maybeSingle();
@@ -113,7 +113,7 @@ export async function optInToDirectory(
     if (existing) {
       // Update existing profile
       const { error } = await serviceSupabase
-        .from("candidate_directory_profiles")
+        .from("candidate_directory_profiles" as any)
         .update({
           visibility_status: "searchable",
           display_mode: data.displayMode,
@@ -142,7 +142,7 @@ export async function optInToDirectory(
     } else {
       // Create new profile
       const { error } = await serviceSupabase
-        .from("candidate_directory_profiles")
+        .from("candidate_directory_profiles" as any)
         .insert({
           candidate_user_id: ctx.user.id,
           candidate_profile_id: candidateProfile?.id ?? null,
@@ -197,7 +197,7 @@ export async function pauseDirectory(): Promise<TalentDirectoryActionResult> {
 
     const supabase = await createClient();
     const { data: profile } = await supabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .select("id")
       .eq("candidate_user_id", ctx.user.id)
       .maybeSingle();
@@ -212,7 +212,7 @@ export async function pauseDirectory(): Promise<TalentDirectoryActionResult> {
     );
 
     const { error } = await serviceSupabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .update({ visibility_status: "paused" })
       .eq("id", profile.id);
 
@@ -242,7 +242,7 @@ export async function leaveDirectory(): Promise<TalentDirectoryActionResult> {
 
     const supabase = await createClient();
     const { data: profile } = await supabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .select("id")
       .eq("candidate_user_id", ctx.user.id)
       .maybeSingle();
@@ -257,7 +257,7 @@ export async function leaveDirectory(): Promise<TalentDirectoryActionResult> {
     );
 
     const { error } = await serviceSupabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .delete()
       .eq("id", profile.id);
 
@@ -365,7 +365,7 @@ export async function sendContactRequest(
 
     // Check target profile exists and is searchable
     const { data: targetProfile } = await supabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .select("id, candidate_user_id")
       .eq("id", data.candidateDirectoryProfileId)
       .eq("visibility_status", "searchable")
@@ -377,7 +377,7 @@ export async function sendContactRequest(
 
     // Check for existing pending request
     const { data: existingRequest } = await supabase
-      .from("candidate_contact_requests")
+      .from("candidate_contact_requests" as any)
       .select("id")
       .eq("employer_id", employer.id)
       .eq("candidate_user_id", targetProfile.candidate_user_id)
@@ -395,7 +395,7 @@ export async function sendContactRequest(
     );
 
     const { error } = await serviceSupabase
-      .from("candidate_contact_requests")
+      .from("candidate_contact_requests" as any)
       .insert({
         employer_id: employer.id,
         candidate_user_id: targetProfile.candidate_user_id,
@@ -450,7 +450,7 @@ export async function respondToContactRequest(
     // Get the request
     const supabase = await createClient();
     const { data: request } = await supabase
-      .from("candidate_contact_requests")
+      .from("candidate_contact_requests" as any)
       .select("*, employer:employers(id, name)")
       .eq("id", data.requestId)
       .eq("candidate_user_id", ctx.user.id)
@@ -477,7 +477,7 @@ export async function respondToContactRequest(
 
       // Consume credit from employer access
       const { data: access } = await serviceSupabase
-        .from("employer_talent_access")
+        .from("employer_talent_access" as any)
         .select("id, contact_credits_used")
         .eq("employer_id", request.employer_id)
         .eq("status", "active")
@@ -487,7 +487,7 @@ export async function respondToContactRequest(
 
       if (access) {
         await serviceSupabase
-          .from("employer_talent_access")
+          .from("employer_talent_access" as any)
           .update({
             contact_credits_used: access.contact_credits_used + 1,
           })
@@ -513,7 +513,7 @@ export async function respondToContactRequest(
     }
 
     const { error } = await serviceSupabase
-      .from("candidate_contact_requests")
+      .from("candidate_contact_requests" as any)
       .update(updateData)
       .eq("id", data.requestId);
 

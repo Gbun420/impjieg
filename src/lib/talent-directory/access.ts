@@ -52,7 +52,7 @@ export async function getEmployerTalentAccess(
 ): Promise<TalentAccessWithEmployer | null> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("employer_talent_access")
+    .from("employer_talent_access" as any)
     .select("*, employer:employers(id, name, slug, logo_url)")
     .eq("employer_id", employerId)
     .order("created_at", { ascending: false })
@@ -70,7 +70,7 @@ export async function getServiceEmployerTalentAccess(
     getSupabaseServiceKey()
   );
   const { data } = await serviceSupabase
-    .from("employer_talent_access")
+    .from("employer_talent_access" as any)
     .select("*, employer:employers(id, name, slug, logo_url)")
     .eq("employer_id", employerId)
     .order("created_at", { ascending: false })
@@ -130,7 +130,7 @@ export async function canCandidateManageDirectoryProfile(
   if (!TALENT_DIRECTORY_ENABLED) return false;
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select("id")
     .eq("candidate_user_id", candidateUserId)
     .maybeSingle();

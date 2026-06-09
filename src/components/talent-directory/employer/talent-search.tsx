@@ -5,13 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 import { Search, MapPin, Briefcase, Clock, Banknote, Eye } from "lucide-react";
 import { searchTalentDirectory } from "@/lib/talent-directory/actions";
 import { formatSalary } from "@/lib/utils";
@@ -99,46 +93,26 @@ export function TalentSearch({ employerId }: { employerId: string }) {
 
         <div className="mt-4 flex flex-wrap gap-3">
           <Select
+            label="Sector"
+            options={SECTORS.map((s) => ({ value: s, label: s }))}
             value={filters.sector}
-            onValueChange={(v) => setFilters((prev) => ({ ...prev, sector: v }))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sector" />
-            </SelectTrigger>
-            <SelectContent>
-              {SECTORS.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+            onChange={(e) => setFilters((prev) => ({ ...prev, sector: e.target.value }))}
+            placeholder="All sectors"
+          />
           <Select
+            label="Location"
+            options={LOCATIONS.map((l) => ({ value: l, label: l }))}
             value={filters.location}
-            onValueChange={(v) => setFilters((prev) => ({ ...prev, location: v }))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Location" />
-            </SelectTrigger>
-            <SelectContent>
-              {LOCATIONS.map((l) => (
-                <SelectItem key={l} value={l}>{l}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+            onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
+            placeholder="All locations"
+          />
           <Select
+            label="Remote"
+            options={REMOTE_OPTIONS.map((r) => ({ value: r, label: r }))}
             value={filters.remotePreference}
-            onValueChange={(v) => setFilters((prev) => ({ ...prev, remotePreference: v }))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Remote" />
-            </SelectTrigger>
-            <SelectContent>
-              {REMOTE_OPTIONS.map((r) => (
-                <SelectItem key={r} value={r}>{r}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(e) => setFilters((prev) => ({ ...prev, remotePreference: e.target.value }))}
+            placeholder="Any"
+          />
         </div>
       </Card>
 

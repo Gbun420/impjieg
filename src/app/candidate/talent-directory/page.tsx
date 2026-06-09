@@ -30,9 +30,9 @@ export default async function CandidateTalentDirectoryPage() {
     redirect("/auth/login?redirect=/candidate/talent-directory");
   }
 
-  // Get existing directory profile
+  // Get existing directory profile (table not yet migrated — cast to avoid type errors)
   const { data: directoryProfile } = await supabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select("*")
     .eq("candidate_user_id", user.id)
     .maybeSingle();

@@ -21,7 +21,7 @@ export async function getCandidateDirectoryProfile(
 ): Promise<CandidateDirectoryProfileFull | null> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select("*, candidate_profile:candidate_profiles(full_name, phone, bio, website, linkedin_url)")
     .eq("candidate_user_id", candidateUserId)
     .maybeSingle();
@@ -34,7 +34,7 @@ export async function getCandidateDirectoryProfileBySlug(
 ): Promise<CandidateDirectoryProfileFull | null> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select("*, candidate_profile:candidate_profiles(full_name, phone, bio, website, linkedin_url)")
     .eq("slug", slug)
     .maybeSingle();
@@ -55,7 +55,7 @@ export async function searchDirectory(
   );
 
   let query = serviceSupabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select(
       "id, slug, display_mode, headline, summary, location, skills, sectors, job_types, remote_preference, experience_years, desired_salary_min, desired_salary_max, availability, allow_cv_requests, created_at",
       { count: "exact" }
@@ -141,7 +141,7 @@ export async function getDirectoryProfileForEmployer(
   );
 
   const { data } = await serviceSupabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select(
       "id, slug, display_mode, headline, summary, location, skills, sectors, job_types, remote_preference, experience_years, desired_salary_min, desired_salary_max, availability, allow_cv_requests, created_at"
     )
@@ -161,7 +161,7 @@ export async function getContactRequestsForCandidate(
 ): Promise<ContactRequestWithDetails[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_contact_requests")
+    .from("candidate_contact_requests" as any)
     .select("*, employer:employers(id, name, slug, logo_url, location), directory_profile:candidate_directory_profiles(id, slug, headline, display_mode)")
     .eq("candidate_user_id", candidateUserId)
     .order("created_at", { ascending: false });
@@ -174,7 +174,7 @@ export async function getContactRequestsForEmployer(
 ): Promise<ContactRequestWithDetails[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_contact_requests")
+    .from("candidate_contact_requests" as any)
     .select("*, directory_profile:candidate_directory_profiles(id, slug, headline, display_mode)")
     .eq("employer_id", employerId)
     .order("created_at", { ascending: false });
@@ -187,7 +187,7 @@ export async function getContactRequestById(
 ): Promise<ContactRequestWithDetails | null> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("candidate_contact_requests")
+    .from("candidate_contact_requests" as any)
     .select("*, employer:employers(id, name, slug, logo_url, location), directory_profile:candidate_directory_profiles(id, slug, headline, display_mode)")
     .eq("id", requestId)
     .maybeSingle();
@@ -208,7 +208,7 @@ export async function getAllEmployerTalentAccess(): Promise<
   );
 
   const { data } = await serviceSupabase
-    .from("employer_talent_access")
+    .from("employer_talent_access" as any)
     .select("*, employer:employers(id, name, slug, logo_url)")
     .order("created_at", { ascending: false });
 
@@ -227,17 +227,17 @@ export async function getDirectoryOverviewStats(): Promise<DirectoryOverviewStat
 
   const [profiles, employers, requests, credits] = await Promise.all([
     serviceSupabase
-      .from("candidate_directory_profiles")
+      .from("candidate_directory_profiles" as any)
       .select("visibility_status", { count: "exact" }),
     serviceSupabase
-      .from("employer_talent_access")
+      .from("employer_talent_access" as any)
       .select("id", { count: "exact" })
       .eq("status", "active"),
     serviceSupabase
-      .from("candidate_contact_requests")
+      .from("candidate_contact_requests" as any)
       .select("status", { count: "exact" }),
     serviceSupabase
-      .from("employer_talent_access")
+      .from("employer_talent_access" as any)
       .select("contact_credits_used"),
   ]);
 
@@ -285,7 +285,7 @@ export async function getAllDirectoryProfiles(
 
   const offset = (page - 1) * limit;
   const { data, count } = await serviceSupabase
-    .from("candidate_directory_profiles")
+    .from("candidate_directory_profiles" as any)
     .select("*, candidate_profile:candidate_profiles(full_name, phone, bio, website, linkedin_url)", {
       count: "exact",
     })
@@ -314,7 +314,7 @@ export async function getAuditLogs(
   );
 
   let query = serviceSupabase
-    .from("candidate_directory_audit_logs")
+    .from("candidate_directory_audit_logs" as any)
     .select("*", { count: "exact" });
 
   if (filters.actorType) {
