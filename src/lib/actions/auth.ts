@@ -91,7 +91,7 @@ export async function signup(formData: FormData) {
         : LEGAL_EVENT_TYPES.SIGNUP_EMPLOYER;
 
     try {
-      const { error: legalError } = await (serviceSupabase as any)
+      const insertResult = await (serviceSupabase as any)
         .from("legal_acceptance_events")
         .insert({
           user_id: result.userId,
@@ -115,9 +115,36 @@ export async function signup(formData: FormData) {
             fullName: data.fullName || undefined,
             companyName: data.companyName || undefined,
           },
-        });
-      if (legalError) {
-        console.error("[LegalReceipt] Failed to record signup acceptance:", legalError.message);
+        })
+        .select("id")
+        .single();
+
+      if (insertResult.error) {
+        console.error("[LegalReceipt] Failed to record signup acceptance:", insertResult.error.message);
+      } else if (insertResult.data) {
+        const eventId = insertResult.data.id;
+
+        // Create receipt records (pending — email delivery handled async)
+        try {
+          await (serviceSupabase as any).from("legal_email_receipts").insert([
+            {
+              acceptance_event_id: eventId,
+              recipient_email: data.email,
+              copy_type: "user_receipt",
+              subject: "Your Impjieg legal receipt",
+              status: "pending",
+            },
+            {
+              acceptance_event_id: eventId,
+              recipient_email: data.email,
+              copy_type: "internal_archive",
+              subject: "Impjieg legal receipt copy",
+              status: "pending",
+            },
+          ]);
+        } catch (receiptErr: any) {
+          console.error("[LegalReceipt] Failed to create receipt records:", receiptErr?.message || receiptErr);
+        }
       }
     } catch (err: any) {
       console.error("[LegalReceipt] Failed to record signup acceptance:", err?.message || err);
