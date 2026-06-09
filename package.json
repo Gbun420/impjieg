@@ -13,6 +13,7 @@
     "qa:delete-dashboard-profiles": "tsx scripts/delete-dashboard-test-profiles.ts",
     "qa:admin-totp": "tsx scripts/generate-admin-qa-totp.ts",
     "qa:check-admin-env": "tsx scripts/check-supabase-admin-env.ts",
+    "admin:create-user": "node --env-file=.env.local --import tsx scripts/create-admin-user.ts",
     "admin:check-mfa-table": "tsx scripts/check-admin-mfa-table.ts",
     "admin:check-commercial-grants": "tsx scripts/check-commercial-grants-tables.ts",
     "legal:check-tables": "node --env-file=.env.local --import tsx scripts/legal-check-tables.ts",
