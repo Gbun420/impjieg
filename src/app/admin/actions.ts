@@ -15,28 +15,17 @@ import {
   clearAdminMfaChallengeCookie,
 } from "@/lib/admin-mfa";
 
-type AdminMfaFactor = {
-  user_id: string;
-  email: string;
-  secret_encrypted: string;
-  enabled: boolean | null;
-};
-
-const MFA_TABLE_MISSING_ERROR =
-  "Admin MFA table is missing. Apply the admin_mfa_factors migration.";
-
-function isMissingTableError(error: { message?: string } | null) {
-  return (
-    error?.message?.includes("Could not find the table") ||
-    error?.message?.includes("relation") && error?.message?.includes("does not exist") ||
-    error?.message?.includes("schema cache") ||
-    error?.message?.includes("Database error querying schema")
-  );
-}
-
 function normalizeCode(code: string) {
   return code.replace(/\s+/g, "").trim();
 }
+
+type MfaFactorRow = {
+  user_id: string;
+  email: string;
+  secret_encrypted: string;
+  enabled: boolean;
+  last_used_at: string | null;
+};
 
 export async function adminLogin(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -82,13 +71,11 @@ export async function adminLogin(formData: FormData) {
 
   const serviceSupabase = createServiceClient(getSupabaseUrl(), getSupabaseServiceKey());
   const { data: mfaFactor, error: mfaQueryError } = await serviceSupabase
-    .from("admin_mfa_factors")
-    .select("enabled")
-    .eq("user_id", user.id)
-    .maybeSingle();
+    .rpc("get_admin_mfa_factor", { p_user_id: user.id })
+    .maybeSingle<MfaFactorRow>();
 
-  if (isMissingTableError(mfaQueryError)) {
-    return { error: MFA_TABLE_MISSING_ERROR };
+  if (mfaQueryError) {
+    return { error: `MFA check failed: ${mfaQueryError.message}` };
   }
 
   const { generateAdminMfaSecret, setAdminMfaChallengeCookie } = await import("@/lib/admin-mfa");
@@ -181,20 +168,12 @@ export async function adminVerifyMfa(formData: FormData) {
     }
 
     const encryptedSecret = encryptAdminMfaSecret(challenge.secret);
-    const { error } = await serviceSupabase.from("admin_mfa_factors").upsert(
-      {
-        user_id: challenge.userId,
-        email: challenge.email,
-        secret_encrypted: encryptedSecret,
-        enabled: true,
-        last_used_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
-
-    if (isMissingTableError(error)) {
-      return { error: MFA_TABLE_MISSING_ERROR };
-    }
+    const { error } = await serviceSupabase.rpc("upsert_admin_mfa_factor", {
+      p_user_id: challenge.userId,
+      p_email: challenge.email,
+      p_secret_encrypted: encryptedSecret,
+      p_enabled: true,
+    });
 
     if (error) {
       return { error: error.message };
@@ -214,14 +193,8 @@ export async function adminVerifyMfa(formData: FormData) {
   }
 
   const { data: factor, error: factorError } = await serviceSupabase
-    .from("admin_mfa_factors")
-    .select("user_id, email, secret_encrypted, enabled")
-    .eq("user_id", challenge.userId)
-    .maybeSingle();
-
-  if (isMissingTableError(factorError)) {
-    return { error: MFA_TABLE_MISSING_ERROR };
-  }
+    .rpc("get_admin_mfa_factor", { p_user_id: challenge.userId })
+    .maybeSingle<MfaFactorRow>();
 
   if (factorError) {
     return { error: factorError.message };
@@ -232,16 +205,15 @@ export async function adminVerifyMfa(formData: FormData) {
   }
 
   const { decryptAdminMfaSecret } = await import("@/lib/admin-mfa");
-  const secret = decryptAdminMfaSecret((factor as AdminMfaFactor).secret_encrypted);
+  const secret = decryptAdminMfaSecret(factor.secret_encrypted);
 
   if (!verifyTotpCode(secret, code)) {
     return { error: "Invalid MFA code. Try again." };
   }
 
-  await serviceSupabase
-    .from("admin_mfa_factors")
-    .update({ last_used_at: new Date().toISOString() })
-    .eq("user_id", challenge.userId);
+  await serviceSupabase.rpc("update_admin_mfa_last_used", {
+    p_user_id: challenge.userId,
+  });
 
   await clearAdminMfaChallengeCookie(cookieStore);
   await setAdminSession(challenge.userId, challenge.email, cookieStore);

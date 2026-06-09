@@ -29,8 +29,34 @@ async function main() {
   await page.type('input[name="password"]', "ImpjiegQA!2026-DoNotUseReal", { delay: 5 });
 
   console.log("4. Clicking submit...");
-  await page.click('button[type="submit"]');
-  await sleep(4000);
+  // Try dispatching form submit event directly
+  const submitted = await page.evaluate(() => {
+    const form = document.querySelector("form");
+    if (form) {
+      // Dispatch submit event
+      const event = new Event("submit", { bubbles: true, cancelable: true });
+      form.dispatchEvent(event);
+      return "form submit dispatched";
+    }
+    return "no form found";
+  });
+  console.log("   Submit result:", submitted);
+
+  // Wait longer and check for any response
+  for (let i = 0; i < 10; i++) {
+    await sleep(1000);
+    const url = page.url();
+    const bodySnippet = await page.evaluate(() => {
+      const errorEl = document.querySelector('[role="alert"], [class*="error"]');
+      return errorEl?.textContent?.trim()?.slice(0, 100) || "no error";
+    });
+    console.log(`   Tick ${i + 1}: URL=${url}, error=${bodySnippet}`);
+
+    if (!url.includes("/admin/login")) {
+      console.log("   Navigation detected!");
+      break;
+    }
+  }
 
   console.log("5. Current URL:", page.url());
 
