@@ -54,7 +54,7 @@ function loadLocalEnv() {
 }
 
 async function findQaUsers(
-  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }
+  supabase: { rpc: (fn: string, params?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }
 ): Promise<Map<string, string>> {
   const emailToId = new Map<string, string>();
 
