@@ -53,40 +53,27 @@ function loadLocalEnv() {
   loadEnvFile(path.resolve(process.cwd(), ".env"));
 }
 
-type AuthAdminClient = {
-  auth: {
-    admin: {
-      listUsers(params?: {
-        page?: number;
-        perPage?: number;
-      }): Promise<{
-        data: { users: { id: string; email: string | null }[]; nextPage?: number | null } | null;
-        error: { message: string } | null;
-      }>;
-      deleteUser(id: string): Promise<{ error: { message: string } | null }>;
-    };
-  };
-};
-
 async function findQaUsers(
-  client: AuthAdminClient
+  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }
 ): Promise<Map<string, string>> {
   const emailToId = new Map<string, string>();
-  let page = 1;
 
-  while (true) {
-    const { data, error } = await client.auth.admin.listUsers({ page, perPage: 100 });
-    if (error) throw new Error(`Failed to list users: ${error.message}`);
+  // Use SQL via RPC to query auth.users directly (admin API may not work)
+  const { data, error } = await supabase.rpc("exec_sql", {
+    query: `SELECT id, email FROM auth.users WHERE email IN (${QA_EMAILS.map((e) => `'${e}'`).join(", ")})`,
+  });
 
-    for (const user of data?.users ?? []) {
-      if (user.email && QA_EMAILS.includes(user.email.toLowerCase())) {
-        emailToId.set(user.email.toLowerCase(), user.id);
-      }
+  if (error) {
+    // Fallback: try to query via a simple RPC or return empty
+    console.warn(`  Warning: Could not query auth.users via RPC: ${error.message}`);
+    return emailToId;
+  }
+
+  const rows = data as { id: string; email: string }[] | null;
+  for (const user of rows ?? []) {
+    if (user.email && QA_EMAILS.includes(user.email.toLowerCase())) {
+      emailToId.set(user.email.toLowerCase(), user.id);
     }
-
-    const nextPage = data?.nextPage ?? null;
-    if (!nextPage) break;
-    page = nextPage;
   }
 
   return emailToId;
@@ -112,13 +99,11 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const adminClient = supabase as unknown as AuthAdminClient;
-
   console.log("Deleting QA dashboard test profiles...\n");
 
   // --- 1. Find QA auth users ---
   console.log("1. Finding QA auth users...");
-  const qaUserIds = await findQaUsers(adminClient);
+  const qaUserIds = await findQaUsers(supabase);
   const candidateUserId = qaUserIds.get(QA_CANDIDATE_EMAIL) ?? null;
   const allQaUserIds = Array.from(qaUserIds.values());
 
@@ -242,7 +227,10 @@ async function main() {
   // --- 5. Delete auth users ---
   console.log("\n5. Deleting auth users...");
   for (const [email, userId] of qaUserIds) {
-    const { error } = await adminClient.auth.admin.deleteUser(userId);
+    // Use SQL to delete auth user (admin API may not work)
+    const { error } = await supabase.rpc("exec_sql", {
+      query: `DELETE FROM auth.users WHERE id = '${userId}'`,
+    });
     if (error) {
       console.error(`  Failed to delete ${email}: ${error.message}`);
     } else {

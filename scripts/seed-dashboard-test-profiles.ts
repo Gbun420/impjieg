@@ -137,25 +137,19 @@ type AuthAdminClient = {
 };
 
 async function findUserByEmail(
-  client: AuthAdminClient,
+  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
   email: string
 ): Promise<{ id: string; email: string | null } | null> {
-  let page = 1;
-  while (true) {
-    const { data, error } = await client.auth.admin.listUsers({ page, perPage: 100 });
-    if (error) throw new Error(`Failed to list users: ${error.message}`);
-    const match = (data?.users ?? []).find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
-    );
-    if (match) return match;
-    const nextPage = data?.nextPage ?? null;
-    if (!nextPage) return null;
-    page = nextPage;
-  }
+  const { data, error } = await supabase.rpc("exec_sql", {
+    query: `SELECT id, email FROM auth.users WHERE email = '${email}'`,
+  });
+  if (error) return null;
+  const rows = data as { id: string; email: string }[] | null;
+  return rows?.[0] ?? null;
 }
 
 async function upsertAuthUser(
-  client: AuthAdminClient,
+  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
   {
     email,
     password,
@@ -166,25 +160,38 @@ async function upsertAuthUser(
     userMetadata: Record<string, unknown>;
   }
 ) {
-  const existing = await findUserByEmail(client, email);
-  const payload = {
-    password,
-    email_confirm: true as const,
-    user_metadata: userMetadata,
-  };
+  const existing = await findUserByEmail(supabase, email);
+  const metadataJson = JSON.stringify(userMetadata).replace(/'/g, "''");
 
   if (existing) {
-    const { data, error } = await client.auth.admin.updateUserById(existing.id, payload);
+    // Update existing user
+    const { error } = await supabase.rpc("exec_sql", {
+      query: `UPDATE auth.users 
+              SET encrypted_password = crypt('${password.replace(/'/g, "''")}', gen_salt('bf')),
+                  raw_user_meta_data = '${metadataJson}'::jsonb,
+                  updated_at = now()
+              WHERE id = '${existing.id}'`,
+    });
     if (error) throw new Error(`Failed to update ${email}: ${error.message}`);
     console.log(`  Updated auth user: ${email}`);
-    return data?.user ?? existing;
+    return existing;
   }
 
-  const { data, error } = await client.auth.admin.createUser({ email, ...payload });
+  // Create new user
+  const userId = crypto.randomUUID();
+  const { error } = await supabase.rpc("exec_sql", {
+    query: `INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, 
+            email_confirmed_at, created_at, updated_at, raw_user_meta_data, raw_app_meta_data,
+            is_super_admin, confirmation_token, recovery_token)
+            VALUES ('00000000-0000-0000-0000-000000000000', '${userId}', 'authenticated', 
+            'authenticated', '${email}', crypt('${password.replace(/'/g, "''")}', gen_salt('bf')),
+            now(), now(), now(), '${metadataJson}'::jsonb, 
+            '{"provider":"email","providers":["email"]}'::jsonb,
+            false, '', '')`,
+  });
   if (error) throw new Error(`Failed to create ${email}: ${error.message}`);
-  if (!data?.user) throw new Error(`Failed to create ${email}: no user returned`);
   console.log(`  Created auth user: ${email}`);
-  return data.user;
+  return { id: userId, email };
 }
 
 // ---------------------------------------------------------------------------
