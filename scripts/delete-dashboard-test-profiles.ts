@@ -54,7 +54,8 @@ function loadLocalEnv() {
 }
 
 async function findQaUsers(
-  supabase: { rpc: (fn: string, params?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any
 ): Promise<Map<string, string>> {
   const emailToId = new Map<string, string>();
 
@@ -99,11 +100,14 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabaseAny = supabase as any;
+
   console.log("Deleting QA dashboard test profiles...\n");
 
   // --- 1. Find QA auth users ---
   console.log("1. Finding QA auth users...");
-  const qaUserIds = await findQaUsers(supabase);
+  const qaUserIds = await findQaUsers(supabaseAny);
   const candidateUserId = qaUserIds.get(QA_CANDIDATE_EMAIL) ?? null;
   const allQaUserIds = Array.from(qaUserIds.values());
 
