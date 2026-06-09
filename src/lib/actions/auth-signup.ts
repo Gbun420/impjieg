@@ -35,7 +35,7 @@ type AdminClient = {
       createUser(payload: {
         email: string;
         password: string;
-        email_confirm: true;
+        email_confirm: boolean;
         user_metadata: {
           accountType: SignupAccountType;
           fullName?: string;
@@ -117,6 +117,13 @@ async function createCandidateProfile(
   }
 }
 
+function isAutoConfirmEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.ALLOW_AUTO_CONFIRM_SIGNUP === "true";
+  }
+  return process.env.ALLOW_AUTO_CONFIRM_SIGNUP !== "false";
+}
+
 export async function signupWithAutoConfirm({
   adminClient,
   userClient,
@@ -128,12 +135,16 @@ export async function signupWithAutoConfirm({
   serviceClient: unknown;
   input: SignupInput;
 }): Promise<SignupResult> {
+  const autoConfirm = isAutoConfirmEnabled();
+
+  const emailConfirm = isAutoConfirmEnabled();
+
   const createPayload =
     input.accountType === "employer"
       ? {
           email: input.email,
           password: input.password,
-          email_confirm: true as const,
+          email_confirm: emailConfirm,
           user_metadata: {
             accountType: input.accountType,
             companyName: input.companyName?.trim() || undefined,
@@ -142,7 +153,7 @@ export async function signupWithAutoConfirm({
       : {
           email: input.email,
           password: input.password,
-          email_confirm: true as const,
+          email_confirm: emailConfirm,
           user_metadata: {
             accountType: input.accountType,
             fullName: input.fullName?.trim() || undefined,
