@@ -29,7 +29,8 @@ function isMissingTableError(error: { message?: string } | null) {
   return (
     error?.message?.includes("Could not find the table") ||
     error?.message?.includes("relation") && error?.message?.includes("does not exist") ||
-    error?.message?.includes("schema cache")
+    error?.message?.includes("schema cache") ||
+    error?.message?.includes("Database error querying schema")
   );
 }
 
