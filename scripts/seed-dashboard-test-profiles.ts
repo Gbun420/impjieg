@@ -693,7 +693,7 @@ async function main() {
       employerProfile: 1,
       jobs: jobRows.length,
       applications: appRows.length,
-      candidateApplications: candAppRows.length + candidateAppRowsForEmployerApps.length,
+      candidateApplications: candidateAppRowsForEmployerApps.length,
       savedJobs: savedJobRows.length,
       candidateAlerts: candAlertRows.length,
       jobAlerts: jobAlertRows.length,
