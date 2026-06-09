@@ -82,8 +82,9 @@ export async function signup(formData: FormData) {
     input: data,
   });
 
-  // Record legal acceptance after successful signup
-  if (result?.success && result.userId) {
+  // Record legal acceptance whenever a user was created (userId present)
+  // This fires for both auto-confirmed signups and needs-confirmation signups
+  if (result.userId) {
     const eventType =
       data.accountType === "candidate"
         ? LEGAL_EVENT_TYPES.SIGNUP_CANDIDATE
@@ -113,6 +114,15 @@ export async function signup(formData: FormData) {
     }).catch((err) => {
       console.error("[LegalReceipt] Failed to record signup acceptance:", err);
     });
+  }
+
+  // If needsConfirmation, tell the client to show check-email
+  if (result.needsConfirmation) {
+    return {
+      success: true,
+      needsConfirmation: true,
+      email: result.email,
+    };
   }
 
   return result;

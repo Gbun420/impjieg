@@ -12,6 +12,7 @@ type SignupInput = {
 
 type SignupResult =
   | { success: true; needsConfirmation: false; redirectTo: string; userId: string; error?: undefined }
+  | { needsConfirmation: true; userId: string; email: string; success?: undefined; error?: undefined; redirectTo?: undefined }
   | { error: string; success?: undefined; needsConfirmation?: undefined; redirectTo?: undefined; userId?: undefined };
 
 type UserClient = {
@@ -170,25 +171,41 @@ export async function signupWithAutoConfirm({
         error: "An account with this email already exists. Please sign in.",
       };
     }
-
     return { error: createError.message };
   }
 
+  const userId = created?.user?.id;
+  if (!userId) {
+    return { error: "Failed to create account — please try again" };
+  }
+
+  // Try to sign the user in (may fail if email confirmation is required)
   const { error: signInError } = await userClient.auth.signInWithPassword({
     email: input.email,
     password: input.password,
   });
 
+  // If sign-in fails because email is not confirmed, return needsConfirmation
+  // The userId is available so legal acceptance can be recorded
   if (signInError) {
+    const isConfirmationError =
+      signInError.message.toLowerCase().includes("email not confirmed") ||
+      signInError.message.toLowerCase().includes("not confirmed") ||
+      signInError.message.toLowerCase().includes("confirm");
+
+    if (isConfirmationError && !emailConfirm) {
+      return {
+        needsConfirmation: true,
+        userId,
+        email: input.email,
+      };
+    }
+
+    // Other sign-in errors are real failures
     return { error: signInError.message };
   }
 
-  const userId = created?.user?.id;
-  if (!userId) {
-    await userClient.auth.signOut();
-    return { error: "Failed to complete account setup" };
-  }
-
+  // User is signed in — create profile
   try {
     if (input.accountType === "candidate") {
       await deleteEmployerProfile(serviceClient, userId);

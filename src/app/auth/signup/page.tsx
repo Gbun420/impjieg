@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building2, Mail, Lock, User, Briefcase, AlertCircle, Loader2 } from "lucide-react";
+import { Building2, Mail, Lock, User, Briefcase, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { LegalAcknowledgementCheckboxes } from "@/components/legal/legal-acknowledgement-checkboxes";
 
 type AccountType = "candidate" | "employer";
@@ -19,6 +19,8 @@ function SignupForm() {
   const [accountType, setAccountType] = useState<AccountType>("employer");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [confirmedEmail, setConfirmedEmail] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
@@ -31,6 +33,12 @@ function SignupForm() {
 
     if (result?.error) {
       setError(result.error);
+      return;
+    }
+
+    if (result?.needsConfirmation) {
+      setNeedsConfirmation(true);
+      setConfirmedEmail(result.email || "");
       return;
     }
 
