@@ -181,7 +181,7 @@ export async function adminVerifyMfa(formData: FormData) {
     }
 
     await clearAdminMfaChallengeCookie(cookieStore);
-    await setAdminSession(cookieStore);
+    await setAdminSession(challenge.userId, challenge.email, cookieStore);
     await logAdminAction(serviceSupabase, {
       adminEmail: challenge.email,
       action: "admin_mfa_enabled",
@@ -220,7 +220,7 @@ export async function adminVerifyMfa(formData: FormData) {
     .eq("user_id", challenge.userId);
 
   await clearAdminMfaChallengeCookie(cookieStore);
-  await setAdminSession(cookieStore);
+  await setAdminSession(challenge.userId, challenge.email, cookieStore);
   await logAdminAction(serviceSupabase, {
     adminEmail: challenge.email,
     action: "admin_login",

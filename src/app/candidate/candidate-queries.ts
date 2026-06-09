@@ -1,3 +1,5 @@
+import { safeRedirectPath } from "@/lib/auth/safe-redirect";
+
 type CandidateProfileFilters = {
   sectors?: string[] | null;
   job_types?: string[] | null;
@@ -46,8 +48,10 @@ export function resolvePostLoginDestination({
   isAdmin: boolean;
   hasEmployerProfile: boolean;
 }) {
-  if (redirectUrl) {
-    return redirectUrl;
+  const safe = safeRedirectPath(redirectUrl, "/");
+
+  if (safe !== "/") {
+    return safe;
   }
 
   if (isAdmin) {

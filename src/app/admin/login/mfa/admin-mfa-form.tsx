@@ -2,22 +2,25 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, Lock, AlertCircle, ArrowRight, QrCode } from "lucide-react";
+import { Shield, Lock, AlertCircle, ArrowRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminVerifyMfa } from "../../actions";
 
-export default function AdminMfaForm({ 
-  mode, 
-  email, 
-  qrCodeUri 
-}: { 
-  mode: "login" | "setup"; 
+export default function AdminMfaForm({
+  mode,
+  email,
+  qrCodeSvg,
+  formattedSecret,
+}: {
+  mode: "login" | "setup";
   email: string;
-  qrCodeUri?: string;
+  qrCodeSvg?: string;
+  formattedSecret?: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
@@ -37,6 +40,17 @@ export default function AdminMfaForm({
     router.refresh();
   }
 
+  async function handleCopySecret() {
+    if (!formattedSecret) return;
+    try {
+      await navigator.clipboard.writeText(formattedSecret.replace(/\s/g, ""));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: select text for manual copy
+    }
+  }
+
   return (
     <div className="mx-auto max-w-md space-y-6">
       <div className="text-center">
@@ -47,7 +61,7 @@ export default function AdminMfaForm({
           {mode === "setup" ? "Setup Admin MFA" : "Two-factor verification"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {mode === "setup" 
+          {mode === "setup"
             ? `Set up your secondary security factor for ${email}.`
             : `Enter the code from your authenticator app to access the admin console.`}
         </p>
@@ -61,14 +75,37 @@ export default function AdminMfaForm({
       )}
 
       <div className="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm backdrop-blur">
-        {mode === "setup" && qrCodeUri && (
+        {mode === "setup" && qrCodeSvg && (
           <div className="mb-6 space-y-4">
             <div className="rounded-2xl border border-border/60 bg-white p-4">
-              <div className="mx-auto aspect-square w-48 bg-muted/20 flex items-center justify-center">
-                {/* In a real app, we'd use a QR code generator here */}
-                <QrCode className="h-32 w-32 text-slate-300" />
-              </div>
+              <div
+                className="mx-auto aspect-square w-48"
+                dangerouslySetInnerHTML={{ __html: qrCodeSvg }}
+              />
             </div>
+            {formattedSecret && (
+              <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Manual setup key
+                </p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 rounded-lg bg-background px-3 py-2 text-sm font-mono text-foreground break-all border border-border/60">
+                    {formattedSecret}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={handleCopySecret}
+                    className="shrink-0 rounded-lg border border-border/60 p-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+                    aria-label="Copy setup key to clipboard"
+                  >
+                    {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Can&apos;t scan? Enter this key manually in your authenticator app.
+                </p>
+              </div>
+            )}
             <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4 text-xs leading-relaxed text-muted-foreground">
               <p className="font-semibold text-primary uppercase tracking-wider mb-1">How to set up</p>
               <ol className="list-decimal list-inside space-y-1">
@@ -82,12 +119,14 @@ export default function AdminMfaForm({
 
         <form action={handleSubmit} className="space-y-4">
           <Input
-            label="Verification code"
+            label="6-digit verification code"
             name="code"
             type="text"
             inputMode="numeric"
+            maxLength={6}
+            autoComplete="one-time-code"
             pattern="[0-9]*"
-            placeholder="000 000"
+            placeholder="000000"
             required
             autoFocus
             icon={<Lock className="h-4 w-4" />}

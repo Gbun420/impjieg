@@ -161,6 +161,12 @@ export async function ensureEmployerProfile() {
     return { error: "Not authenticated", profile: null };
   }
 
+  // Only employer accounts can have employer profiles
+  const accountType = user.user_metadata?.accountType;
+  if (accountType !== "employer") {
+    return { error: "Only employer accounts can access the employer dashboard", profile: null };
+  }
+
   // Check if employer profile exists
   const { data: existingProfile } = await serviceSupabase
     .from("employers")

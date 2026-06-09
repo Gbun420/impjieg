@@ -143,16 +143,16 @@ function SignupForm() {
           label="Password"
           name="password"
           type="password"
-          placeholder="At least 6 characters"
+          placeholder="At least 8 characters"
           required
-          minLength={6}
+          minLength={8}
           autoComplete="new-password"
           icon={<Lock className="h-4 w-4" />}
           error={undefined}
         />
         <div className="-mt-2">
           <p className="text-xs text-muted-foreground">
-            Must be at least 6 characters long
+            At least 8 characters with uppercase, lowercase, number, and special character.
           </p>
         </div>
         <Button
