@@ -628,6 +628,11 @@ function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
   const signupEvents = data.legalReceipts.filter((r) => r.event_type.startsWith("account_signup")).length;
   const checkoutEvents = data.legalReceipts.filter((r) => r.event_type === "employer_checkout_completed").length;
   const withMarketing = data.legalReceipts.filter((r) => r.marketing_consent).length;
+  const today = data.legalReceipts.filter((r) => {
+    const now = new Date();
+    const created = new Date(r.created_at);
+    return created.toDateString() === now.toDateString();
+  }).length;
 
   function eventTypeLabel(eventType: string): string {
     switch (eventType) {
@@ -648,33 +653,59 @@ function LegalReceiptsConsole({ data }: { data: AdminConsoleData }) {
     }
   }
 
+  function consentBadge(receipt: typeof data.legalReceipts[number]) {
+    const parts: string[] = [];
+    if (receipt.terms_accepted) parts.push("T");
+    if (receipt.privacy_notice_acknowledged) parts.push("P");
+    if (receipt.marketing_consent) parts.push("M");
+    if (parts.length === 0) return "None";
+    return parts.join("+");
+  }
+
   return (
     <div className="space-y-6">
       <SummaryGrid
         metrics={[
           { label: "Total receipts", value: totalReceipts, note: "Legal acceptance events recorded" },
+          { label: "Today", value: today, note: "Events in the last 24h" },
           { label: "Signups", value: signupEvents, note: "Account creation acceptances" },
           { label: "Checkouts", value: checkoutEvents, note: "Payment acceptances" },
-          { label: "Marketing opt-ins", value: withMarketing, note: "Users who accepted marketing" },
+          { label: "Marketing opt-ins", value: withMarketing, note: `${totalReceipts > 0 ? Math.round((withMarketing / totalReceipts) * 100) : 0}% of all events` },
         ]}
       />
 
-      <Panel title="Legal acceptance receipts" description="Consent records and receipt delivery status">
-        {data.legalReceipts.map((receipt) => (
+      <Panel title="Legal acceptance events" description="Consent records indexed by creation time. Latest 20 events.">
+        {data.legalReceipts.length === 0 ? (
           <SectionItem
-            key={receipt.id}
-            title={eventTypeLabel(receipt.event_type)}
-            subtitle={receipt.email}
-            meta={`${receipt.account_type} · ${receipt.source_route} · ${daysAgo(receipt.created_at)}`}
-            badge={
-              receipt.terms_accepted && receipt.privacy_notice_acknowledged ? (
-                <Badge variant="success">Consented</Badge>
-              ) : (
-                <Badge variant="warning">Partial</Badge>
-              )
-            }
+            title="No events recorded yet"
+            subtitle="Legal acceptance events will appear here after the migration is applied and users interact with legal consent flows."
+            badge={<Badge variant="warning">Pending migration</Badge>}
           />
-        ))}
+        ) : (
+          data.legalReceipts.map((receipt) => (
+            <SectionItem
+              key={receipt.id}
+              title={eventTypeLabel(receipt.event_type)}
+              subtitle={receipt.email}
+              meta={`${receipt.account_type} · ${receipt.source_route} · ${daysAgo(receipt.created_at)}`}
+              badge={
+                receipt.terms_accepted && receipt.privacy_notice_acknowledged ? (
+                  <Badge variant="success">{consentBadge(receipt)}</Badge>
+                ) : (
+                  <Badge variant="warning">Incomplete</Badge>
+                )
+              }
+            />
+          ))
+        )}
+      </Panel>
+
+      <Panel title="Delivery status" description="Email receipt delivery tracking (requires legal_email_receipts table)">
+        <SectionItem
+          title="Delivery tracking available after migration"
+          subtitle="The legal_email_receipts and legal_email_delivery_attempts tables must be created (see XXX_legal_receipt_workflow.sql) before per-receipt delivery status is visible here."
+          badge={<Badge variant="info">Planned</Badge>}
+        />
       </Panel>
     </div>
   );

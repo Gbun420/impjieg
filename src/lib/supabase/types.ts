@@ -483,8 +483,215 @@ export interface Database {
            created_at?: string;
            updated_at?: string;
          };
-       };
-      payments: {
+        };
+        legal_acceptance_events: {
+          Row: {
+            account_type: string | null;
+            consent_text_snapshot: string;
+            created_at: string;
+            document_version_ids: string[];
+            email: string;
+            event_type: string;
+            id: string;
+            ip_hash: string | null;
+            marketing_consent: boolean;
+            metadata: Json;
+            privacy_notice_acknowledged: boolean;
+            related_entity_id: string | null;
+            related_entity_type: string | null;
+            source_route: string | null;
+            terms_accepted: boolean;
+            user_agent_hash: string | null;
+            user_id: string | null;
+          };
+          Insert: {
+            account_type?: string | null;
+            consent_text_snapshot: string;
+            created_at?: string;
+            document_version_ids?: string[];
+            email: string;
+            event_type: string;
+            id?: string;
+            ip_hash?: string | null;
+            marketing_consent?: boolean;
+            metadata?: Json;
+            privacy_notice_acknowledged?: boolean;
+            related_entity_id?: string | null;
+            related_entity_type?: string | null;
+            source_route?: string | null;
+            terms_accepted?: boolean;
+            user_agent_hash?: string | null;
+            user_id?: string | null;
+          };
+          Update: {
+            account_type?: string | null;
+            consent_text_snapshot?: string;
+            created_at?: string;
+            document_version_ids?: string[];
+            email?: string;
+            event_type?: string;
+            id?: string;
+            ip_hash?: string | null;
+            marketing_consent?: boolean;
+            metadata?: Json;
+            privacy_notice_acknowledged?: boolean;
+            related_entity_id?: string | null;
+            related_entity_type?: string | null;
+            source_route?: string | null;
+            terms_accepted?: boolean;
+            user_agent_hash?: string | null;
+            user_id?: string | null;
+          };
+          Relationships: [];
+        };
+        legal_document_versions: {
+          Row: {
+            content_hash: string;
+            created_at: string;
+            document_id: string;
+            effective_at: string;
+            id: string;
+            is_current: boolean;
+            public_url: string;
+            summary: string | null;
+            version: string;
+          };
+          Insert: {
+            content_hash: string;
+            created_at?: string;
+            document_id: string;
+            effective_at?: string;
+            id?: string;
+            is_current?: boolean;
+            public_url: string;
+            summary?: string | null;
+            version: string;
+          };
+          Update: {
+            content_hash?: string;
+            created_at?: string;
+            document_id?: string;
+            effective_at?: string;
+            id?: string;
+            is_current?: boolean;
+            public_url?: string;
+            summary?: string | null;
+            version?: string;
+          };
+          Relationships: [];
+        };
+        legal_documents: {
+          Row: {
+            audience: string;
+            created_at: string;
+            description: string | null;
+            id: string;
+            is_active: boolean;
+            slug: string;
+            title: string;
+            updated_at: string;
+          };
+          Insert: {
+            audience: string;
+            created_at?: string;
+            description?: string | null;
+            id?: string;
+            is_active?: boolean;
+            slug: string;
+            title: string;
+            updated_at?: string;
+          };
+          Update: {
+            audience?: string;
+            created_at?: string;
+            description?: string | null;
+            id?: string;
+            is_active?: boolean;
+            slug?: string;
+            title?: string;
+            updated_at?: string;
+          };
+          Relationships: [];
+        };
+        legal_email_delivery_attempts: {
+          Row: {
+            attempted_at: string;
+            error: string | null;
+            id: string;
+            provider: string;
+            provider_message_id: string | null;
+            receipt_id: string;
+            status: string;
+          };
+          Insert: {
+            attempted_at?: string;
+            error?: string | null;
+            id?: string;
+            provider?: string;
+            provider_message_id?: string | null;
+            receipt_id: string;
+            status: string;
+          };
+          Update: {
+            attempted_at?: string;
+            error?: string | null;
+            id?: string;
+            provider?: string;
+            provider_message_id?: string | null;
+            receipt_id?: string;
+            status?: string;
+          };
+          Relationships: [];
+        };
+        legal_email_receipts: {
+          Row: {
+            acceptance_event_id: string;
+            copy_type: string;
+            created_at: string;
+            error: string | null;
+            html_hash: string | null;
+            id: string;
+            provider: string;
+            provider_message_id: string | null;
+            recipient_email: string;
+            sent_at: string | null;
+            status: string;
+            subject: string;
+            text_hash: string | null;
+          };
+          Insert: {
+            acceptance_event_id: string;
+            copy_type: string;
+            created_at?: string;
+            error?: string | null;
+            html_hash?: string | null;
+            id?: string;
+            provider?: string;
+            provider_message_id?: string | null;
+            recipient_email: string;
+            sent_at?: string | null;
+            status?: string;
+            subject: string;
+            text_hash?: string | null;
+          };
+          Update: {
+            acceptance_event_id?: string;
+            copy_type?: string;
+            created_at?: string;
+            error?: string | null;
+            html_hash?: string | null;
+            id?: string;
+            provider?: string;
+            provider_message_id?: string | null;
+            recipient_email?: string;
+            sent_at?: string | null;
+            status?: string;
+            subject?: string;
+            text_hash?: string | null;
+          };
+          Relationships: [];
+        };
+        payments: {
         Row: {
           id: string;
           employer_id: string;
