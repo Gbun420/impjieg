@@ -102,40 +102,6 @@ function loadLocalEnv() {
   loadEnvFile(path.resolve(process.cwd(), ".env"));
 }
 
-type AuthAdminClient = {
-  auth: {
-    admin: {
-      listUsers(params?: {
-        page?: number;
-        perPage?: number;
-      }): Promise<{
-        data: { users: { id: string; email: string | null }[]; nextPage?: number | null } | null;
-        error: { message: string } | null;
-      }>;
-      createUser(payload: {
-        email: string;
-        password: string;
-        email_confirm: true;
-        user_metadata: Record<string, unknown>;
-      }): Promise<{
-        data: { user: { id: string; email: string | null } | null } | null;
-        error: { message: string } | null;
-      }>;
-      updateUserById(
-        id: string,
-        payload: {
-          password: string;
-          email_confirm: true;
-          user_metadata: Record<string, unknown>;
-        }
-      ): Promise<{
-        data: { user: { id: string; email: string | null } | null } | null;
-        error: { message: string } | null;
-      }>;
-    };
-  };
-};
-
 async function findUserByEmail(
   supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
   email: string
@@ -462,14 +428,12 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const adminClient = supabase as unknown as AuthAdminClient;
-
   console.log("Seeding QA dashboard test profiles...\n");
 
   // --- 1. Auth users ---
   console.log("1. Creating auth users...");
 
-  const candidateUser = await upsertAuthUser(adminClient, {
+  const candidateUser = await upsertAuthUser(supabase, {
     email: CANDIDATE_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -478,7 +442,7 @@ async function main() {
     },
   });
 
-  const employerUser = await upsertAuthUser(adminClient, {
+  const employerUser = await upsertAuthUser(supabase, {
     email: EMPLOYER_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -487,7 +451,7 @@ async function main() {
     },
   });
 
-  const adminUser = await upsertAuthUser(adminClient, {
+  const adminUser = await upsertAuthUser(supabase, {
     email: ADMIN_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
