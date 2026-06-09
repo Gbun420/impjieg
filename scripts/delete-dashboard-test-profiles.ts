@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/types";
 
 // ---------------------------------------------------------------------------
@@ -54,27 +54,31 @@ function loadLocalEnv() {
 }
 
 async function findQaUsers(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any
+  supabase: SupabaseClient<Database>
 ): Promise<Map<string, string>> {
   const emailToId = new Map<string, string>();
+  let page = 1;
+  const perPage = 100;
 
-  // Use SQL via RPC to query auth.users directly (admin API may not work)
-  const { data, error } = await supabase.rpc("exec_sql", {
-    query: `SELECT id, email FROM auth.users WHERE email IN (${QA_EMAILS.map((e) => `'${e}'`).join(", ")})`,
-  });
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page,
+      perPage,
+    });
 
-  if (error) {
-    // Fallback: try to query via a simple RPC or return empty
-    console.warn(`  Warning: Could not query auth.users via RPC: ${error.message}`);
-    return emailToId;
-  }
-
-  const rows = data as { id: string; email: string }[] | null;
-  for (const user of rows ?? []) {
-    if (user.email && QA_EMAILS.includes(user.email.toLowerCase())) {
-      emailToId.set(user.email.toLowerCase(), user.id);
+    if (error) {
+      console.warn(`  Warning: Could not list auth users: ${error.message}`);
+      return emailToId;
     }
+
+    for (const user of data.users) {
+      if (user.email && QA_EMAILS.includes(user.email.toLowerCase())) {
+        emailToId.set(user.email.toLowerCase(), user.id);
+      }
+    }
+
+    if (data.users.length < perPage) break;
+    page += 1;
   }
 
   return emailToId;
@@ -100,14 +104,11 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabaseAny = supabase as any;
-
   console.log("Deleting QA dashboard test profiles...\n");
 
   // --- 1. Find QA auth users ---
   console.log("1. Finding QA auth users...");
-  const qaUserIds = await findQaUsers(supabaseAny);
+  const qaUserIds = await findQaUsers(supabase);
   const candidateUserId = qaUserIds.get(QA_CANDIDATE_EMAIL) ?? null;
   const allQaUserIds = Array.from(qaUserIds.values());
 
@@ -231,10 +232,7 @@ async function main() {
   // --- 5. Delete auth users ---
   console.log("\n5. Deleting auth users...");
   for (const [email, userId] of qaUserIds) {
-    // Use SQL to delete auth user (admin API may not work)
-    const { error } = await supabaseAny.rpc("exec_sql", {
-      query: `DELETE FROM auth.users WHERE id = '${userId}'`,
-    });
+    const { error } = await supabase.auth.admin.deleteUser(userId);
     if (error) {
       console.error(`  Failed to delete ${email}: ${error.message}`);
     } else {
