@@ -164,11 +164,11 @@ async function upsertAuthUser(
 // Seed data
 // ---------------------------------------------------------------------------
 
-function buildCandidateAlerts() {
+function buildCandidateAlerts(candidateUserId: string) {
   return [
     {
       id: stableUuid("qa-candidate-alert:tech-hybrid"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       name: "QA Technology Hybrid",
       sectors: ["Technology"],
       job_types: ["Full-time"],
@@ -180,7 +180,7 @@ function buildCandidateAlerts() {
     },
     {
       id: stableUuid("qa-candidate-alert:compliance-remote"),
-      user_id: CANDIDATE_USER_ID,
+      user_id: candidateUserId,
       name: "QA Compliance Remote",
       sectors: ["Legal & Compliance"],
       job_types: ["Full-time"],
