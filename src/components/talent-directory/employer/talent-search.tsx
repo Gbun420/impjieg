@@ -63,8 +63,9 @@ export function TalentSearch({ employerId }: { employerId: string }) {
 
       const result = await searchTalentDirectory(input);
       if (result.ok && result.data) {
-        setResults(result.data.profiles);
-        setTotal(result.data.total);
+        const searchResult = result.data as { profiles: SearchResult[]; total: number };
+        setResults(searchResult.profiles);
+        setTotal(searchResult.total);
       } else {
         setMessage({ type: "error", text: result.error ?? "An error occurred" });
       }
