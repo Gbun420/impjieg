@@ -205,7 +205,12 @@ export async function adminVerifyMfa(formData: FormData) {
   }
 
   const { decryptAdminMfaSecret } = await import("@/lib/admin-mfa");
-  const secret = decryptAdminMfaSecret(factor.secret_encrypted);
+  let secret: string;
+  try {
+    secret = decryptAdminMfaSecret(factor.secret_encrypted);
+  } catch {
+    return { error: "MFA configuration error. Please contact support." };
+  }
 
   if (!verifyTotpCode(secret, code)) {
     return { error: "Invalid MFA code. Try again." };

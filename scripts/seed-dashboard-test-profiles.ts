@@ -741,7 +741,11 @@ async function main() {
 // ---------------------------------------------------------------------------
 
 function encryptForQa(secret: string): string {
-  const key = crypto.createHash("sha256").update("impjieg-qa-dashboard-seed").digest();
+  const adminToken = process.env.INTERNAL_ADMIN_TOKEN;
+  if (!adminToken) {
+    throw new Error("INTERNAL_ADMIN_TOKEN required in .env.local to encrypt MFA secret");
+  }
+  const key = crypto.createHash("sha256").update(`${adminToken}:impjieg-admin-mfa-secret`).digest();
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
   const encrypted = Buffer.concat([cipher.update(secret, "utf8"), cipher.final()]);
