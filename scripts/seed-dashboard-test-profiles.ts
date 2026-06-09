@@ -5,6 +5,17 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/types";
 
 // ---------------------------------------------------------------------------
+// Prerequisites
+// ---------------------------------------------------------------------------
+
+// This script requires a valid SUPABASE_SERVICE_ROLE_KEY in .env.local.
+// The key must be the actual service_role key (not the anon key or a
+// publishable key). If you get "Invalid API key", check your .env.local.
+//
+// Alternative: use the Supabase MCP tool or direct SQL to seed the data.
+// See output/qa-dashboard-credentials.local.md for the seed data.
+
+// ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
