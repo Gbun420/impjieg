@@ -10,7 +10,9 @@ import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
 import { insertWithUniqueSlugRetry } from "@/lib/unique-slug";
 import { validatePasswordPolicy } from "@/lib/password-policy";
-import { LEGAL_EVENT_TYPES, CONSENT_TEXT } from "@/lib/legal/constants";
+import { LEGAL_EVENT_TYPES, CONSENT_TEXT, LEGAL_ARCHIVE_EMAIL, SUPPORT_EMAIL, DATA_PROTECTION_EMAIL } from "@/lib/legal/constants";
+import { buildUserLegalReceiptEmail, buildInternalLegalArchiveEmail } from "@/lib/legal/email";
+import { sendEmail } from "@/lib/email-sender";
 import type { Database, Employer } from "@/lib/supabase/types";
 
 type EmployerInsert = Database["public"]["Tables"]["employers"]["Insert"];
@@ -124,9 +126,17 @@ export async function signup(formData: FormData) {
       } else if (insertResult.data) {
         const eventId = insertResult.data.id;
 
-        // Create receipt records (pending — email delivery handled async)
-        try {
-          await (serviceSupabase as any).from("legal_email_receipts").insert([
+        // Create receipt records and send emails
+        const consentSnapshot = [
+          `terms: ${CONSENT_TEXT.terms}`,
+          `privacy: ${CONSENT_TEXT.privacy}`,
+          data.marketingConsent ? `marketing: ${CONSENT_TEXT.marketing}` : "marketing: not accepted",
+        ].join("; ");
+
+        // Insert receipt rows first
+        const { data: receipts } = await (serviceSupabase as any)
+          .from("legal_email_receipts")
+          .insert([
             {
               acceptance_event_id: eventId,
               recipient_email: data.email,
@@ -136,14 +146,111 @@ export async function signup(formData: FormData) {
             },
             {
               acceptance_event_id: eventId,
-              recipient_email: data.email,
+              recipient_email: LEGAL_ARCHIVE_EMAIL,
               copy_type: "internal_archive",
-              subject: "Impjieg legal receipt copy",
+              subject: `Impjieg legal receipt copy: ${eventType} — ${data.email}`,
               status: "pending",
             },
-          ]);
-        } catch (receiptErr: any) {
-          console.error("[LegalReceipt] Failed to create receipt records:", receiptErr?.message || receiptErr);
+          ])
+          .select("id, copy_type");
+
+        const receiptRows = (receipts || []) as { id: string; copy_type: string }[];
+        const userReceiptId = receiptRows.find((r) => r.copy_type === "user_receipt")?.id;
+        const archiveReceiptId = receiptRows.find((r) => r.copy_type === "internal_archive")?.id;
+
+        // Send user receipt email
+        if (userReceiptId) {
+          try {
+            const userEmail = buildUserLegalReceiptEmail({
+              eventType,
+              email: data.email,
+              accountType: data.accountType,
+              sourceRoute: "/auth/signup",
+              acceptanceEventId: eventId,
+            });
+
+            const userResult = await sendEmail({
+              to: data.email,
+              subject: userEmail.subject,
+              html: userEmail.html,
+              text: userEmail.text,
+            });
+
+            await (serviceSupabase as any)
+              .from("legal_email_receipts")
+              .update({
+                status: userResult.success ? "sent" : "failed",
+                provider_message_id: userResult.messageId || null,
+                error: userResult.error || null,
+                sent_at: userResult.success ? new Date().toISOString() : null,
+              })
+              .eq("id", userReceiptId);
+
+            await (serviceSupabase as any)
+              .from("legal_email_delivery_attempts")
+              .insert({
+                receipt_id: userReceiptId,
+                status: userResult.success ? "sent" : "failed",
+                provider_message_id: userResult.messageId || null,
+                error: userResult.error || null,
+              });
+          } catch (err: any) {
+            console.error("[LegalReceipt] User receipt email failed:", err?.message || err);
+            await (serviceSupabase as any)
+              .from("legal_email_receipts")
+              .update({ status: "failed", error: err?.message || "Unknown error" })
+              .eq("id", userReceiptId);
+          }
+        }
+
+        // Send internal archive email
+        if (archiveReceiptId) {
+          try {
+            const archiveEmail = buildInternalLegalArchiveEmail({
+              eventType,
+              email: data.email,
+              accountType: data.accountType,
+              sourceRoute: "/auth/signup",
+              acceptanceEventId: eventId,
+              userId: result.userId,
+              termsAccepted: true,
+              privacyAcknowledged: true,
+              marketingConsent: data.marketingConsent,
+              consentTextSnapshot: consentSnapshot,
+            });
+
+            const archiveResult = await sendEmail({
+              to: LEGAL_ARCHIVE_EMAIL,
+              subject: archiveEmail.subject,
+              html: archiveEmail.html,
+              text: archiveEmail.text,
+            });
+
+            await (serviceSupabase as any)
+              .from("legal_email_receipts")
+              .update({
+                status: archiveResult.success ? "sent" : "failed",
+                provider_message_id: archiveResult.messageId || null,
+                error: archiveResult.error || null,
+                sent_at: archiveResult.success ? new Date().toISOString() : null,
+              })
+              .eq("id", archiveReceiptId);
+
+            await (serviceSupabase as any)
+              .from("legal_email_delivery_attempts")
+              .insert({
+                receipt_id: archiveReceiptId,
+                status: archiveResult.success ? "sent" : "failed",
+                provider_message_id: archiveResult.messageId || null,
+                error: archiveResult.error || null,
+              });
+          } catch (err: any) {
+            console.error("[LegalReceipt] Archive receipt email failed:", err?.message || err);
+            await (serviceSupabase as any)
+              .from("legal_email_receipts")
+              .update({ status: "failed", error: err?.message || "Unknown error" })
+              .eq("id", archiveReceiptId);
+          }
         }
       }
     } catch (err: any) {
