@@ -419,12 +419,15 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabaseAny = supabase as any;
+
   console.log("Seeding QA dashboard test profiles...\n");
 
   // --- 1. Auth users ---
   console.log("1. Creating auth users...");
 
-  const candidateUser = await upsertAuthUser(supabase, {
+  const candidateUser = await upsertAuthUser(supabaseAny, {
     email: CANDIDATE_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -433,7 +436,7 @@ async function main() {
     },
   });
 
-  const employerUser = await upsertAuthUser(supabase, {
+  const employerUser = await upsertAuthUser(supabaseAny, {
     email: EMPLOYER_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -442,7 +445,7 @@ async function main() {
     },
   });
 
-  const adminUser = await upsertAuthUser(supabase, {
+  const adminUser = await upsertAuthUser(supabaseAny, {
     email: ADMIN_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
