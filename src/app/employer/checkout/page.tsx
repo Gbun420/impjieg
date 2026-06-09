@@ -57,7 +57,7 @@ export default function CheckoutPage({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId, listingType, bundleType }),
+        body: JSON.stringify({ jobId, listingType, bundleType, termsAccepted }),
       });
 
       const data = await res.json();

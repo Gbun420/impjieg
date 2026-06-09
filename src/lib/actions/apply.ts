@@ -7,6 +7,8 @@ import { buildEmployerNotificationEmail, buildCandidateConfirmationEmail } from 
 import { sendEmail } from "@/lib/email-sender";
 import { SITE } from "@/lib/constants";
 import { getSupabaseServiceKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { recordLegalAcceptance } from "@/lib/legal/receipts";
+import { LEGAL_EVENT_TYPES, CONSENT_TEXT } from "@/lib/legal/constants";
 import type {
   Application,
   Database,
@@ -47,9 +49,14 @@ export async function submitApplication(formData: FormData) {
   const candidatePhone = formData.get("candidatePhone") as string;
   const coverLetter = formData.get("coverLetter") as string;
   const cvUrl = formData.get("cvUrl") as string;
+  const applicationProcessingAccepted = formData.get("legal-application-processing") === "on";
 
   if (!jobId || !employerId || !candidateName || !candidateEmail) {
     return { error: "Please fill in all required fields" };
+  }
+
+  if (!applicationProcessingAccepted) {
+    return { error: "You must acknowledge the Application Processing Notice" };
   }
 
   const applicationsTable = supabase.from(
@@ -203,6 +210,28 @@ export async function submitApplication(formData: FormData) {
       // Silently fail notification
     }
   }
+
+  // Record legal acceptance for application
+  recordLegalAcceptance({
+    email: candidateEmail,
+    accountType: "candidate",
+    eventType: LEGAL_EVENT_TYPES.JOB_APPLICATION,
+    termsAccepted: true,
+    privacyNoticeAcknowledged: true,
+    consentTextSnapshot: [
+      `applicationProcessing: ${CONSENT_TEXT.applicationProcessing}`,
+    ].join("; "),
+    sourceRoute: "/jobs/[employerSlug]/[jobSlug]",
+    relatedEntityType: "application",
+    relatedEntityId: application.id,
+    metadata: {
+      jobId,
+      employerId,
+      jobTitle: jobTitleStr,
+    },
+  }).catch((err) => {
+    console.error("[LegalReceipt] Failed to record application acceptance:", err);
+  });
 
   revalidatePath(`/jobs/[employerSlug]/[jobSlug]`);
   return { success: true };

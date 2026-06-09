@@ -65,6 +65,7 @@ export function LegalAcknowledgementCheckboxes({
         <div className="flex items-start gap-3">
           <Checkbox
             id="legal-terms"
+            name="legal-terms"
             checked={terms}
             onCheckedChange={(checked) => handleTermsChange(checked as boolean)}
           />
@@ -88,6 +89,7 @@ export function LegalAcknowledgementCheckboxes({
         <div className="flex items-start gap-3">
           <Checkbox
             id="legal-privacy"
+            name="legal-privacy"
             checked={privacy}
             onCheckedChange={(checked) => handlePrivacyChange(checked as boolean)}
           />
@@ -111,6 +113,7 @@ export function LegalAcknowledgementCheckboxes({
         <div className="flex items-start gap-3">
           <Checkbox
             id="legal-application-processing"
+            name="legal-application-processing"
             checked={applicationProcessing}
             onCheckedChange={(checked) =>
               handleApplicationProcessingChange(checked as boolean)
@@ -129,6 +132,7 @@ export function LegalAcknowledgementCheckboxes({
         <div className="flex items-start gap-3">
           <Checkbox
             id="legal-marketing"
+            name="legal-marketing"
             checked={marketing}
             onCheckedChange={(checked) =>
               handleMarketingChange(checked as boolean)
@@ -147,6 +151,7 @@ export function LegalAcknowledgementCheckboxes({
         <div className="flex items-start gap-3">
           <Checkbox
             id="legal-talent-directory"
+            name="legal-talent-directory"
             checked={false}
             onCheckedChange={() => {}}
           />

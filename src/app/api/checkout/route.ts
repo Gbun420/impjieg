@@ -26,6 +26,9 @@ const checkoutSchema = z.object({
   bundleType: z.string().optional().nullable(),
   serviceType: z.string().optional().nullable(),
   billingCycle: z.enum(["monthly", "annual"]).default("monthly"),
+  termsAccepted: z.boolean().refine((v) => v === true, {
+    message: "You must accept the Terms of Service",
+  }),
 });
 
 type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"];
