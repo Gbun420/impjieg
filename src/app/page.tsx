@@ -46,20 +46,21 @@ async function StatsSection() {
   }>);
 
   const stats = [
-    { value: String(salaryCoverage.activeJobs), label: "Active roles", note: "Updated daily", Icon: Building2 },
-    { value: `${salaryCoverage.salaryCoveragePercent}%`, label: "Salary shown", note: "Transparent ranges", Icon: Banknote },
-    { value: "30d", label: "Freshness", note: "Expired roles drop off", Icon: Clock },
-    { value: "Direct", label: "Apply", note: "No middlemen", Icon: CheckCircle2 },
+    { value: `${salaryCoverage.activeJobs} active roles`, note: "Updated daily", Icon: Building2 },
+    { value: "Salary visibility", note: "Clearer pay signals", Icon: Banknote },
+    { value: "30-day freshness", note: "Expired roles drop off", Icon: Clock },
+    { value: "Direct apply", note: "No middlemen", Icon: CheckCircle2 },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       {stats.map((s) => (
-        <div key={s.label} className="flex flex-col items-center gap-1 rounded-xl border border-border/40 bg-card/60 px-2 py-3 text-center backdrop-blur sm:px-3 sm:py-4">
-          <s.Icon className="h-4 w-4 text-primary" />
-          <p className="text-lg font-bold leading-none text-foreground sm:text-xl">{s.value}</p>
-          <p className="text-xs font-medium text-foreground">{s.label}</p>
-          <p className="text-[0.65rem] leading-tight text-muted-foreground hidden sm:block">{s.note}</p>
+        <div key={s.value} className="flex items-center gap-2 rounded-xl border border-border/40 bg-card/60 px-3 py-2.5 backdrop-blur sm:flex-col sm:items-start sm:gap-1 sm:px-4 sm:py-3.5">
+          <s.Icon className="h-4 w-4 shrink-0 text-primary sm:h-3.5 sm:w-3.5" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-snug text-foreground sm:text-[0.8rem]">{s.value}</p>
+            <p className="text-[0.65rem] leading-tight text-muted-foreground sm:text-[0.65rem]">{s.note}</p>
+          </div>
         </div>
       ))}
     </div>
