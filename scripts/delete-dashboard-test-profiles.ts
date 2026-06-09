@@ -133,7 +133,7 @@ async function main() {
     .from("employers")
     .select("id")
     .eq("slug", QA_EMPLOYER_SLUG)
-    .maybeSingle();
+    .maybeSingle<{ id: string }>();
 
   const employerId = employerProfile?.id ?? null;
   console.log(`  Employer profile: ${employerId ?? "not found"}`);
@@ -146,7 +146,7 @@ async function main() {
       .from("jobs")
       .select("id")
       .eq("slug", slug)
-      .maybeSingle();
+      .maybeSingle<{ id: string }>();
     if (job?.id) {
       jobIds.push(job.id);
       console.log(`  Found job: ${slug} → ${job.id}`);

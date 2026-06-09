@@ -509,7 +509,7 @@ async function main() {
         sectors: ["Technology", "iGaming", "Finance & Banking"],
         remote_preference: "Hybrid",
         is_open_to_work: true,
-      },
+      } as never,
       { onConflict: "user_id" }
     );
 
@@ -545,7 +545,7 @@ async function main() {
         is_verified: true,
         email_notifications: true,
         whatsapp_notifications: false,
-      },
+      } as never,
       { onConflict: "id" }
     );
 
@@ -561,7 +561,7 @@ async function main() {
   const jobRows = buildEmployerJobs(EMPLOYER_PROFILE_ID);
   const { error: jobsError } = await supabase
     .from("jobs")
-    .upsert(jobRows, { onConflict: "id" });
+    .upsert(jobRows as never, { onConflict: "id" });
 
   if (jobsError) {
     console.error("  Jobs error:", jobsError.message);
@@ -575,7 +575,7 @@ async function main() {
   const appRows = buildApplications(EMPLOYER_PROFILE_ID);
   const { error: appsError } = await supabase
     .from("applications")
-    .upsert(appRows, { onConflict: "id" });
+    .upsert(appRows as never, { onConflict: "id" });
 
   if (appsError) {
     console.error("  Applications error:", appsError.message);
@@ -621,7 +621,7 @@ async function main() {
 
   const { error: candAppsErr } = await supabase
     .from("candidate_applications")
-    .upsert(candidateAppRowsForEmployerApps, { onConflict: "id" });
+    .upsert(candidateAppRowsForEmployerApps as never, { onConflict: "id" });
 
   if (candAppsErr) {
     console.error("  Candidate applications (employer-side) error:", candAppsErr.message);
@@ -635,7 +635,7 @@ async function main() {
   const candAppRows = buildCandidateApplications();
   const { error: candAppError } = await supabase
     .from("candidate_applications")
-    .upsert(candAppRows, { onConflict: "id" });
+    .upsert(candAppRows as never, { onConflict: "id" });
 
   if (candAppError) {
     console.error("  Candidate applications error:", candAppError.message);
@@ -649,7 +649,7 @@ async function main() {
   const savedJobRows = buildSavedJobs();
   const { error: savedError } = await supabase
     .from("saved_jobs")
-    .upsert(savedJobRows, { onConflict: "user_id,job_id" });
+    .upsert(savedJobRows as never, { onConflict: "user_id,job_id" });
 
   if (savedError) {
     console.error("  Saved jobs error:", savedError.message);
@@ -663,7 +663,7 @@ async function main() {
   const candAlertRows = buildCandidateAlerts();
   const { error: candAlertError } = await supabase
     .from("candidate_alerts")
-    .upsert(candAlertRows, { onConflict: "id" });
+    .upsert(candAlertRows as never, { onConflict: "id" });
 
   if (candAlertError) {
     console.error("  Candidate alerts error:", candAlertError.message);
@@ -677,7 +677,7 @@ async function main() {
   const jobAlertRows = buildJobAlerts();
   const { error: jobAlertError } = await supabase
     .from("job_alerts")
-    .upsert(jobAlertRows, { onConflict: "email" });
+    .upsert(jobAlertRows as never, { onConflict: "email" });
 
   if (jobAlertError) {
     console.error("  Job alerts error:", jobAlertError.message);
@@ -700,7 +700,7 @@ async function main() {
         secret_encrypted: encryptedSecret,
         enabled: true,
         last_used_at: new Date().toISOString(),
-      },
+      } as never,
       { onConflict: "user_id" }
     );
 
