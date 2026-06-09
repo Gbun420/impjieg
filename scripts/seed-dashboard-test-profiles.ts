@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/types";
 
 // ---------------------------------------------------------------------------
@@ -102,62 +102,87 @@ function loadLocalEnv() {
   loadEnvFile(path.resolve(process.cwd(), ".env"));
 }
 
-async function findUserByEmail(
-  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
+async function findAuthUserByEmail(
+  supabase: SupabaseClient<Database>,
   email: string
-): Promise<{ id: string; email: string | null } | null> {
-  const { data, error } = await supabase.rpc("exec_sql", {
-    query: `SELECT id, email FROM auth.users WHERE email = '${email}'`,
-  });
-  if (error) return null;
-  const rows = data as { id: string; email: string }[] | null;
-  return rows?.[0] ?? null;
+) {
+  const normalized = email.toLowerCase();
+  let page = 1;
+  const perPage = 100;
+
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page,
+      perPage,
+    });
+
+    if (error) {
+      throw new Error(`Failed to list auth users: ${error.message}`);
+    }
+
+    const user = data.users.find(
+      (entry) => entry.email?.toLowerCase() === normalized
+    );
+
+    if (user) return user;
+
+    if (data.users.length < perPage) return null;
+    page += 1;
+  }
 }
 
 async function upsertAuthUser(
-  supabase: { rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
+  supabase: SupabaseClient<Database>,
   {
     email,
     password,
     userMetadata,
+    appMetadata,
   }: {
     email: string;
     password: string;
     userMetadata: Record<string, unknown>;
+    appMetadata?: Record<string, unknown>;
   }
 ) {
-  const existing = await findUserByEmail(supabase, email);
-  const metadataJson = JSON.stringify(userMetadata).replace(/'/g, "''");
+  const existing = await findAuthUserByEmail(supabase, email);
 
   if (existing) {
-    // Update existing user
-    const { error } = await supabase.rpc("exec_sql", {
-      query: `UPDATE auth.users 
-              SET encrypted_password = crypt('${password.replace(/'/g, "''")}', gen_salt('bf')),
-                  raw_user_meta_data = '${metadataJson}'::jsonb,
-                  updated_at = now()
-              WHERE id = '${existing.id}'`,
-    });
-    if (error) throw new Error(`Failed to update ${email}: ${error.message}`);
+    const { data, error } = await supabase.auth.admin.updateUserById(
+      existing.id,
+      {
+        password,
+        email_confirm: true,
+        user_metadata: userMetadata,
+        app_metadata: {
+          ...(existing.app_metadata ?? {}),
+          ...(appMetadata ?? {}),
+        },
+      }
+    );
+
+    if (error) {
+      throw new Error(`Failed to update auth user ${email}: ${error.message}`);
+    }
+
     console.log(`  Updated auth user: ${email}`);
-    return existing;
+    return data.user ?? existing;
   }
 
-  // Create new user
-  const userId = crypto.randomUUID();
-  const { error } = await supabase.rpc("exec_sql", {
-    query: `INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, 
-            email_confirmed_at, created_at, updated_at, raw_user_meta_data, raw_app_meta_data,
-            is_super_admin, confirmation_token, recovery_token)
-            VALUES ('00000000-0000-0000-0000-000000000000', '${userId}', 'authenticated', 
-            'authenticated', '${email}', crypt('${password.replace(/'/g, "''")}', gen_salt('bf')),
-            now(), now(), now(), '${metadataJson}'::jsonb, 
-            '{"provider":"email","providers":["email"]}'::jsonb,
-            false, '', '')`,
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: userMetadata,
+    app_metadata: appMetadata ?? {},
   });
-  if (error) throw new Error(`Failed to create ${email}: ${error.message}`);
+
+  if (error || !data.user) {
+    throw new Error(`Failed to create auth user ${email}: ${error?.message ?? "No user returned"}`);
+  }
+
   console.log(`  Created auth user: ${email}`);
-  return { id: userId, email };
+  return data.user;
 }
 
 // ---------------------------------------------------------------------------
@@ -419,15 +444,12 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabaseAny = supabase as any;
-
   console.log("Seeding QA dashboard test profiles...\n");
 
   // --- 1. Auth users ---
   console.log("1. Creating auth users...");
 
-  const candidateUser = await upsertAuthUser(supabaseAny, {
+  const candidateUser = await upsertAuthUser(supabase, {
     email: CANDIDATE_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -436,7 +458,7 @@ async function main() {
     },
   });
 
-  const employerUser = await upsertAuthUser(supabaseAny, {
+  const employerUser = await upsertAuthUser(supabase, {
     email: EMPLOYER_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
@@ -445,11 +467,14 @@ async function main() {
     },
   });
 
-  const adminUser = await upsertAuthUser(supabaseAny, {
+  const adminUser = await upsertAuthUser(supabase, {
     email: ADMIN_EMAIL,
     password: QA_PASSWORD,
     userMetadata: {
       accountType: "admin",
+    },
+    appMetadata: {
+      role: "admin",
     },
   });
 
