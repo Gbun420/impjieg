@@ -1,4 +1,5 @@
 import type { Job } from "@/lib/supabase/types";
+import { SALARY_DISCLOSURE_REQUIRED } from "@/lib/constants";
 
 export type EmployerComplianceSummary = {
   activeJobs: number;
@@ -32,8 +33,20 @@ export function validateSalaryRange(
   salaryMin: number | null | undefined,
   salaryMax: number | null | undefined
 ) {
-  if (salaryMin == null || salaryMax == null) {
+  const bothNull = salaryMin == null && salaryMax == null;
+
+  if (bothNull && !SALARY_DISCLOSURE_REQUIRED) {
+    return null;
+  }
+
+  if (bothNull && SALARY_DISCLOSURE_REQUIRED) {
     return "Salary range is required before a job can be posted.";
+  }
+
+  if (salaryMin == null || salaryMax == null) {
+    return SALARY_DISCLOSURE_REQUIRED
+      ? "Salary range is required before a job can be posted."
+      : "Both salary values must be provided together.";
   }
 
   if (!Number.isFinite(salaryMin) || !Number.isFinite(salaryMax)) {

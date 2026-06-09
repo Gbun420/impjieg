@@ -8,6 +8,9 @@ export const SITE = {
   email: "hello@impjieg.com",
 };
 
+export const SALARY_DISCLOSURE_REQUIRED =
+  process.env.SALARY_DISCLOSURE_REQUIRED === "true";
+
 export const SECTORS = [
   "iGaming",
   "Technology",

@@ -368,7 +368,7 @@ export default async function JobDetailPage({
           </Card>
 
           {/* Salary */}
-          {salaryText && (
+          {salaryText ? (
             <Card className="marketplace-panel border-primary/20">
               <div className="p-5">
                 <div className="flex items-center gap-2">
@@ -378,12 +378,30 @@ export default async function JobDetailPage({
                   <span className="text-sm font-medium text-primary">
                     Salary signal
                   </span>
+                  <Badge variant="success" className="text-xs">Salary shown</Badge>
                 </div>
                 <p className="mt-2 font-mono text-2xl font-bold text-primary">
                   {salaryText}
                   <span className="text-base font-normal text-muted-foreground">
                     /year
                   </span>
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <Card className="marketplace-panel border-border/50 bg-muted/20">
+              <div className="p-5">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50">
+                    <Banknote className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Salary
+                  </span>
+                  <Badge variant="secondary" className="text-xs">Salary not disclosed</Badge>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  The employer has not included salary information for this role.
                 </p>
               </div>
             </Card>

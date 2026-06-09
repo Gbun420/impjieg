@@ -5,15 +5,26 @@ import {
   hasValidSalaryRange,
   validateSalaryRange,
 } from "./compliance";
+import { SALARY_DISCLOSURE_REQUIRED } from "./constants";
 
 test("hasValidSalaryRange accepts a well-ordered positive range", () => {
   assert.equal(hasValidSalaryRange(30000, 45000), true);
 });
 
-test("validateSalaryRange blocks missing and invalid salary ranges", () => {
-  assert.equal(validateSalaryRange(null, null), "Salary range is required before a job can be posted.");
+test("validateSalaryRange blocks invalid salary ranges", () => {
   assert.equal(validateSalaryRange(0, 45000), "Salary range must be greater than zero.");
   assert.equal(validateSalaryRange(45000, 30000), "Maximum salary must be higher than minimum salary.");
+  assert.equal(validateSalaryRange(30000, null), "Both salary values must be provided together.");
+});
+
+test("validateSalaryRange allows missing salary when not required", () => {
+  if (SALARY_DISCLOSURE_REQUIRED) return; // skip when required
+  assert.equal(validateSalaryRange(null, null), null);
+});
+
+test("validateSalaryRange blocks missing salary when required", () => {
+  if (!SALARY_DISCLOSURE_REQUIRED) return; // skip when not required
+  assert.equal(validateSalaryRange(null, null), "Salary range is required before a job can be posted.");
 });
 
 test("deriveEmployerComplianceSummary counts active jobs with salary coverage", () => {

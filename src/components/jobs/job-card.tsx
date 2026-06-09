@@ -110,8 +110,14 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                   <span className="font-mono text-sm font-semibold text-primary sm:text-[0.95rem]">
                     {salaryText}
                   </span>
+                  <Badge variant="success" className="text-[0.65rem] px-1.5 py-0">Salary shown</Badge>
                 </div>
-              ) : null}
+              ) : (
+                <div className="mt-3 flex items-center gap-1.5">
+                  <Banknote className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+                  <span className="text-sm text-muted-foreground">Salary not disclosed</span>
+                </div>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                 <span className="flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-foreground/80">
