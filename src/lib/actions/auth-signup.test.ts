@@ -225,3 +225,212 @@ test("signupWithAutoConfirm returns a friendly duplicate-user error", async () =
     error: "An account with this email already exists. Please sign in.",
   });
 });
+
+test("signupWithAutoConfirm returns needsConfirmation when email not confirmed", async () => {
+  // Simulate production mode where email confirmation is required
+  const prevNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  try {
+    const result = await signupWithAutoConfirm({
+      adminClient: {
+        auth: {
+          admin: {
+            async createUser(payload) {
+              return { data: { user: { id: "user_3" } }, error: null };
+            },
+          },
+        },
+      },
+      userClient: {
+        auth: {
+          async signInWithPassword() {
+            return { error: { message: "Email not confirmed" } };
+          },
+          async signOut() {
+            return { error: null };
+          },
+        },
+      },
+      serviceClient: {
+        from() {
+          return {
+            delete() {
+              return {
+                eq() {
+                  return Promise.resolve({ error: null });
+                },
+              };
+            },
+          };
+        },
+      } as never,
+      input: {
+        email: "needs-confirm@example.com",
+        password: "secret123",
+        accountType: "candidate",
+        fullName: "Pat Test",
+      },
+    });
+
+    assert.equal(result.needsConfirmation, true);
+    assert.equal(result.userId, "user_3");
+    assert.equal(result.email, "needs-confirm@example.com");
+    assert.equal(result.success, undefined);
+    assert.equal(result.error, undefined);
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+  }
+});
+
+test("signupWithAutoConfirm returns needsConfirmation for not confirmed variant messages", async () => {
+  const prevNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  try {
+    const result = await signupWithAutoConfirm({
+      adminClient: {
+        auth: {
+          admin: {
+            async createUser(payload) {
+              return { data: { user: { id: "user_4" } }, error: null };
+            },
+          },
+        },
+      },
+      userClient: {
+        auth: {
+          async signInWithPassword() {
+            return { error: { message: "Email not confirmed. Please check your inbox for the confirmation link." } };
+          },
+          async signOut() {
+            return { error: null };
+          },
+        },
+      },
+      serviceClient: {
+        from() {
+          return {
+            delete() {
+              return {
+                eq() {
+                  return Promise.resolve({ error: null });
+                },
+              };
+            },
+          };
+        },
+      } as never,
+      input: {
+        email: "confirm2@example.com",
+        password: "secret123",
+        accountType: "employer",
+        companyName: "TestCo",
+      },
+    });
+
+    assert.equal(result.needsConfirmation, true);
+    assert.equal(result.userId, "user_4");
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+  }
+});
+
+test("signupWithAutoConfirm returns error for non-confirmation sign-in failures", async () => {
+  const prevNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  try {
+    const result = await signupWithAutoConfirm({
+      adminClient: {
+        auth: {
+          admin: {
+            async createUser(payload) {
+              return { data: { user: { id: "user_5" } }, error: null };
+            },
+          },
+        },
+      },
+      userClient: {
+        auth: {
+          async signInWithPassword() {
+            return { error: { message: "Invalid login credentials" } };
+          },
+          async signOut() {
+            return { error: null };
+          },
+        },
+      },
+      serviceClient: {
+        from() {
+          return {
+            delete() {
+              return {
+                eq() {
+                  return Promise.resolve({ error: null });
+                },
+              };
+            },
+          };
+        },
+      } as never,
+      input: {
+        email: "bad@example.com",
+        password: "secret123",
+        accountType: "candidate",
+        fullName: "Bad Creds",
+      },
+    });
+
+    assert.equal(result.error, "Invalid login credentials");
+    assert.equal(result.success, undefined);
+    assert.equal(result.needsConfirmation, undefined);
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+  }
+});
+
+test("signupWithAutoConfirm returns error when user has no id", async () => {
+  const result = await signupWithAutoConfirm({
+    adminClient: {
+      auth: {
+        admin: {
+          async createUser(payload) {
+            return { data: { user: null }, error: null };
+          },
+        },
+      },
+    },
+    userClient: {
+      auth: {
+        async signInWithPassword() {
+          return { error: null };
+        },
+        async signOut() {
+          return { error: null };
+        },
+      },
+    },
+    serviceClient: {
+      from() {
+        return {
+          delete() {
+            return {
+              eq() {
+                return Promise.resolve({ error: null });
+              },
+            };
+          },
+        };
+      },
+    } as never,
+    input: {
+      email: "noid@example.com",
+      password: "secret123",
+      accountType: "candidate",
+      fullName: "No ID",
+    },
+  });
+
+  assert.equal(result.error, "Failed to create account — please try again");
+});

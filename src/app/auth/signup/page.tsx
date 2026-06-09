@@ -57,6 +57,21 @@ function SignupForm() {
 
   return (
     <div className="space-y-6">
+      {needsConfirmation && (
+        <div className="flex items-start gap-3 rounded-xl bg-success/10 p-5 text-sm border border-success/20">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+          <div>
+            <p className="font-semibold text-success">Account created — check your email</p>
+            <p className="mt-1 text-muted-foreground">
+              We sent a confirmation link to <strong>{confirmedEmail}</strong>.
+              Please check your inbox and click the link to sign in.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Your legal consent has been recorded. A receipt will be sent to your email.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
