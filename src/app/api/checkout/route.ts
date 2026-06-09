@@ -16,6 +16,12 @@ import { selectBestCommercialDiscount } from "@/lib/monetization/admin-grants/re
 import { consumeGrantCredit } from "@/lib/monetization/admin-grants/actions";
 
 import { z } from "zod";
+import {
+  resolveListingPrice,
+  resolvePlanPrice,
+  resolvePackPrice,
+  resolveBundlePrice,
+} from "@/lib/stripe/prices";
 
 const checkoutSchema = z.object({
   jobId: z.string().optional().nullable(),
@@ -103,6 +109,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Employer profile not found" }, { status: 404 });
     }
 
+    // Verify job ownership if jobId provided
+    if (jobId) {
+      const { data: job, error: jobError } = await supabase
+        .from("jobs")
+        .select("employer_id")
+        .eq("id", jobId)
+        .single<{ employer_id: string }>();
+
+      if (jobError || !job || job.employer_id !== employer.id) {
+        return NextResponse.json({ error: "Job not found or does not belong to your account" }, { status: 403 });
+      }
+    }
+
     const serviceSupabase = createServiceClient<Database>(
       getSupabaseUrl(),
       getSupabaseServiceKey()
@@ -133,11 +152,13 @@ export async function POST(request: Request) {
       employerId: employer.id,
     };
 
-    // Handle job listing payments (existing functionality)
+    // Handle job listing payments
     if (jobId && listingType) {
-      amount = listingType === "featured" ? 5900 : 2900; // amount in cents
-      // In a real app, you would use actual Stripe price IDs
-      priceId = listingType === "featured" ? "price_featured" : "price_standard";
+      amount = listingType === "featured" ? 5900 : 2900;
+      priceId = resolveListingPrice(listingType);
+      if (!priceId) {
+        return NextResponse.json({ error: "Listing price not configured" }, { status: 500 });
+      }
       metadata.jobId = jobId;
       metadata.listingType = listingType;
     }
@@ -147,23 +168,13 @@ export async function POST(request: Request) {
       if (!plan) {
         return NextResponse.json({ error: "Invalid plan type" }, { status: 400 });
       }
-      
+
       amount = billingCycle === "annual" ? plan.priceAnnual * 100 : plan.price * 100;
-      // In a real app, you would have price IDs for each plan/billing cycle combination
-      priceId = planType === "basic" 
-        ? billingCycle === "annual" 
-          ? "price_basic_annual" 
-          : "price_basic_monthly"
-        : planType === "professional"
-          ? billingCycle === "annual"
-            ? "price_professional_annual"
-            : "price_professional_monthly"
-          : planType === "enterprise"
-            ? billingCycle === "annual"
-              ? "price_enterprise_annual"
-              : "price_enterprise_monthly"
-            : "";
-      
+      priceId = resolvePlanPrice(planType, billingCycle);
+      if (!priceId) {
+        return NextResponse.json({ error: "Subscription price not configured" }, { status: 500 });
+      }
+
       metadata.planType = planType;
       metadata.billingCycle = billingCycle;
     }
@@ -173,15 +184,13 @@ export async function POST(request: Request) {
       if (!pack) {
         return NextResponse.json({ error: "Invalid pack type" }, { status: 400 });
       }
-      
+
       amount = pack.price * 100;
-      // In a real app, you would have price IDs for each pack
-      priceId = packType === "starter"
-        ? "price_starter_pack"
-        : packType === "standard"
-          ? "price_standard_pack"
-          : "price_premium_pack";
-      
+      priceId = resolvePackPrice(packType);
+      if (!priceId) {
+        return NextResponse.json({ error: "Credit pack price not configured" }, { status: 500 });
+      }
+
       metadata.packType = packType;
       metadata.credits = String(pack.credits);
     }
@@ -191,15 +200,13 @@ export async function POST(request: Request) {
       if (!bundle) {
         return NextResponse.json({ error: "Invalid bundle type" }, { status: 400 });
       }
-      
+
       amount = bundle.price * 100;
-      // In a real app, you would have price IDs for each bundle
-      priceId = bundleType === "featuredBoost"
-        ? "price_featured_boost"
-        : bundleType === "socialPromotion"
-          ? "price_social_promotion"
-          : "price_email_blast";
-      
+      priceId = resolveBundlePrice(bundleType);
+      if (!priceId) {
+        return NextResponse.json({ error: "Promotion bundle price not configured" }, { status: 500 });
+      }
+
       metadata.bundleType = bundleType;
       metadata.jobId = jobId;
     }
