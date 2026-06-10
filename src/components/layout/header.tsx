@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, Briefcase, Building2 } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, Briefcase, Building2, BookOpen } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { SITE } from "@/lib/constants";
 import { ImpjiegLogo, ImpjiegMark } from "@/components/brand";
@@ -18,6 +18,7 @@ import { ImpjiegLogo, ImpjiegMark } from "@/components/brand";
 const navLinks = [
   { label: "Find jobs", href: "/jobs", icon: Briefcase },
   { label: "Companies", href: "/companies", icon: Building2 },
+  { label: "Blog", href: "/blog", icon: BookOpen },
   { label: "Hire talent", href: "/pricing" },
 ];
 

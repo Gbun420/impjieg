@@ -9,6 +9,15 @@ const nextConfig = {
     ],
   },
 
+  experimental: {
+    // Ensure MDX blog content is bundled into serverless output (fs reads).
+    outputFileTracingIncludes: {
+      "/blog": ["./content/blog/**/*"],
+      "/blog/[slug]": ["./content/blog/**/*"],
+      "/sitemap.xml": ["./content/blog/**/*"],
+    },
+  },
+
   async headers() {
     return [
       {
