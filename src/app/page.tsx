@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
+import { toSlug } from "@/lib/seo/taxonomy";
 
 export const dynamic = "force-dynamic";
 
@@ -321,7 +322,7 @@ export default async function HomePage() {
             {HOMEPAGE_SECTORS.map((sector) => (
               <Link
                 key={sector}
-                href={`/jobs?sector=${encodeURIComponent(sector)}`}
+                href={`/jobs/sector/${toSlug(sector)}`}
                 className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card-hover hover:shadow-sm"
               >
                 {sector}

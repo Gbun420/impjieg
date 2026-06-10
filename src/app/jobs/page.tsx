@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
+import { SITE, SECTORS } from "@/lib/constants";
+import { toSlug } from "@/lib/seo/taxonomy";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Browse Malta jobs with clearer salary, work-mode, employer, and freshness signals on Impjieg.",
   alternates: {
-    canonical: "https://impjieg.vercel.app/jobs",
+    canonical: `${SITE.url}/jobs`,
   },
 };
 
@@ -281,10 +283,10 @@ export default async function JobsPage({
         <div className="mt-3 grid gap-4 lg:grid-cols-[1fr_0.72fr] lg:items-end">
           <div>
             <h1 className="text-3xl font-bold tracking-[-0.05em] text-white sm:text-4xl">
-              Browse roles with the signals that matter.
+              Jobs in Malta
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68 sm:text-base">
-              Filter Malta&apos;s tech, digital, and iGaming jobs by salary range, location, work mode, and hiring context.
+              Browse Malta&apos;s tech, digital, iGaming, finance, and compliance roles with clear salary, work-mode, and employer signals. Filter by salary range, location, and work mode.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs text-white/68">
@@ -297,11 +299,20 @@ export default async function JobsPage({
           </div>
         </div>
       </div>
-      <div className="mb-6">
-        <p className="text-sm text-muted-foreground">
-          Browse live Malta roles with salary, work-mode, employer, and freshness signals.
-        </p>
-      </div>
+      <nav aria-label="Browse jobs by sector" className="mb-6">
+        <h2 className="text-sm font-semibold text-foreground">Popular sectors in Malta</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SECTORS.map((sectorLabel) => (
+            <Link
+              key={sectorLabel}
+              href={`/jobs/sector/${toSlug(sectorLabel)}`}
+              className="rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+            >
+              {sectorLabel} jobs
+            </Link>
+          ))}
+        </div>
+      </nav>
       <Suspense fallback={<SearchFiltersSkeleton />}>
         <JobsContent searchParams={params} />
       </Suspense>
