@@ -8,26 +8,13 @@ import { Card } from "@/components/ui/card";
 import { MapPin, Briefcase, Clock, Banknote, ArrowRight } from "lucide-react";
 import { formatSalary, daysAgo } from "@/lib/utils";
 import type { JobWithEmployer } from "@/lib/supabase/types";
-import { SECTORS, LOCATIONS } from "@/lib/constants";
+import { SECTORS, LOCATIONS, SITE } from "@/lib/constants";
+import { getSectorBySlug, toSlug } from "@/lib/seo/taxonomy";
+import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 
 export const dynamic = "force-dynamic";
 
 const JOBS_PER_PAGE = 20;
-
-function slugToLabel(slug: string): string {
-  return slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
-function labelToSlug(label: string): string {
-  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
-}
-
-function isValidSector(sector: string): boolean {
-  return SECTORS.some((s) => labelToSlug(s) === sector);
-}
 
 export async function generateMetadata({
   params,
@@ -35,11 +22,11 @@ export async function generateMetadata({
   params: Promise<{ sector: string }>;
 }): Promise<Metadata> {
   const { sector } = await params;
-  if (!isValidSector(sector)) {
+  const sectorLabel = getSectorBySlug(sector);
+  if (!sectorLabel) {
     return { title: "Not Found" };
   }
-  const sectorLabel = slugToLabel(sector);
-  const canonicalUrl = `https://impjieg.vercel.app/jobs/sector/${sector}`;
+  const canonicalUrl = `${SITE.url}/jobs/sector/${sector}`;
   const hasJobs = await checkSectorHasJobs(sectorLabel);
 
   const metadata: Metadata = {
@@ -72,11 +59,10 @@ export default async function SectorPage({
 }) {
   const { sector } = await params;
 
-  if (!isValidSector(sector)) {
+  const sectorLabel = getSectorBySlug(sector);
+  if (!sectorLabel) {
     notFound();
   }
-
-  const sectorLabel = slugToLabel(sector);
 
   const supabase = await createClient();
 
@@ -97,11 +83,18 @@ export default async function SectorPage({
 
   const typedJobs = jobs as unknown as JobWithEmployer[];
 
-  const relatedSectors = SECTORS.filter((s) => labelToSlug(s) !== sector).slice(0, 8);
-  const hasJobs = typedJobs.length > 0;
+  const relatedSectors = SECTORS.filter((s) => s !== sectorLabel).slice(0, 8);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+      <BreadcrumbSchema
+        id="sector-breadcrumb-jsonld"
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Jobs", path: "/jobs" },
+          { name: `${sectorLabel} Jobs in Malta`, path: `/jobs/sector/${sector}` },
+        ]}
+      />
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link href="/jobs" className="hover:text-foreground">Jobs</Link>
         <span className="mx-2">/</span>
@@ -221,7 +214,7 @@ export default async function SectorPage({
             {LOCATIONS.map((loc) => (
               <Link
                 key={loc}
-                href={`/jobs/sector/${sector}/location/${labelToSlug(loc)}`}
+                href={`/jobs/sector/${sector}/location/${toSlug(loc)}`}
                 className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
               >
                 {loc}
@@ -238,7 +231,7 @@ export default async function SectorPage({
             {relatedSectors.map((sec) => (
               <Link
                 key={sec}
-                href={`/jobs/sector/${labelToSlug(sec)}`}
+                href={`/jobs/sector/${toSlug(sec)}`}
                 className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
               >
                 {sec}
