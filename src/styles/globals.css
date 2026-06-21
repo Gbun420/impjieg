@@ -13,6 +13,8 @@
   --color-ink-light: #121A2B;
   --color-harbor: #08111F;
   --color-signal-blue: #2563EB;
+  --color-coral: #FB3B4E;
+  --color-coral-press: #E22B3E;
   --color-lagoon: #14C7B7;
   --color-deep-lagoon: #0F766E;
   --color-saffron: #FFB020;
@@ -23,19 +25,19 @@
   --color-slate: #64748B;
   --color-emerald: #12B76A;
   --color-rose: #E5484D;
-  --color-border: #DBE4F0;
+  --color-border: #E7E9EC;
 
   /* Semantic Tokens */
   color-scheme: light;
-  --background: var(--color-mist);
+  --background: #FBFBFD;
   --foreground: var(--color-ink);
-  --primary: var(--color-signal-blue);
+  --primary: var(--color-coral);
   --primary-foreground: #FFFFFF;
-  --primary-hover: #1D4ED8;
-  --secondary: var(--color-lagoon);
-  --secondary-foreground: var(--color-ink);
-  --accent: var(--color-saffron);
-  --accent-foreground: var(--color-ink);
+  --primary-hover: var(--color-coral-press);
+  --secondary: #16324F;
+  --secondary-foreground: #FFFFFF;
+  --accent: var(--color-coral);
+  --accent-foreground: #FFFFFF;
   --muted: #EAF0F6;
   --muted-foreground: var(--color-slate);
   --card: var(--color-surface);
@@ -43,7 +45,7 @@
   --card-hover: #F0F6FC;
   --border: var(--color-border);
   --border-hover: #B8C6D8;
-  --ring: var(--color-signal-blue);
+  --ring: var(--color-coral);
   --success: var(--color-emerald);
   --success-foreground: #FFFFFF;
   --warning: var(--color-saffron);
@@ -64,13 +66,13 @@
   color-scheme: dark;
   --background: var(--color-ink);
   --foreground: #F8FAFC;
-  --primary: #7AA8FF;
-  --primary-foreground: var(--color-ink);
-  --primary-hover: #95B8FF;
-  --secondary: #46D1BE;
-  --secondary-foreground: var(--color-ink);
-  --accent: #FFBF66;
-  --accent-foreground: var(--color-ink);
+  --primary: #FF6473;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #FF7B88;
+  --secondary: #2C4A66;
+  --secondary-foreground: #FFFFFF;
+  --accent: #FF6473;
+  --accent-foreground: #FFFFFF;
   --muted: #142235;
   --muted-foreground: #A7B8C9;
   --card: var(--color-ink-light);
@@ -78,7 +80,7 @@
   --card-hover: #17253A;
   --border: #22334A;
   --border-hover: #36506D;
-  --ring: #7AA8FF;
+  --ring: #FF6473;
   --success: #3CCF95;
   --success-foreground: var(--color-ink);
   --warning: #FFCA66;
@@ -129,18 +131,11 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), transparent 34%),
-    radial-gradient(circle at 12% 0%, rgba(30, 99, 255, 0.08), transparent 34%),
-    radial-gradient(circle at 88% 4%, rgba(20, 199, 183, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(247, 244, 236, 0.4), transparent 28%);
+  background-image: none;
 }
 
 .dark body {
-  background-image:
-    radial-gradient(circle at top, rgba(30, 99, 255, 0.16), transparent 42%),
-    radial-gradient(circle at 85% 0%, rgba(20, 199, 183, 0.1), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%);
+  background-image: none;
 }
 
 h1,

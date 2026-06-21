@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Inter, Manrope } from "next/font/google";
+import { Sora, Inter, Manrope, Baloo_2 } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/header";
@@ -24,6 +24,14 @@ const inter = Inter({
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
+  display: "swap",
+});
+
+// Rounded, friendly display face used for the impjieg.work logo wordmark.
+const baloo = Baloo_2({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-logo",
   display: "swap",
 });
 
@@ -106,7 +114,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${sora.variable} ${inter.variable} ${manrope.variable}`}
+      className={`h-full antialiased ${sora.variable} ${inter.variable} ${manrope.variable} ${baloo.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">

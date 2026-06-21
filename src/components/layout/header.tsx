@@ -12,8 +12,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { Menu, X, Sun, Moon, LogOut, LayoutDashboard, Briefcase, Building2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { SITE } from "@/lib/constants";
-import { ImpjiegLogo, ImpjiegMark } from "@/components/brand";
+import { ImpjiegLogo } from "@/components/brand";
 
 const navLinks = [
   { label: "Find jobs", href: "/jobs", icon: Briefcase },
@@ -108,17 +107,7 @@ export default function Header({
     return (
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-            <ImpjiegMark size={36} />
-            <span className="flex flex-col leading-none">
-              <span className="font-display text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground">
-                {SITE.name}
-              </span>
-              <span className="text-[0.68rem] font-medium tracking-[0.18em] text-muted-foreground">
-                Admin console
-              </span>
-            </span>
-          </Link>
+          <ImpjiegLogo compact />
 
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="hidden border-border/60 bg-muted/70 text-foreground md:inline-flex">
@@ -157,17 +146,7 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group inline-flex items-center gap-3" aria-label="Impjieg homepage">
-          <ImpjiegMark size={42} />
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-xl font-semibold tracking-[-0.04em] text-foreground group-hover:text-primary transition-colors">
-              {SITE.name}
-            </span>
-            <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-foreground/60">
-              Hiring signal
-            </span>
-          </span>
-        </Link>
+        <ImpjiegLogo />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
           {navLinks.map((link) => {

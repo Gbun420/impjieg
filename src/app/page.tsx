@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   MessageSquare,
   RefreshCw,
+  Search,
+  MapPin,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 
@@ -55,7 +57,7 @@ async function StatsSection() {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       {stats.map((s) => (
-        <div key={s.value} className="flex items-center gap-2 rounded-xl border border-border/40 bg-card/60 px-3 py-2.5 backdrop-blur sm:flex-col sm:items-start sm:gap-1 sm:px-4 sm:py-3.5">
+        <div key={s.value} className="flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5 sm:flex-col sm:items-start sm:gap-1.5 sm:px-4 sm:py-4">
           <s.Icon className="h-4 w-4 shrink-0 text-primary sm:h-3.5 sm:w-3.5" />
           <div className="min-w-0">
             <p className="text-sm font-semibold leading-snug text-foreground sm:text-[0.8rem]">{s.value}</p>
@@ -113,80 +115,79 @@ async function LatestJobs() {
 export default async function HomePage() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden bg-harbor py-10 text-foreground sm:py-16 lg:py-20">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:px-8">
+      <section className="relative overflow-hidden border-b border-border/60 py-20 sm:py-28">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <div className="animate-fade-in-up">
-            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Malta hiring signal
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.07] px-4 py-1.5 text-sm font-semibold text-primary">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
+              Live Malta roles, updated daily
             </div>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.055em] text-foreground sm:text-5xl lg:text-6xl">
-              Jobs with clearer signals.
+
+            <h1 className="mx-auto max-w-[15ch] text-5xl font-extrabold tracking-[-0.035em] text-foreground sm:text-6xl lg:text-[4.25rem] lg:leading-[1.05]">
+              Find your next opportunity in Malta.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-              Impjieg helps candidates and employers move faster with salary, work-mode, employer, and freshness signals built into every role.
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl">
+              Real salaries, clear work-mode, verified employers — Malta&apos;s tech, iGaming, finance and digital jobs, without the noise.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
-                <Link href="/jobs">
-                  <span className="flex items-center gap-2">
-                    Find roles
-                  </span>
-                </Link>
+            <form
+              action="/jobs"
+              method="GET"
+              role="search"
+              className="mx-auto mt-9 flex max-w-2xl flex-col gap-2 rounded-2xl border border-border bg-card p-2 shadow-[0_1px_2px_rgba(11,27,46,0.04),0_18px_44px_-18px_rgba(11,27,46,0.20)] sm:flex-row sm:items-center sm:rounded-full"
+            >
+              <div className="flex flex-1 items-center gap-2.5 px-4 py-2.5">
+                <Search className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <input
+                  name="q"
+                  type="text"
+                  placeholder="Job title or keyword"
+                  aria-label="Job title or keyword"
+                  className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+              <div className="flex flex-1 items-center gap-2.5 px-4 py-2.5">
+                <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <input
+                  name="location"
+                  type="text"
+                  placeholder="Location in Malta"
+                  aria-label="Location"
+                  className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <Button type="submit" variant="primary" size="lg" className="gap-2 sm:rounded-full">
+                <Search className="h-4 w-4" aria-hidden="true" />
+                Search
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
-                <Link href="/employer/post-job">
-                  <span className="flex items-center gap-2">
-                    Post a role
-                  </span>
+            </form>
+
+            <div className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
+              <span className="text-muted-foreground/80">Popular:</span>
+              {[
+                ["iGaming", "/jobs/sector/igaming"],
+                ["Technology", "/jobs/sector/technology"],
+                ["Finance", "/jobs/sector/finance-banking"],
+                ["Remote", "/jobs?workType=Remote"],
+              ].map(([label, href]) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="rounded-full border border-border bg-card px-3 py-1 font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
+                >
+                  {label}
                 </Link>
-              </Button>
+              ))}
             </div>
 
-            <div className="mt-10">
-              <Suspense fallback={<Skeleton className="h-20 w-full max-w-md" />}>
+            <div className="mx-auto mt-12 max-w-3xl">
+              <Suspense fallback={<Skeleton className="h-16 w-full" />}>
                 <StatsSection />
               </Suspense>
-            </div>
-          </div>
-
-          <div className="animate-fade-in-up stagger-2">
-            <div className="rounded-[2rem] border border-border/30 bg-card/50 p-3 shadow-[0_28px_90px_rgba(11,18,32,0.15)] backdrop-blur sm:p-4">
-              <div className="rounded-[1.5rem] border border-border/30 bg-background/80 p-3 sm:p-4">
-                <div className="flex items-center justify-between border-b border-border pb-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Marketplace pulse</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">Live Malta roles</p>
-                  </div>
-                  <span className="rounded-full bg-lagoon/15 px-3 py-1 text-xs font-semibold text-lagoon">Updated</span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {[
-                    ["Product designer", "Sliema · Hybrid", "€42k–55k"],
-                    ["Compliance analyst", "St Julian's · On-site", "€36k–48k"],
-                    ["Senior React engineer", "Malta / EU · Remote", "€62k–78k"],
-                  ].map(([title, meta, salary]) => (
-                    <div key={title} className="flex items-center justify-between gap-3 rounded-2xl border border-border/30 bg-card/50 px-3 py-2.5">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-foreground">{title}</p>
-                        <p className="mt-0.5 text-sm text-muted-foreground">{meta}</p>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-primary">{salary}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 rounded-2xl border border-border/30 bg-card/50 p-3">
-                  <p className="text-sm font-semibold text-foreground">Marketplace search</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">Search live Malta roles. Results update automatically.</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    <span className="rounded-full bg-lagoon/15 px-2.5 py-0.5 text-xs font-semibold text-lagoon">Live signal</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-0.5 text-xs font-semibold text-foreground">Explore</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
