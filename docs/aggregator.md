@@ -90,7 +90,9 @@ looks right, flip the source to `confirmed` and let the cron run.
 
 ## Schedule
 
-`vercel.json` runs `/api/jobs/import` every 6 hours (`0 */6 * * *`). Each run
+`vercel.json` runs `/api/jobs/import` once daily (`0 4 * * *`). Vercel's Hobby
+plan only allows once-per-day crons — a sub-daily schedule (e.g. `0 */6 * * *`)
+**fails the deployment**. On Pro you can increase the frequency. Each run
 refreshes `expires_at` on jobs it still sees, so live roles stay fresh and
 stale ones expire out of the listings.
 
