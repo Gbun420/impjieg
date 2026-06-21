@@ -34,21 +34,25 @@ const HOMEPAGE_SECTORS = [
 ] as const;
 
 async function StatsSection() {
-  const supabase = await createClient();
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("status, salary_min, salary_max, expires_at")
-    .eq("status", "active")
-    .gte("expires_at", new Date().toISOString());
-
-  const salaryCoverage = deriveEmployerComplianceSummary((jobs || []) as Array<{
-    status: "active";
-    salary_min: number | null;
-    salary_max: number | null;
-  }>);
+  let activeJobs = 0;
+  try {
+    const supabase = await createClient();
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("status, salary_min, salary_max, expires_at")
+      .eq("status", "active")
+      .gte("expires_at", new Date().toISOString());
+    activeJobs = deriveEmployerComplianceSummary((jobs || []) as Array<{
+      status: "active";
+      salary_min: number | null;
+      salary_max: number | null;
+    }>).activeJobs;
+  } catch {
+    activeJobs = 0;
+  }
 
   const stats = [
-    { value: `${salaryCoverage.activeJobs} active roles`, note: "Updated daily", Icon: Building2 },
+    { value: activeJobs > 0 ? `${activeJobs} active roles` : "Live Malta roles", note: "Updated daily", Icon: Building2 },
     { value: "Salary visibility", note: "Clearer pay signals", Icon: Banknote },
     { value: "30-day freshness", note: "Expired roles drop off", Icon: Clock },
     { value: "Direct apply", note: "No middlemen", Icon: CheckCircle2 },
@@ -70,21 +74,27 @@ async function StatsSection() {
 }
 
 async function LatestJobs() {
-  const supabase = await createClient();
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("*, employers(id, name, slug, logo_url, location)")
-    .eq("status", "active")
-    .gte("expires_at", new Date().toISOString())
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(12);
+  let jobs: JobWithEmployer[] | null = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("jobs")
+      .select("*, employers(id, name, slug, logo_url, location)")
+      .eq("status", "active")
+      .gte("expires_at", new Date().toISOString())
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(12);
+    jobs = data as unknown as JobWithEmployer[] | null;
+  } catch {
+    jobs = null;
+  }
 
   if (!jobs || jobs.length === 0) {
     return null;
   }
 
-  const typedJobs = jobs as unknown as JobWithEmployer[];
+  const typedJobs = jobs;
   const featuredJobs = typedJobs.filter((job) => job.is_featured);
   const standardJobs = typedJobs.filter((job) => !job.is_featured);
   const displayJobs = [
