@@ -1,18 +1,19 @@
 import Link from "next/link";
 
 /**
- * The impjieg.work wordmark, recreated as crisp, theme-aware text in a rounded
- * display face (Baloo 2) to match the brand logo. "impjieg" in ink, ".work" in
- * the coral accent. To use the exact artwork instead, drop it at
- * public/logo.svg and render it here with next/image.
+ * The impjieg.work wordmark in a rounded display face (Baloo 2). "impjieg" in
+ * ink (or white on dark surfaces via `onDark`), ".work" in the coral accent.
+ * To use the exact artwork, drop it at public/logo.svg and render with next/image.
  */
 export function ImpjiegLogo({
   href = "/",
   compact = false,
+  onDark = false,
   className = "",
 }: {
   href?: string;
   compact?: boolean;
+  onDark?: boolean;
   className?: string;
 }) {
   return (
@@ -24,7 +25,7 @@ export function ImpjiegLogo({
         compact ? "text-xl" : "text-[1.7rem]"
       } ${className}`}
     >
-      <span className="text-foreground">impjieg</span>
+      <span className={onDark ? "text-white" : "text-foreground"}>impjieg</span>
       <span className="text-primary">.work</span>
     </Link>
   );
