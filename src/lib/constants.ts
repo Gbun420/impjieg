@@ -52,19 +52,39 @@ export const REMOTE_OPTIONS = [
   "Hybrid",
 ] as const;
 
+// Malta-only. Employment/iGaming hubs first, then other localities, Gozo as a
+// region. Kept in sync with the aggregator's locality normalizer
+// (src/lib/aggregator/normalize.ts) so imported job locations are filterable
+// and each has a /jobs/sector/{sector}/location/{location} landing page.
 export const LOCATIONS = [
   "Valletta",
   "Sliema",
   "St. Julian's",
+  "Gzira",
+  "Ta' Xbiex",
+  "Msida",
+  "San Gwann",
+  "Swieqi",
   "Birkirkara",
   "Mosta",
+  "Naxxar",
+  "St Paul's Bay",
+  "Mellieha",
   "Qormi",
-  "Zabbar",
-  "San Gwann",
   "Marsa",
-  "Msida",
+  "Hamrun",
+  "Pieta",
+  "Floriana",
+  "Santa Venera",
   "Attard",
+  "Balzan",
+  "Zabbar",
+  "Paola",
+  "Marsascala",
+  "Luqa",
+  "Zebbug",
   "Mgarr",
+  "Gozo",
 ] as const;
 
 export const PRICING = {
