@@ -277,17 +277,14 @@ export default async function JobDetailPage({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_0.42fr]">
         {/* Main content */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="space-y-8">
           {/* Header */}
-          <Card className="overflow-hidden border-border/70 bg-harbor text-foreground shadow-[0_26px_80px_rgba(11,18,32,0.15)]">
+          <Card className="overflow-hidden">
             <div className={`h-1 w-full ${
-              j.is_featured
-                ? "bg-[linear-gradient(90deg,var(--primary)_0%,var(--secondary)_100%)]"
-                : "bg-border/30"
+              j.is_featured ? "bg-primary" : "bg-border/30"
             }`} />
-            <div className="relative overflow-hidden p-6 sm:p-7">
-              <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.16),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.1),transparent_28%)]" />
-              <div className="relative">
+            <div className="p-6 sm:p-7">
+              <div>
                 <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                   Role signal
                 </p>
