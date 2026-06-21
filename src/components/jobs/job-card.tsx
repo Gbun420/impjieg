@@ -21,24 +21,6 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-function getAvatarColor(name: string) {
-  const colors = [
-    "bg-primary/15",
-    "bg-secondary/15",
-    "bg-accent/15",
-    "bg-success/15",
-    "bg-warning/15",
-    "bg-purple-500/15",
-    "bg-pink-500/15",
-    "bg-orange-500/15",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-}
-
 export default function JobCard({ job, isSaved = false, isAuthenticated = false }: JobCardProps) {
   const salaryText = (job.salary_min || job.salary_max)
     ? `${formatSalary(job.salary_min ?? 0)}${job.salary_max ? ` - ${formatSalary(job.salary_max)}` : "+"}`
@@ -46,17 +28,16 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
 
   const employerName = job.employers?.name || "Unknown Company";
   const initials = getInitials(employerName);
-  const avatarColor = getAvatarColor(employerName);
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-[1.5rem] border p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-lg sm:p-5 ${
+      className={`group relative overflow-hidden rounded-[1.5rem] border p-4 transition-all duration-150 hover:-translate-y-0.5 sm:p-5 shadow-[0_1px_2px_rgba(11,27,46,0.04),0_12px_32px_-14px_rgba(11,27,46,0.10)] hover:shadow-[0_2px_4px_rgba(11,27,46,0.05),0_24px_48px_-18px_rgba(11,27,46,0.16)] ${
         job.is_featured
-          ? "border-primary/30 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04)_50%,rgba(255,255,255,0.84))]"
-          : "border-border/80 bg-white/82 backdrop-blur hover:bg-white"
+          ? "border-primary/30 bg-primary/[0.04]"
+          : "border-border bg-card"
       }`}
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-[linear-gradient(180deg,#1E63FF,#14C7B7)] opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-primary opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
         <Link href={`/jobs/${job.employers.slug}/${job.slug}`} className="min-w-0 flex-1">
           <div className="flex items-start gap-3 sm:gap-4">
@@ -81,7 +62,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 />
               ) : (
                 <span
-                  className={`text-base sm:text-lg font-semibold uppercase text-foreground ${avatarColor}`}
+                  className="text-base sm:text-lg font-bold uppercase text-foreground/70"
                   aria-hidden="true"
                 >
                   {initials}
