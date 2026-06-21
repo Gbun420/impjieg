@@ -11,14 +11,52 @@ import { createHash } from "node:crypto";
 import { SECTORS } from "@/lib/constants";
 import type { NormalizedJob } from "./types";
 
-/** Common Malta localities used to recognise a Malta-based role from free text. */
-const MALTA_LOCALITIES = [
-  "malta", "valletta", "sliema", "st julian", "st. julian", "saint julian", "gzira",
-  "msida", "birkirkara", "qormi", "mosta", "naxxar", "san gwann", "ta' xbiex",
-  "ta xbiex", "marsa", "mriehel", "central business district", "floriana", "pieta",
-  "swieqi", "gozo", "victoria gozo", "paola", "fgura", "zebbug", "attard", "balzan",
-  "santa venera", "hamrun", "marsascala", "marsaskala", "luqa", "gudja", "kalkara",
+/**
+ * Canonical Malta localities/regions and their match aliases. Labels follow the
+ * site's LOCATIONS taxonomy where possible so aggregated jobs line up with the
+ * location filters; other common localities (and Gozo as a region) are also
+ * recognised. This board is Malta-only — a job's location is always a Malta
+ * locality or region, never another country.
+ */
+const MALTA_LOCALITIES: Array<{ label: string; aliases: string[] }> = [
+  { label: "Valletta", aliases: ["valletta", "il-belt"] },
+  { label: "Sliema", aliases: ["sliema"] },
+  { label: "St. Julian's", aliases: ["st julian", "st. julian", "saint julian", "san giljan", "san ġiljan", "paceville"] },
+  { label: "Gzira", aliases: ["gzira", "gżira"] },
+  { label: "Ta' Xbiex", aliases: ["ta' xbiex", "ta xbiex"] },
+  { label: "Msida", aliases: ["msida"] },
+  { label: "Birkirkara", aliases: ["birkirkara", "b'kara"] },
+  { label: "Mosta", aliases: ["mosta"] },
+  { label: "Qormi", aliases: ["qormi"] },
+  { label: "Zabbar", aliases: ["zabbar", "żabbar"] },
+  { label: "San Gwann", aliases: ["san gwann"] },
+  { label: "Marsa", aliases: ["marsa"] },
+  { label: "Attard", aliases: ["attard"] },
+  { label: "Mgarr", aliases: ["mgarr", "mġarr"] },
+  { label: "Swieqi", aliases: ["swieqi"] },
+  { label: "Naxxar", aliases: ["naxxar"] },
+  { label: "St Paul's Bay", aliases: ["st paul", "st. paul", "san pawl", "bugibba", "qawra"] },
+  { label: "Mellieha", aliases: ["mellieha", "mellieħa"] },
+  { label: "Paola", aliases: ["paola"] },
+  { label: "Hamrun", aliases: ["hamrun", "ħamrun"] },
+  { label: "Marsascala", aliases: ["marsascala", "marsaskala"] },
+  { label: "Floriana", aliases: ["floriana"] },
+  { label: "Pieta", aliases: ["pieta", "pietà"] },
+  { label: "Santa Venera", aliases: ["santa venera", "mriehel", "mrieħel", "central business district"] },
+  { label: "Luqa", aliases: ["luqa"] },
+  { label: "Zebbug", aliases: ["zebbug", "żebbuġ"] },
+  { label: "Balzan", aliases: ["balzan"] },
+  { label: "Gozo", aliases: ["gozo", "għawdex", "ghawdex", "victoria gozo", "rabat gozo", "marsalforn", "xlendi", "nadur", "xewkija", "ghajnsielem", "għajnsielem"] },
 ];
+
+/** Canonical Malta locality/region for free text, or null if none recognised. */
+function recognizeMaltaLocality(text: string): string | null {
+  const t = text.toLowerCase();
+  for (const { label, aliases } of MALTA_LOCALITIES) {
+    if (aliases.some((a) => t.includes(a))) return label;
+  }
+  return null;
+}
 
 /**
  * Keyword → sector mapping. Values are validated against SECTORS at runtime;
@@ -51,13 +89,20 @@ export function mapSector(job: NormalizedJob): string {
   return fallbackSector();
 }
 
-/** True when the role is plausibly Malta-based (or remote hiring into Malta). */
+/** True only for Malta-based roles. This board is Malta-only — never other countries. */
 export function isMaltaJob(job: NormalizedJob): boolean {
-  const text = `${job.location} ${job.title}`.toLowerCase();
-  if (MALTA_LOCALITIES.some((loc) => text.includes(loc))) return true;
-  // A purely remote posting on a Malta employer's board is acceptable.
-  if (job.remoteType === "Remote" && /remote/i.test(job.location || "")) return true;
-  return false;
+  const text = `${job.location} ${job.title}`;
+  if (recognizeMaltaLocality(text)) return true;
+  return /\bmalta\b/i.test(text);
+}
+
+/**
+ * Normalize an imported job's location to a Malta locality/region. By the time
+ * this runs the job has already passed isMaltaJob, so it always returns a Malta
+ * value: a recognised locality/region, or "Malta" when only the country is given.
+ */
+export function normalizeMaltaLocation(raw: string): string {
+  return recognizeMaltaLocality(raw || "") ?? "Malta";
 }
 
 export function normalizeRemote(job: NormalizedJob): "Remote" | "Hybrid" | "On-site" {

@@ -24,6 +24,7 @@ import {
   isMaltaJob,
   mapSector,
   normalizeJobType,
+  normalizeMaltaLocation,
   normalizeRemote,
   parseSalary,
 } from "./normalize";
@@ -252,7 +253,7 @@ async function importOneJob(
       .update({
         title: job.title,
         description,
-        location: job.location || "Malta",
+        location: normalizeMaltaLocation(job.location),
         sector,
         job_type: jobType,
         remote_type: remoteType,
@@ -283,7 +284,7 @@ async function importOneJob(
             title: job.title,
             slug,
             description,
-            location: job.location || "Malta",
+            location: normalizeMaltaLocation(job.location),
             sector,
             job_type: jobType,
             seniority: null,
