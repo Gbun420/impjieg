@@ -32,7 +32,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-primary text-primary-foreground shadow-[0_1px_2px_rgba(11,27,46,0.10),0_10px_22px_-8px_rgba(251,59,78,0.50)] hover:bg-primary-hover hover:-translate-y-0.5",
+        "bg-accent text-accent-foreground shadow-[0_1px_2px_rgba(26,22,19,0.12),0_12px_24px_-8px_rgba(255,196,0,0.60)] hover:bg-[#E8A800] hover:-translate-y-0.5",
       secondary:
         "border border-secondary/25 bg-secondary/10 text-secondary hover:border-secondary/35 hover:bg-secondary/18",
       outline:

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Inter, Manrope, Baloo_2 } from "next/font/google";
+import { Barlow, Inter, Manrope, Baloo_2 } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/header";
@@ -9,9 +9,11 @@ import { SITE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-const sora = Sora({
+// Thick, modern display face for headlines.
+const barlow = Barlow({
   subsets: ["latin"],
-  variable: "--font-sora",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-barlow",
   display: "swap",
 });
 
@@ -101,8 +103,8 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F7F4EC" },
-    { media: "(prefers-color-scheme: dark)", color: "#08111F" },
+    { media: "(prefers-color-scheme: light)", color: "#FFFBED" },
+    { media: "(prefers-color-scheme: dark)", color: "#14110D" },
   ],
 };
 
@@ -114,7 +116,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${sora.variable} ${inter.variable} ${manrope.variable} ${baloo.variable}`}
+      className={`h-full antialiased ${barlow.variable} ${inter.variable} ${manrope.variable} ${baloo.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">

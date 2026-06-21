@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Companies",
+  title: "Companies Hiring in Malta",
   description: "Browse companies hiring in Malta. Discover company culture, workplace highlights, and open job roles.",
 };
 import { Card } from "@/components/ui/card";
@@ -38,11 +38,17 @@ export default async function CompaniesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-        Companies
-      </h1>
+    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <header className="max-w-2xl">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          Companies hiring in Malta
+        </h1>
+        <p className="mt-3 text-lg text-muted-foreground">
+          Explore employers actively hiring across Malta — their open roles, locations, and what it&apos;s like to work there.
+        </p>
+      </header>
 
+      <div className="mt-10">
       {!employers || employers.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-border/50 bg-card/50 py-20 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
@@ -105,6 +111,7 @@ export default async function CompaniesPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

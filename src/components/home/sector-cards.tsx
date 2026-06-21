@@ -53,10 +53,10 @@ export function SectorCards() {
             key={slug}
             href={`/jobs/sector/${slug}`}
             aria-label={`${name} jobs in Malta`}
-            className="group relative aspect-[9/16] w-[150px] shrink-0 snap-start overflow-hidden rounded-[1.25rem] ring-1 ring-border transition-all duration-200 hover:-translate-y-1 hover:ring-2 hover:ring-primary/40 sm:w-[176px]"
+            className="group relative aspect-[9/16] w-[150px] shrink-0 snap-start overflow-hidden rounded-[1.25rem] ring-1 ring-border transition-all duration-200 hover:-translate-y-1 hover:ring-2 hover:ring-accent/70 sm:w-[176px]"
           >
             {/* base */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#173657] to-[#0B1B2E]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#272019] to-[#0C0A08]" />
             {image && (
               <Image
                 src={image}
@@ -67,7 +67,7 @@ export function SectorCards() {
               />
             )}
             {/* legibility scrim */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B1B2E] via-[#0B1B2E]/35 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0C0A08] via-[#0C0A08]/45 to-transparent" />
             {!image && (
               <Icon
                 className="absolute right-4 top-4 h-9 w-9 text-white/15"
@@ -77,7 +77,7 @@ export function SectorCards() {
             )}
             <div className="absolute inset-x-0 bottom-0 p-4">
               <h3 className="text-[0.95rem] font-semibold leading-tight text-white">{name}</h3>
-              <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-white/55 transition-colors group-hover:text-primary">
+              <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-white/55 transition-colors group-hover:text-accent">
                 View roles
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>

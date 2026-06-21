@@ -25,7 +25,7 @@ const companyLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-[#08111F] text-white">
+    <footer className="border-t border-border bg-[#14110D] text-white">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
@@ -33,9 +33,6 @@ export default function Footer() {
             <p className="mt-3 text-sm leading-6 text-white/64">
               Malta&apos;s hiring marketplace for salary, work-mode, and employer clarity.
             </p>
-            <span className="mt-3 inline-flex rounded-full border border-primary/30 bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
-              Malta hiring signal
-            </span>
           </div>
 
           <div>

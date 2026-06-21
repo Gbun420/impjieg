@@ -134,10 +134,8 @@ export default function PricingPage() {
           Employer pricing
         </p>
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-          Plans for every hiring stage{" "}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            how often you hire
-          </span>
+          Pricing that scales with{" "}
+          <span className="text-primary">how often you hire</span>
         </h1>
         <p className="mt-3 text-lg text-muted-foreground">
           Start with one listing, add visibility when a role needs attention, or move to a repeatable hiring plan.
@@ -225,7 +223,7 @@ export default function PricingPage() {
                   A premium listing with stronger placement and faster candidate attention.
                 </p>
                 <div className="mt-5 flex items-baseline gap-1">
-                  <span className="font-mono text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  <span className="font-mono text-4xl font-bold text-primary">
                     €{PRICING.featured.price}
                   </span>
                   <span className="text-muted-foreground">/listing</span>
@@ -465,20 +463,20 @@ export default function PricingPage() {
       </div>
 
       {/* CTA */}
-      <div className="mt-16 rounded-[2rem] border border-primary/20 bg-[radial-gradient(circle_at_top,rgba(30,99,255,0.08),transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)] p-8 text-center shadow-sm">
-        <h2 className="text-2xl font-bold text-foreground">
+      <div className="mt-16 overflow-hidden rounded-[2rem] bg-gradient-to-b from-[#272019] to-[#0C0A08] p-10 text-center shadow-[0_24px_60px_-20px_rgba(12,10,8,0.5)]">
+        <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Ready to hire smarter?
         </h2>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mx-auto mt-3 max-w-md text-white/70">
           Post your first role in under 2 minutes. No contracts, no hidden fees.
         </p>
-        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild variant="primary" size="lg">
             <Link href="/employer/post-job">
               Post a role — €{PRICING.standard.price}
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg">
+          <Button asChild variant="outline" size="lg" className="border-white/25 bg-white/10 text-white hover:bg-white/20">
             <Link href="/contact">
               Contact Sales
             </Link>

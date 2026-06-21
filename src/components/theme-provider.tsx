@@ -28,9 +28,9 @@ function getInitialTheme(): Theme {
     return stored;
   }
 
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  // Default to the light "sunlight" brand theme; visitors can opt into dark
+  // via the header toggle (their choice persists in localStorage).
+  return "light";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
