@@ -21,17 +21,9 @@ import {
   MapPin,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
+import { SectorCards } from "@/components/home/sector-cards";
 
 export const dynamic = "force-dynamic";
-
-const HOMEPAGE_SECTORS = [
-  "iGaming",
-  "Technology",
-  "Legal & Compliance",
-  "Finance & Banking",
-  "Marketing & Media",
-  "Retail & E-commerce",
-] as const;
 
 async function StatsSection() {
   let activeJobs = 0;
@@ -128,14 +120,6 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-border/60 py-20 sm:py-28">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <div className="animate-fade-in-up">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.07] px-4 py-1.5 text-sm font-semibold text-primary">
-              <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
-              Live Malta roles, updated daily
-            </div>
-
             <h1 className="mx-auto max-w-[15ch] text-5xl font-extrabold tracking-[-0.035em] text-foreground sm:text-6xl lg:text-[4.25rem] lg:leading-[1.05]">
               Find your next opportunity in Malta.
             </h1>
@@ -328,17 +312,7 @@ export default async function HomePage() {
               All sectors <ArrowRight className="inline h-3.5 w-3.5 ml-0.5" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {HOMEPAGE_SECTORS.map((sector) => (
-              <Link
-                key={sector}
-                href={`/jobs?sector=${encodeURIComponent(sector)}`}
-                className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card-hover hover:shadow-sm"
-              >
-                {sector}
-              </Link>
-            ))}
-          </div>
+          <SectorCards />
         </div>
       </section>
 
