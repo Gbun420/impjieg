@@ -2,9 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 /**
- * Brand logo. On light surfaces (header, auth) renders the actual impjieg.work
- * artwork. On dark surfaces (footer) the navy artwork would disappear, so it
- * falls back to a white wordmark in the rounded brand face.
+ * Brand logo — the actual impjieg.work artwork. Uses the white variant on dark
+ * surfaces (footer) and the standard navy variant on light surfaces (header, auth).
  */
 export function ImpjiegLogo({
   href = "/",
@@ -17,22 +16,6 @@ export function ImpjiegLogo({
   onDark?: boolean;
   className?: string;
 }) {
-  if (onDark) {
-    return (
-      <Link
-        href={href}
-        aria-label="Impjieg — Find your next opportunity"
-        style={{ fontFamily: "var(--font-logo), system-ui, sans-serif" }}
-        className={`inline-flex select-none items-baseline font-extrabold leading-none tracking-[-0.01em] ${
-          compact ? "text-xl" : "text-[1.6rem]"
-        } ${className}`}
-      >
-        <span className="text-white">impjieg</span>
-        <span className="text-primary">.work</span>
-      </Link>
-    );
-  }
-
   return (
     <Link
       href={href}
@@ -40,10 +23,10 @@ export function ImpjiegLogo({
       className={`inline-flex items-center ${className}`}
     >
       <Image
-        src="/logo.png"
+        src={onDark ? "/logo-white.png" : "/logo.png"}
         alt="Impjieg — Find your next opportunity"
-        width={1931}
-        height={617}
+        width={960}
+        height={306}
         priority
         className={`${compact ? "h-7" : "h-9"} w-auto`}
       />
