@@ -19,7 +19,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # This project needs --legacy-peer-deps (peer conflicts), which makes the
+        # lockfile incompatible with strict `npm ci`. Use the same install Vercel uses.
+        run: npm install --legacy-peer-deps
 
       - name: Lint
         run: npm run lint
