@@ -1,5 +1,19 @@
 # Impjieg Brand Modernization Execution Plan
 
+> ⚠️ **SUPERSEDED 2026-06-21 — brand pivot to "Sunlight" (black · white · yellow).**
+> The navy-ink + coral system described below is **no longer the source of truth.**
+> Current brand (implemented in `src/styles/globals.css`):
+> - **Canvas:** white `#FFFFFF` + warm cream sections `#FFFBED`
+> - **Text / `--primary`:** warm near-black `#1A1613` (keeps the many `text-primary` accents legible)
+> - **Accent / `--accent`:** sunny yellow `#FFC400` — fills & CTAs use yellow with **dark** text; deeper gold `#E0A400` / `#8A6300` for hovers and accent text on light surfaces
+> - **Dark panels (footer, sector cards, CTAs):** warm-black gradient `from-[#272019] to-[#0C0A08]`
+> - **Display font:** Barlow (thick, modern); **body:** Inter
+> - **Logo / icons:** black wordmark + gold accent on light; white + yellow on dark; yellow favicon tile + black "i"
+> - Default theme is **light** (sunlight); dark mode available via the header toggle
+>
+> Rationale: a cheerful, optimistic identity for a stressful job-search audience. The phase
+> structure below stays useful as a map of *which surfaces* to touch, but use the palette above.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Reposition Impjieg as Malta's modern jobs marketplace for tech, digital, and iGaming talent, with a dark-ink Mediterranean-tech brand system that is consistent across public UI, metadata, and lifecycle surfaces.
