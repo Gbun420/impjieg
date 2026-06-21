@@ -33,7 +33,14 @@ const SECTORS: Sector[] = [
  * gradient + sector icon (deliberately not stock photography).
  */
 const IMAGES: Record<string, string> = {
-  // igaming: "/sectors/igaming.jpg",
+  igaming: "/sectors/igaming.jpg",
+  technology: "/sectors/technology.jpg",
+  "finance-banking": "/sectors/finance-banking.jpg",
+  healthcare: "/sectors/healthcare.jpg",
+  "marketing-media": "/sectors/marketing-media.jpg",
+  "legal-compliance": "/sectors/legal-compliance.jpg",
+  "tourism-hospitality": "/sectors/tourism-hospitality.jpg",
+  "construction-engineering": "/sectors/construction-engineering.jpg",
 };
 
 export function SectorCards() {
