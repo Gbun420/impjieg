@@ -72,7 +72,7 @@ function SignupForm() {
           </div>
         </div>
       )}
-      <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+      <div className="rounded-[1.75rem] border border-border/70 bg-gradient-to-br from-[#272019] to-[#0C0A08] p-5 text-white shadow-[0_20px_60px_rgba(12,10,8,0.14)]">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
@@ -251,7 +251,7 @@ export default function SignupPage() {
     <Suspense
       fallback={
         <div className="space-y-6">
-          <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+          <div className="rounded-[1.75rem] border border-border/70 bg-gradient-to-br from-[#272019] to-[#0C0A08] p-5 text-white shadow-[0_20px_60px_rgba(12,10,8,0.14)]">
             <div className="h-6 w-40 rounded bg-white/10" />
             <div className="mt-4 h-4 w-full max-w-lg rounded bg-white/10" />
           </div>

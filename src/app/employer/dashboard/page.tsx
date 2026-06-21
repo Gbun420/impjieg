@@ -154,7 +154,7 @@ export default async function EmployerDashboardPage() {
       </div>
 
       <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
-        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] p-5">
+        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(255,196,0,0.08),rgba(255,196,0,0.04))] p-5">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
@@ -233,7 +233,7 @@ export default async function EmployerDashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="overflow-hidden border-border/70 bg-surface shadow-sm">
-          <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] p-5">
+          <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(255,196,0,0.08),rgba(255,196,0,0.04))] p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
@@ -300,7 +300,7 @@ export default async function EmployerDashboardPage() {
         </Card>
       </div>
 
-      <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,rgba(14,23,45,0.98),rgba(23,37,76,0.94)_55%,rgba(12,17,29,0.98))] p-6 text-white shadow-lg sm:p-8">
+      <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,#272019,#14110D_55%,#0C0A08)] p-6 text-white shadow-lg sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
             <Badge variant="info" className="border-white/10 bg-white/10 text-white">

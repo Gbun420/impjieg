@@ -6,7 +6,7 @@ export async function generateQrCodeSvg(data: string): Promise<string> {
     width: 200,
     margin: 2,
     color: {
-      dark: "#08111F",
+      dark: "#1A1613",
       light: "#FFFFFF",
     },
   });

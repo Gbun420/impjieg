@@ -66,7 +66,7 @@ function SummaryGrid({ metrics }: { metrics: SummaryMetric[] }) {
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
         <Card key={metric.label} className="overflow-hidden border-border/70 bg-surface p-5 shadow-sm">
-          <div className="h-1 w-full rounded-full bg-[linear-gradient(90deg,#1E63FF_0%,#14C7B7_100%)]" />
+          <div className="h-1 w-full rounded-full bg-[linear-gradient(90deg,#FFC400_0%,#E0A400_100%)]" />
           <p className="mt-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {metric.label}
           </p>
@@ -91,7 +91,7 @@ function Panel({
 }) {
   return (
     <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
-      <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(30,99,255,0.95)_0%,rgba(20,199,183,0.95)_100%)]" />
+      <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(255,196,0,0.95)_0%,rgba(224,164,0,0.95)_100%)]" />
       <div className="p-6">
         <div className="flex flex-col gap-1">
           <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
@@ -156,7 +156,7 @@ function SectionItem({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)] sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(26,22,19,0.04)] sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-foreground">{title}</p>
@@ -260,7 +260,7 @@ function AggregationConsole({ data }: { data: AdminConsoleData }) {
           {data.aggregationSources.map((source) => (
             <div
               key={source.id}
-              className="rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+              className="rounded-[1.25rem] border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(26,22,19,0.04)]"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>

@@ -118,6 +118,7 @@ export default async function HomePage() {
   return (
     <div>
       <section className="relative overflow-hidden border-b border-border/60 py-20 sm:py-28">
+        <div className="sunlight-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px]" aria-hidden="true" />
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <div className="animate-fade-in-up">
             <h1 className="mx-auto max-w-[15ch] text-5xl font-extrabold tracking-[-0.035em] text-foreground sm:text-6xl lg:text-[4.25rem] lg:leading-[1.05]">

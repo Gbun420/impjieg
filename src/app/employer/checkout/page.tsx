@@ -114,7 +114,7 @@ export default function CheckoutPage({
       )}
 
       <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
-        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] px-6 py-5">
+        <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(255,196,0,0.08),rgba(255,196,0,0.04))] px-6 py-5">
           <h2 className="text-lg font-semibold text-foreground">
             Order summary
           </h2>

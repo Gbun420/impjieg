@@ -79,10 +79,10 @@ export function buildJobAlertDigestEmail({
       const jobUrl = safeUrlHref(job.url, "#");
 
       return `
-        <li style="margin:0 0 14px;padding:16px;border:1px solid #DBE4F0;border-radius:16px;background:#FFFFFF;list-style:none;">
-          <a href="${jobUrl}" style="font-weight:800;color:#0B1220;text-decoration:none;">${escapeHtml(job.title)}</a><br>
+        <li style="margin:0 0 14px;padding:16px;border:1px solid #ECE5D6;border-radius:16px;background:#FFFFFF;list-style:none;">
+          <a href="${jobUrl}" style="font-weight:800;color:#1A1613;text-decoration:none;">${escapeHtml(job.title)}</a><br>
           <span style="display:inline-block;margin-top:6px;color:#64748B;">${escapeHtml(job.employerName)} · ${escapeHtml(job.location)} · ${escapeHtml(job.jobType)}${job.remoteType ? ` · ${escapeHtml(job.remoteType)}` : ""}</span><br>
-          <span style="display:inline-block;margin-top:8px;color:#1E63FF;font-weight:800;">${escapeHtml(salary)}</span>
+          <span style="display:inline-block;margin-top:8px;color:#8A6300;font-weight:800;">${escapeHtml(salary)}</span>
         </li>
       `;
     })
@@ -99,7 +99,7 @@ export function buildJobAlertDigestEmail({
         label: "Browse all jobs",
         href: browseJobsUrl,
       },
-      footerHtml: `You are receiving this email because you created a job alert on Impjieg. <a href="${unsubscribeUrl}" style="color:#1E63FF;">Unsubscribe</a>`,
+      footerHtml: `You are receiving this email because you created a job alert on Impjieg. <a href="${unsubscribeUrl}" style="color:#8A6300;">Unsubscribe</a>`,
     }),
   };
 }
@@ -125,7 +125,7 @@ export function buildJobAlertConfirmationEmail({
         label: "Browse the latest jobs",
         href: browseJobsUrl,
       },
-      footerHtml: `If you no longer want these alerts, you can <a href="${unsubscribeUrl}" style="color:#1E63FF;">unsubscribe here</a>.`,
+      footerHtml: `If you no longer want these alerts, you can <a href="${unsubscribeUrl}" style="color:#8A6300;">unsubscribe here</a>.`,
     }),
   };
 }
