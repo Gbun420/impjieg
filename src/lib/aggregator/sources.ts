@@ -4,13 +4,15 @@
  * Provider is detected from the source's `feed_url` host, so no schema change
  * is needed — operators just paste the public ATS URL. Supported shapes:
  *
- *   Greenhouse: https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true
- *   Lever:      https://api.lever.co/v0/postings/{company}?mode=json
- *   Workable:   https://apply.workable.com/api/v1/widget/accounts/{subdomain}?details=true
+ *   Greenhouse:     https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true
+ *   Lever:          https://api.lever.co/v0/postings/{company}?mode=json
+ *   Workable:       https://apply.workable.com/api/v1/widget/accounts/{subdomain}?details=true
+ *   Teamtailor:     https://{company}.teamtailor.com/jobs.json  (JSON Feed; location in _jobposting JSON-LD)
+ *   SmartRecruiters: https://api.smartrecruiters.com/v1/companies/{id}/postings?limit=100
  *
- * Greenhouse and Lever expose stable, documented, auth-free JSON APIs. The
- * Workable widget endpoint is public but less formally documented — verify it
- * returns the expected shape for a given account before enabling that source.
+ * Greenhouse, Lever, Teamtailor, and SmartRecruiters expose stable, auth-free
+ * public JSON. The Workable widget endpoint is public but less formally
+ * documented — verify it returns the expected shape before enabling a source.
  *
  * Every fetch is defensive: it times out, checks status, and tolerates missing
  * fields rather than throwing, so one bad source never breaks a run.
@@ -31,6 +33,8 @@ export function detectProvider(feedUrl: string): AtsProvider | null {
   if (host.includes("greenhouse.io")) return "greenhouse";
   if (host.includes("lever.co")) return "lever";
   if (host.includes("workable.com")) return "workable";
+  if (host.includes("teamtailor.com")) return "teamtailor";
+  if (host.includes("smartrecruiters.com")) return "smartrecruiters";
   return null;
 }
 
@@ -168,6 +172,98 @@ function parseWorkable(payload: unknown): NormalizedJob[] {
     .filter((j): j is NormalizedJob => j !== null);
 }
 
+// ---- Teamtailor (public JSON Feed at {company}.teamtailor.com/jobs.json) -----
+// Each item carries a schema.org JobPosting under `_jobposting`, where the
+// structured location lives (jobLocation[].address.addressLocality/Country).
+
+function parseTeamtailor(payload: unknown): NormalizedJob[] {
+  const items = asArray((payload as { items?: unknown })?.items);
+  return items
+    .map((raw): NormalizedJob | null => {
+      const it = raw as Record<string, unknown>;
+      const id = str(it.id);
+      const title = str(it.title);
+      if (!id || !title) return null;
+      const jp = (it._jobposting as Record<string, unknown>) || {};
+      const locations = asArray(jp.jobLocation);
+      // When a job lists several offices, prefer the Malta one.
+      let address: Record<string, unknown> = {};
+      for (const loc of locations) {
+        const addr = ((loc as Record<string, unknown>)?.address as Record<string, unknown>) || {};
+        if (!Object.keys(address).length) address = addr;
+        if (str(addr.addressCountry).toUpperCase() === "MT" || /malta/i.test(str(addr.addressRegion))) {
+          address = addr;
+          break;
+        }
+      }
+      const parts = [str(address.addressLocality), str(address.addressRegion)].filter(Boolean);
+      if (str(address.addressCountry).toUpperCase() === "MT" && !/malta/i.test(parts.join(" "))) {
+        parts.push("Malta");
+      }
+      return {
+        externalId: id,
+        title,
+        description: str(it.content_html) || str(jp.description),
+        location: parts.join(", "),
+        applyUrl: str(it.url),
+        canonicalUrl: str(it.url),
+        remoteType: null,
+        jobType: null,
+        department: null,
+        salaryMin: null,
+        salaryMax: null,
+        postedAt: str(it.date_published) || str(jp.datePosted) || null,
+      };
+    })
+    .filter((j): j is NormalizedJob => j !== null);
+}
+
+// ---- SmartRecruiters (public Posting API: /v1/companies/{id}/postings) -------
+// The list endpoint has no job body, so we build a short summary; jobs link out.
+
+function parseSmartRecruiters(payload: unknown): NormalizedJob[] {
+  const content = asArray((payload as { content?: unknown })?.content);
+  return content
+    .map((raw): NormalizedJob | null => {
+      const it = raw as Record<string, unknown>;
+      const id = str(it.id);
+      const title = str(it.name);
+      if (!id || !title) return null;
+      const loc = (it.location as Record<string, unknown>) || {};
+      const country = str(loc.country); // lowercase ISO-2
+      const remote = Boolean(loc.remote);
+      const hybrid = Boolean(loc.hybrid);
+      const parts = [str(loc.city), str(loc.region)].filter(Boolean);
+      if (country.toLowerCase() === "mt") parts.push("Malta");
+      else if (country) parts.push(country.toUpperCase());
+      const location = parts.join(", ") || (remote ? "Remote" : "");
+      const companyId = str((it.company as Record<string, unknown>)?.identifier);
+      const applyUrl = companyId
+        ? `https://jobs.smartrecruiters.com/${companyId}/${id}`
+        : str(it.ref);
+      const dept =
+        str((it.department as Record<string, unknown>)?.label) ||
+        str((it.function as Record<string, unknown>)?.label) ||
+        null;
+      const summary = [title, dept, location].filter(Boolean).join(" · ");
+      return {
+        externalId: id,
+        title,
+        description: `<p>${summary}</p>`,
+        location,
+        applyUrl,
+        canonicalUrl: applyUrl,
+        remoteType: remote ? "Remote" : hybrid ? "Hybrid" : null,
+        jobType: str((it.typeOfEmployment as Record<string, unknown>)?.label) || null,
+        department: dept,
+        salaryMin: null,
+        salaryMax: null,
+        postedAt: str(it.releasedDate) || null,
+      };
+    })
+    .filter((j): j is NormalizedJob => j !== null);
+}
+
 /** Fetch + parse one source by its `feed_url`. Throws on network/parse failure. */
 export async function fetchSource(source: JobSource): Promise<SourceFetchResult> {
   if (!source.feed_url) {
@@ -183,7 +279,9 @@ export async function fetchSource(source: JobSource): Promise<SourceFetchResult>
   let jobs: NormalizedJob[];
   if (provider === "greenhouse") jobs = parseGreenhouse(payload);
   else if (provider === "lever") jobs = parseLever(payload);
-  else jobs = parseWorkable(payload);
+  else if (provider === "workable") jobs = parseWorkable(payload);
+  else if (provider === "teamtailor") jobs = parseTeamtailor(payload);
+  else jobs = parseSmartRecruiters(payload);
 
   return { jobs, provider };
 }

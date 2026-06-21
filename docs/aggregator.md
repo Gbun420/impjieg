@@ -35,12 +35,27 @@ Aggregated jobs **always link out** via `application_url` and carry a
 | Greenhouse | `https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true` |
 | Lever      | `https://api.lever.co/v0/postings/{company}?mode=json` |
 | Workable   | `https://apply.workable.com/api/v1/widget/accounts/{subdomain}?details=true` |
+| Teamtailor | `https://{company}.teamtailor.com/jobs.json` |
+| SmartRecruiters | `https://api.smartrecruiters.com/v1/companies/{id}/postings?limit=100` |
 
 > **Verify every source before enabling it.** Greenhouse and Lever are stable,
 > documented, auth-free JSON APIs. Workable's public widget endpoint is less
 > formal — confirm it returns the expected shape for the specific account. Do
 > not assume a given Malta company uses a given ATS; check its careers page.
 > Prefer official feeds/ATS APIs over scraping, and respect each site's ToS.
+
+## Quick seed (verified Malta sources)
+
+To wire all the curl-verified Malta feeds at once (Betsson, Kaizen Gaming, Nium,
+BrainRocket, Soft2Bet, EveryMatrix), run:
+
+```bash
+# imports as drafts for review by default; add SEED_DEFAULT_STATUS=confirmed to publish live
+SEED_DEFAULT_STATUS=confirmed npx tsx scripts/aggregator-seed-malta-sources.ts
+```
+
+Then dry-run the import (below). To add one source by hand, use the per-company
+script instead.
 
 ## Setup (per company)
 

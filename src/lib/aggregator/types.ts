@@ -11,7 +11,7 @@
  * narrow casts, mirroring the existing repo style (see src/lib/actions/jobs.ts).
  */
 
-export type AtsProvider = "greenhouse" | "lever" | "workable";
+export type AtsProvider = "greenhouse" | "lever" | "workable" | "teamtailor" | "smartrecruiters";
 
 /** A `job_sources` row (subset we rely on). */
 export interface JobSource {
