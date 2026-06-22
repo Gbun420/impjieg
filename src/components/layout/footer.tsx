@@ -5,6 +5,7 @@ import { ImpjiegLogo } from "@/components/brand";
 const jobSeekerLinks = [
   { label: "Browse Jobs", href: "/jobs" },
   { label: "Salary Calculator", href: "/salary-calculator" },
+  { label: "Salary Guide", href: "/salaries" },
   { label: "Job Alerts", href: "/alerts" },
   { label: "Companies", href: "/companies" },
 ];

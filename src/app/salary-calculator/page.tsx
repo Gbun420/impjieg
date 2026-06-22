@@ -68,12 +68,12 @@ export default function SalaryCalculatorPage() {
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
-              <Link href="/jobs">
-                Browse jobs with salary <ArrowRight className="ml-2 h-4 w-4" />
+              <Link href="/salaries">
+                Salary ranges by role <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="w-full border-white/25 bg-white/10 text-white hover:bg-white/20 sm:w-auto">
-              <Link href="/employer/post-job">Post a role with salary visibility</Link>
+              <Link href="/jobs">Browse jobs with salary</Link>
             </Button>
           </div>
         </div>
