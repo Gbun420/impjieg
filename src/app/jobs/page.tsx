@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
+import { Briefcase } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -215,7 +216,11 @@ async function JobsContent({
   ]);
 
   if (jobsError || !jobsData) {
-    return <p className="text-sm text-muted-foreground">Error loading jobs.</p>;
+    return (
+      <div className="mt-6 rounded-2xl border border-border bg-card px-6 py-12 text-center">
+        <p className="text-sm text-muted-foreground">We couldn&apos;t load roles right now. Please refresh in a moment.</p>
+      </div>
+    );
   }
 
   const typedJobs = jobsData;
@@ -225,6 +230,9 @@ async function JobsContent({
   const savedJobIds = new Set((savedJobs || []).map((row) => row.job_id));
   const totalJobs = jobsCount ?? typedJobs.length;
   const hasNextPage = from + typedJobs.length < totalJobs;
+  const hasFilters = Boolean(
+    queryText || sector || location || workTypes.length > 0 || experience.length > 0 || visa || searchParams.salaryMin || searchParams.salaryMax
+  );
 
   return (
     <>
@@ -233,11 +241,34 @@ async function JobsContent({
       </Suspense>
       <div className="mt-6">
         {typedJobs.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No jobs found matching your criteria.</p>
-            <Link href="/jobs" className="mt-3 inline-flex text-sm text-primary hover:text-primary-hover transition-colors">
-              Clear filters
-            </Link>
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">
+              <Briefcase className="h-7 w-7 text-[#141210]" aria-hidden="true" />
+            </div>
+            <h2 className="mt-4 text-lg font-bold text-foreground">
+              {hasFilters ? "No roles match your filters" : "No live roles just yet"}
+            </h2>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+              {hasFilters
+                ? "Try widening your search — clear a filter or two and check again."
+                : "New Malta roles are added regularly. Set a free alert and we'll email you the moment something fits."}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {hasFilters ? (
+                <Button asChild variant="primary" size="lg">
+                  <Link href="/jobs">Clear filters</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="primary" size="lg">
+                    <Link href="/alerts">Set a job alert</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link href="/jobs/sector/igaming">Browse iGaming roles</Link>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         ) : (
           <>
@@ -275,7 +306,7 @@ export default async function JobsPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <header className="mb-8">
-        <p className="text-sm font-semibold text-primary">Malta job marketplace</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Malta job marketplace</p>
         <h1 className="mt-2 text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
           Jobs in Malta
         </h1>

@@ -31,20 +31,20 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-[1.5rem] border p-4 transition-all duration-150 hover:-translate-y-0.5 sm:p-5 shadow-[0_1px_2px_rgba(11,27,46,0.04),0_12px_32px_-14px_rgba(11,27,46,0.10)] hover:shadow-[0_2px_4px_rgba(11,27,46,0.05),0_24px_48px_-18px_rgba(11,27,46,0.16)] ${
+      className={`group relative overflow-hidden rounded-[1.5rem] border p-4 transition-all duration-150 hover:-translate-y-0.5 sm:p-5 shadow-[0_1px_2px_rgba(26,22,19,0.04),0_12px_32px_-14px_rgba(26,22,19,0.10)] hover:shadow-[0_2px_4px_rgba(26,22,19,0.05),0_24px_48px_-18px_rgba(26,22,19,0.16)] ${
         job.is_featured
-          ? "border-primary/30 bg-primary/[0.04]"
+          ? "border-transparent bg-accent/[0.07] ring-1 ring-accent/50"
           : "border-border bg-card"
       }`}
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-primary opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-accent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
         <Link href={`/jobs/${job.employers.slug}/${job.slug}`} className="min-w-0 flex-1">
           <div className="flex items-start gap-3 sm:gap-4">
             <div
               className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl transition-all ${
               job.is_featured
-                ? "bg-primary/10 ring-1 ring-primary/10"
+                ? "bg-accent/20 ring-1 ring-accent/30"
                 : "bg-muted"
             }`}
               {...(job.employers.logo_url
@@ -75,7 +75,7 @@ export default function JobCard({ job, isSaved = false, isAuthenticated = false 
                 <h2 className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                   {job.title}
                 </h2>
-                  {job.is_featured ? <Badge variant="default">Priority role</Badge> : null}
+                  {job.is_featured ? <Badge variant="accent">Priority role</Badge> : null}
               </div>
 
               <p className="mt-0.5 flex items-center gap-1 text-sm text-foreground/75">
