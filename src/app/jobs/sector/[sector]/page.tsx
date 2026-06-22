@@ -8,6 +8,7 @@ import { Briefcase } from "lucide-react";
 import JobCard from "@/components/jobs/job-card";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
+import { getSectorContent } from "@/lib/seo/sector-content";
 
 export const dynamic = "force-dynamic";
 
@@ -40,10 +41,13 @@ export async function generateMetadata({
   const sectorLabel = slugToLabel(sector);
   const canonicalUrl = `https://impjieg.vercel.app/jobs/sector/${sector}`;
   const hasJobs = await checkSectorHasJobs(sectorLabel);
+  const sectorContent = getSectorContent(sector);
 
   const metadata: Metadata = {
     title: `${sectorLabel} Jobs in Malta | Impjieg`,
-    description: `Browse ${sectorLabel.toLowerCase()} jobs in Malta with salary, work-mode, employer, and freshness signals. Apply directly.`,
+    description:
+      sectorContent?.intro ??
+      `Browse ${sectorLabel.toLowerCase()} jobs in Malta with salary, work-mode, employer, and freshness signals. Apply directly.`,
     alternates: {
       canonical: canonicalUrl,
     },
@@ -102,6 +106,7 @@ export default async function SectorPage({
 
   const relatedSectors = SECTORS.filter((s) => labelToSlug(s) !== sector).slice(0, 8);
   const hasJobs = typedJobs.length > 0;
+  const sectorContent = getSectorContent(sector);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -188,21 +193,44 @@ export default async function SectorPage({
         <h2 className="text-xl font-semibold text-foreground">
           Working in {sectorLabel} in Malta
         </h2>
-        <div className="mt-4 space-y-3 text-muted-foreground">
-          <p>
-            Malta&apos;s {sectorLabel.toLowerCase()} sector is one of the fastest-growing industries on the island.
-            With a business-friendly environment, English as an official language, and a strategic location
-            between Europe and North Africa, Malta attracts top talent and international companies alike.
-          </p>
-          <p>
-            Salaries in {sectorLabel.toLowerCase()} are competitive, with many roles offering additional benefits
-            such as remote work options, health insurance, and professional development budgets.
-            Many employers are also visa-friendly, making Malta an attractive destination for international professionals.
-          </p>
-          <p>
-            Browse all available {sectorLabel.toLowerCase()} roles above, or filter by specific locations across Malta.
-          </p>
-        </div>
+        {sectorContent ? (
+          <div className="mt-4 space-y-4 text-muted-foreground">
+            <p className="leading-7">{sectorContent.intro}</p>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Common {sectorLabel.toLowerCase()} roles in Malta</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {sectorContent.roles.map((role) => (
+                  <span key={role} className="rounded-full border border-border bg-card px-3 py-1 text-sm text-muted-foreground">
+                    {role}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <p className="leading-7">
+              Browse the latest {sectorLabel.toLowerCase()} roles above, filter by location across Malta, or{" "}
+              <Link href="/jobs" className="font-medium text-foreground underline decoration-accent decoration-2 underline-offset-2 hover:text-primary">
+                see all jobs in Malta
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-3 text-muted-foreground">
+            <p>
+              Malta&apos;s {sectorLabel.toLowerCase()} sector is one of the fastest-growing industries on the island.
+              With a business-friendly environment, English as an official language, and a strategic location
+              between Europe and North Africa, Malta attracts top talent and international companies alike.
+            </p>
+            <p>
+              Salaries in {sectorLabel.toLowerCase()} are competitive, with many roles offering additional benefits
+              such as remote work options, health insurance, and professional development budgets.
+              Many employers are also visa-friendly, making Malta an attractive destination for international professionals.
+            </p>
+            <p>
+              Browse all available {sectorLabel.toLowerCase()} roles above, or filter by specific locations across Malta.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );
