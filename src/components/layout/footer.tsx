@@ -6,6 +6,7 @@ const jobSeekerLinks = [
   { label: "Browse Jobs", href: "/jobs" },
   { label: "Salary Calculator", href: "/salary-calculator" },
   { label: "Salary Guide", href: "/salaries" },
+  { label: "Work Permit Checker", href: "/work-permit-checker" },
   { label: "Job Alerts", href: "/alerts" },
   { label: "Companies", href: "/companies" },
 ];

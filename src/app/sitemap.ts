@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/contact",
       "/salary-calculator",
       "/salaries",
+      "/work-permit-checker",
       "/alerts",
       "/blog",
       "/saved-jobs",
