@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SectorCards } from "@/components/home/sector-cards";
+import { LatestArticles } from "@/components/home/latest-articles";
 
 export const dynamic = "force-dynamic";
 
@@ -311,6 +312,13 @@ export default function HomePage() {
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LatestJobs />
           </Suspense>
+        </Reveal>
+      </section>
+
+      {/* From the blog */}
+      <section className="border-t border-border py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <LatestArticles />
         </Reveal>
       </section>
 
