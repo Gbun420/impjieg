@@ -62,20 +62,14 @@ export const metadata: Metadata = {
     siteName: "Impjieg",
     title: SITE.title,
     description: SITE.description,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: SITE.title,
-      },
-    ],
+    // Images come from the file-based opengraph-image.tsx routes (branded,
+    // per-page). The root app/opengraph-image.tsx provides the default.
   },
   twitter: {
     card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
-    images: ["/og-image.png"],
+    // twitter:image is generated from the opengraph-image.tsx routes.
   },
   robots: {
     index: true,
