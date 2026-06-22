@@ -92,17 +92,13 @@ export default async function SectorPage({
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
-  const { data: jobs, error } = await query.limit(JOBS_PER_PAGE);
+  const { data: jobs } = await query.limit(JOBS_PER_PAGE);
 
-  if (error || !jobs) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-16 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
-        We couldn&apos;t load roles right now. Please refresh in a moment.
-      </div>
-    );
-  }
-
-  const typedJobs = jobs as unknown as JobWithEmployer[];
+  // Always render the page and its SEO content, even when the job list is empty
+  // or the query errors. The static guidance, roles, and internal links are
+  // valuable on their own, and `force-dynamic` means a transient error
+  // self-heals on the next request — far better than hiding everything.
+  const typedJobs = (jobs ?? []) as unknown as JobWithEmployer[];
 
   const relatedSectors = SECTORS.filter((s) => labelToSlug(s) !== sector).slice(0, 8);
   const hasJobs = typedJobs.length > 0;
@@ -142,6 +138,7 @@ export default async function SectorPage({
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <Button asChild variant="primary" size="lg"><Link href="/alerts">Set a job alert</Link></Button>
               <Button asChild variant="outline" size="lg"><Link href="/jobs">Browse all jobs</Link></Button>
+              <Button asChild variant="ghost" size="lg"><Link href="/blog">Read the Malta guides</Link></Button>
             </div>
           </div>
         ) : (

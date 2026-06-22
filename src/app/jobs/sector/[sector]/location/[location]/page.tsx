@@ -154,13 +154,11 @@ export default async function SectorLocationPage({
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
-  const { data: jobs, error } = await query.limit(JOBS_PER_PAGE);
+  const { data: jobs } = await query.limit(JOBS_PER_PAGE);
 
-  if (error || !jobs) {
-    return <p>Error loading jobs.</p>;
-  }
-
-  const typedJobs = jobs as unknown as JobWithEmployer[];
+  // Always render the page and its SEO content, even on an empty board or a
+  // query error — the guidance and internal links matter on their own.
+  const typedJobs = (jobs ?? []) as unknown as JobWithEmployer[];
 
   const relatedSectors = SECTORS.filter((s) => labelToSlug(s) !== sector).slice(0, 6);
   const relatedLocations = LOCATIONS.filter((l) => labelToSlug(l) !== location).slice(0, 6);
@@ -195,9 +193,12 @@ export default async function SectorLocationPage({
           <Card className="p-8 text-center">
             <h2 className="text-lg font-semibold text-foreground">No jobs found</h2>
             <p className="mt-2 text-muted-foreground">
-              No {sectorLabel.toLowerCase()} roles in {locationLabel} at the moment. Try another location or sector.
+              No {sectorLabel.toLowerCase()} roles in {locationLabel} at the moment. Set a free alert, or explore nearby.
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <Button asChild variant="primary">
+                <Link href="/alerts">Set a job alert</Link>
+              </Button>
               <Button asChild variant="outline">
                 <Link href={`/jobs/sector/${sector}`}>
                   View all {sectorLabel} jobs

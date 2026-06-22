@@ -266,6 +266,9 @@ async function JobsContent({
                   <Button asChild variant="outline" size="lg">
                     <Link href="/jobs/sector/igaming">Browse iGaming roles</Link>
                   </Button>
+                  <Button asChild variant="ghost" size="lg">
+                    <Link href="/blog">Read the Malta guides</Link>
+                  </Button>
                 </>
               )}
             </div>

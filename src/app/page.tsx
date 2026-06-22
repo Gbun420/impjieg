@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Search,
   MapPin,
+  Briefcase,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SectorCards } from "@/components/home/sector-cards";
@@ -85,7 +86,27 @@ async function LatestJobs() {
   }
 
   if (!jobs || jobs.length === 0) {
-    return null;
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Latest Jobs</h2>
+          <p className="text-sm text-muted-foreground mt-1">Fresh opportunities updated regularly</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card px-6 py-14 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">
+            <Briefcase className="h-7 w-7 text-[#141210]" aria-hidden="true" />
+          </div>
+          <h3 className="mt-4 text-lg font-bold text-foreground">New Malta roles are landing soon</h3>
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+            Be the first to know — set a free job alert, or read our guides to working in Malta while you wait.
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Button asChild variant="primary" size="lg"><Link href="/alerts">Set a job alert</Link></Button>
+            <Button asChild variant="outline" size="lg"><Link href="/blog">Read the Malta guides</Link></Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const typedJobs = jobs;
