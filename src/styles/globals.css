@@ -292,3 +292,54 @@ h4,
   a { color: inherit !important; }
   .bg-gradient-to-r, .bg-gradient-to-br { background: none !important; }
 }
+
+/* ---- Accessibility ---- */
+
+/* Skip-to-content link: hidden until focused by keyboard users */
+.skip-to-content {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  border-radius: var(--radius-full);
+  background: var(--color-ink, #1A1613);
+  color: #fff;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(26, 22, 19, 0.25);
+  transition: transform 0.15s ease;
+}
+.skip-to-content:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Visible keyboard-focus ring on all interactive elements (mouse clicks
+   don't trigger :focus-visible, so this only shows for keyboard/AT users). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Respect users who prefer reduced motion: neutralise animations, transitions,
+   and smooth scrolling site-wide. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
