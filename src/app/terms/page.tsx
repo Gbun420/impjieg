@@ -91,10 +91,10 @@ export default function TermsPage() {
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>Standard listing (€29):</strong> 30-day listing on the Platform.
+            <strong>Standard listing (€39):</strong> 30-day listing on the Platform.
           </li>
           <li>
-            <strong>Featured listing (€59):</strong> 30-day listing with homepage
+            <strong>Featured listing (€69):</strong> 30-day listing with homepage
             placement and priority positioning.
           </li>
         </ul>

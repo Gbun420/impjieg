@@ -423,7 +423,7 @@ export default function HomePage() {
             {[
               {
                 q: "Is it free to post a job?",
-                a: "Yes — your first listing is free. No credit card required. After that, standard listings are €29 for 30 days, and featured listings (3× visibility) are €59. Volume discounts and subscription plans are available for teams hiring regularly.",
+                a: "Yes — your first listing is free. No credit card required. After that, standard listings are €39 for 30 days, and featured listings (3× visibility) are €69. Volume discounts and subscription plans are available for teams hiring regularly.",
               },
               {
                 q: "How does employer verification work?",

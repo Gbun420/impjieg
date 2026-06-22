@@ -90,12 +90,12 @@ export const LOCATIONS = [
 export const PRICING = {
   standard: {
     label: "Standard",
-    price: 29,
+    price: 39,
     description: "30-day listing on Impjieg",
   },
   featured: {
     label: "Featured",
-    price: 59,
+    price: 69,
     description: "30-day listing + homepage feature + top of search",
   },
 } as const;

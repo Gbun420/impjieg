@@ -44,7 +44,7 @@ export async function createCheckoutSession(
     return { error: "Employer profile not found" };
   }
 
-  const amount = listingType === "featured" ? 5900 : 2900;
+  const amount = listingType === "featured" ? 6900 : 3900;
 
   const paymentsTable = supabase.from("payments") as unknown as PaymentsMutationTable;
 

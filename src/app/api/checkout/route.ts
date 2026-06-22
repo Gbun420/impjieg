@@ -154,7 +154,10 @@ export async function POST(request: Request) {
 
     // Handle job listing payments
     if (jobId && listingType) {
-      amount = listingType === "featured" ? 5900 : 2900;
+      // NOTE: the actual charge for listings comes from the Stripe Price object
+      // (STRIPE_PRICE_STANDARD / STRIPE_PRICE_FEATURED) referenced below; this
+      // amount drives the payment record + discount math, so keep them in sync.
+      amount = listingType === "featured" ? 6900 : 3900;
       priceId = resolveListingPrice(listingType);
       if (!priceId) {
         return NextResponse.json({ error: "Listing price not configured" }, { status: 500 });
