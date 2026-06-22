@@ -1,10 +1,15 @@
 import { ImageResponse } from "next/og";
 
 /**
- * Shared branded Open Graph / social-preview image renderer (Sunlight brand:
- * warm-black background, sunny-yellow accent, Barlow display type). Used by the
- * file-based `opengraph-image.tsx` routes so every shared link gets a specific,
- * on-brand 1200x630 card. Pure code-generated — no DB, works at the edge/build.
+ * Shared branded Open Graph / social-preview image renderer (Sunlight brand).
+ * Used by the file-based `opengraph-image.tsx` routes and the social-card route
+ * so every shared link / post gets a specific, on-brand 1200x630 card with the
+ * real Impjieg logo. Pure code-generated — runs on the edge.
+ *
+ *  - variant "dark"  (default): warm-black gradient, white logo — used for the
+ *    per-page link previews (legible on light social feeds).
+ *  - variant "light": sunny-yellow gradient, dark logo on a white chip, black
+ *    text — the brand / social-share card.
  */
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -13,6 +18,7 @@ export const OG_CONTENT_TYPE = "image/png" as const;
 type OgFont = { name: string; data: ArrayBuffer; weight: 400 | 600 | 700; style: "normal" };
 
 let fontsPromise: Promise<OgFont[]> | null = null;
+let logosPromise: Promise<{ white: string; dark: string }> | null = null;
 
 function loadFonts(): Promise<OgFont[]> {
   if (!fontsPromise) {
@@ -27,6 +33,24 @@ function loadFonts(): Promise<OgFont[]> {
   return fontsPromise;
 }
 
+function toDataUri(buf: ArrayBuffer): string {
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  // btoa is available on the edge runtime
+  return `data:image/png;base64,${btoa(binary)}`;
+}
+
+function loadLogos(): Promise<{ white: string; dark: string }> {
+  if (!logosPromise) {
+    logosPromise = Promise.all([
+      fetch(new URL("./logo-white.png", import.meta.url)).then((r) => r.arrayBuffer()),
+      fetch(new URL("./logo-dark.png", import.meta.url)).then((r) => r.arrayBuffer()),
+    ]).then(([white, dark]) => ({ white: toDataUri(white), dark: toDataUri(dark) }));
+  }
+  return logosPromise;
+}
+
 /** Scale the headline down as it gets longer so it always fits ~3 lines. */
 function titleSize(title: string): number {
   const len = title.length;
@@ -36,26 +60,42 @@ function titleSize(title: string): number {
   return 46;
 }
 
-/** The Impjieg mark: dark rounded square + white bar + yellow sun dot. */
-function Mark() {
-  return (
-    <div style={{ display: "flex", position: "relative", width: 56, height: 56, borderRadius: 15, background: "#14110D" }}>
-      <div style={{ position: "absolute", left: 23, top: 25, width: 10, height: 19, borderRadius: 5, background: "#FFFFFF" }} />
-      <div style={{ position: "absolute", left: 22, top: 11, width: 12, height: 12, borderRadius: 6, background: "#FFC400" }} />
-    </div>
-  );
-}
+const LOGO_W = 300;
+const LOGO_H = Math.round((300 * 306) / 960); // preserve the 960x306 aspect ratio
 
 export async function renderOgImage({
   eyebrow,
   title,
   footer = "Real salaries · verified employers · Malta",
+  variant = "dark",
 }: {
   eyebrow: string;
   title: string;
   footer?: string;
+  variant?: "dark" | "light";
 }) {
-  const fonts = await loadFonts();
+  const [fonts, logos] = await Promise.all([loadFonts(), loadLogos()]);
+  const light = variant === "light";
+
+  const theme = light
+    ? {
+        background: "linear-gradient(135deg, #FFD93B 0%, #FFC400 100%)",
+        glow: "radial-gradient(circle, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 70%)",
+        title: "#141210",
+        eyebrowBg: "#1A1613",
+        eyebrowText: "#FFFFFF",
+        footer: "rgba(20,18,16,0.72)",
+        footerBar: "#1A1613",
+      }
+    : {
+        background: "linear-gradient(135deg, #272019 0%, #0C0A08 100%)",
+        glow: "radial-gradient(circle, rgba(255,196,0,0.20) 0%, rgba(255,196,0,0) 70%)",
+        title: "#FFFFFF",
+        eyebrowBg: "#FFC400",
+        eyebrowText: "#1A1613",
+        footer: "rgba(255,255,255,0.62)",
+        footerBar: "#FFC400",
+      };
 
   return new ImageResponse(
     (
@@ -67,12 +107,11 @@ export async function renderOgImage({
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #272019 0%, #0C0A08 100%)",
+          background: theme.background,
           fontFamily: "Barlow",
           position: "relative",
         }}
       >
-        {/* sunny-yellow glow, top-right (echoes the homepage hero) */}
         <div
           style={{
             position: "absolute",
@@ -81,19 +120,21 @@ export async function renderOgImage({
             width: 560,
             height: 560,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,196,0,0.20) 0%, rgba(255,196,0,0) 70%)",
+            background: theme.glow,
             display: "flex",
           }}
         />
 
-        {/* brand lockup */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Mark />
-          <div style={{ display: "flex", alignItems: "baseline", fontSize: 32, fontWeight: 700 }}>
-            <span style={{ color: "#FFFFFF" }}>impjieg</span>
-            <span style={{ color: "#FFC400" }}>.work</span>
+        {/* brand logo (real artwork) */}
+        {light ? (
+          <div style={{ display: "flex", background: "#FFFFFF", borderRadius: 18, padding: "16px 22px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logos.dark} width={260} height={Math.round((260 * 306) / 960)} alt="" />
           </div>
-        </div>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logos.white} width={LOGO_W} height={LOGO_H} alt="" />
+        )}
 
         {/* eyebrow + headline */}
         <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
@@ -101,8 +142,8 @@ export async function renderOgImage({
             <div
               style={{
                 display: "flex",
-                background: "#FFC400",
-                color: "#1A1613",
+                background: theme.eyebrowBg,
+                color: theme.eyebrowText,
                 fontSize: 22,
                 fontWeight: 700,
                 textTransform: "uppercase",
@@ -117,7 +158,7 @@ export async function renderOgImage({
           <div
             style={{
               display: "flex",
-              color: "#FFFFFF",
+              color: theme.title,
               fontSize: titleSize(title),
               fontWeight: 700,
               lineHeight: 1.06,
@@ -130,8 +171,8 @@ export async function renderOgImage({
         </div>
 
         {/* footer */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16, color: "rgba(255,255,255,0.62)", fontSize: 25, fontWeight: 600 }}>
-          <div style={{ display: "flex", width: 44, height: 5, borderRadius: 3, background: "#FFC400" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 16, color: theme.footer, fontSize: 25, fontWeight: 600 }}>
+          <div style={{ display: "flex", width: 44, height: 5, borderRadius: 3, background: theme.footerBar }} />
           <span>{footer}</span>
         </div>
       </div>
