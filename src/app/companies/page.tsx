@@ -51,8 +51,8 @@ export default async function CompaniesPage() {
       <div className="mt-10">
       {!employers || employers.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-border/50 bg-card/50 py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
-            <Building2 className="h-8 w-8 text-muted-foreground" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/20">
+            <Building2 className="h-8 w-8 text-[#141210]" />
           </div>
           <p className="mt-4 text-lg font-medium text-foreground">
             No companies yet
@@ -65,10 +65,10 @@ export default async function CompaniesPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(employers as EmployerWithJobRef[]).map((employer) => (
             <Link key={employer.id} href={`/companies/${employer.slug}`}>
-              <Card className="group h-full p-6">
+              <Card className="group h-full p-6 transition-all duration-200 hover:-translate-y-1 hover:border-accent">
                 <div className="flex items-start gap-4">
                   <div
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-secondary/20 transition-all"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted/50 transition-all group-hover:bg-accent/20"
                     role="img"
                     aria-label={
                       employer.logo_url

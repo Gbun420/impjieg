@@ -15,6 +15,7 @@ import CompanyTrustPanel from "@/components/companies/company-trust-panel";
 import CompanyAbout from "@/components/companies/company-about";
 import CompanyHiringProcess from "@/components/companies/company-hiring-process";
 import CompanyOpenRoles from "@/components/companies/company-open-roles";
+import { SocialShare } from "@/components/share/social-share";
 import type { Employer, JobWithEmployer } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -143,13 +144,20 @@ export default async function CompanyProfilePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href="/companies"
-          className="group mb-8 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-          Back to companies
-        </Link>
+        <div className="mb-8 flex items-center justify-between gap-3">
+          <Link
+            href="/companies"
+            className="group inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Back to companies
+          </Link>
+          <SocialShare
+            title={`${emp.name} — hiring in Malta`}
+            text={`${emp.name} is hiring in Malta. See their open roles on Impjieg:`}
+            label="Share"
+          />
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="space-y-6">

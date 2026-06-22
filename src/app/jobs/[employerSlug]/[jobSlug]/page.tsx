@@ -24,7 +24,7 @@ import { formatSalary, formatDate, daysAgo, addDaysIso } from "@/lib/utils";
 import { isJobPubliclyLive } from "@/lib/job-visibility";
 import type { CandidateProfile, Database, JobWithEmployer } from "@/lib/supabase/types";
 import ApplyForm from "@/components/jobs/apply-form";
-import { ShareJobButton } from "@/components/jobs/share-job";
+import { SocialShare } from "@/components/share/social-share";
 import { SaveJobButton } from "@/components/jobs/save-job-button";
 import { sanitizeJobDescription, sanitizeJobDescriptionForMetadata } from "@/lib/job-description";
 
@@ -281,7 +281,7 @@ export default async function JobDetailPage({
           {/* Header */}
           <Card className="overflow-hidden">
             <div className={`h-1 w-full ${
-              j.is_featured ? "bg-primary" : "bg-border/30"
+              j.is_featured ? "bg-accent" : "bg-border/30"
             }`} />
             <div className="p-6 sm:p-7">
               <div>
@@ -292,7 +292,7 @@ export default async function JobDetailPage({
                 <div
                   className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
                     j.is_featured
-                      ? "bg-primary/10 ring-1 ring-primary/10"
+                      ? "bg-accent/15 ring-1 ring-accent/25"
                       : "bg-muted"
                   }`}
                   role="img"
@@ -323,7 +323,7 @@ export default async function JobDetailPage({
                           <h1 className="text-2xl font-bold tracking-[-0.05em] text-foreground sm:text-3xl">
                           {j.title}
                         </h1>
-                        {j.is_featured ? <Badge variant="accent" className="border-primary/20 bg-primary/10 text-primary">Priority role</Badge> : null}
+                        {j.is_featured ? <Badge variant="accent">Priority role</Badge> : null}
                       </div>
                       <Link
                         href={`/companies/${j.employers.slug}`}
@@ -339,7 +339,7 @@ export default async function JobDetailPage({
                         authenticated={!!user}
                         redirectTo={`/jobs/${j.employers.slug}/${j.slug}`}
                       />
-                      <ShareJobButton title={j.title} />
+                      <SocialShare title={j.title} text={`Check out this job: ${j.title}`} label="Share" />
                     </div>
                   </div>
                   <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -366,18 +366,18 @@ export default async function JobDetailPage({
 
           {/* Salary */}
           {salaryText ? (
-            <Card className="marketplace-panel border-primary/20">
+            <Card className="marketplace-panel border-accent/40">
               <div className="p-5">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                    <Banknote className="h-4 w-4 text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20">
+                    <Banknote className="h-4 w-4 text-[#141210]" />
                   </div>
-                  <span className="text-sm font-medium text-primary">
+                  <span className="text-sm font-medium text-foreground">
                     Salary signal
                   </span>
                   <Badge variant="success" className="text-xs">Salary shown</Badge>
                 </div>
-                <p className="mt-2 font-mono text-2xl font-bold text-primary">
+                <p className="mt-2 font-mono text-2xl font-bold text-foreground">
                   {salaryText}
                   <span className="text-base font-normal text-muted-foreground">
                     /year
@@ -518,7 +518,7 @@ export default async function JobDetailPage({
         <div className="lg:col-span-1">
           <div className="sticky top-20 space-y-4">
             <Card className="overflow-hidden border-border/70 bg-card shadow-[0_18px_55px_rgba(11,18,32,0.08)]">
-              <div className="border-b border-border/60 bg-primary/5 p-5">
+              <div className="border-b border-border/60 bg-accent/10 p-5">
                 <h2 className="text-base font-semibold text-foreground">
                   Apply for this role
                 </h2>
