@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { escapeXml } from "./jobs/rss/route";
+import { escapeXml } from "./jobs/rss/escape";
 import {
   candidateAlertInputSchema,
   candidateAlertUpdateSchema,
-} from "./candidate/alerts/route";
+} from "./candidate/alerts/schema";
 
 test("escapeXml preserves XML safety for feed content", () => {
   const input = `Senior <Engineer> & "Builder" 'Lead'`;

@@ -4,7 +4,7 @@ import {
   buildJobAlertUnsubscribeUrl,
   createSignedToken,
 } from "@/lib/email-security";
-import { unsubscribeJobAlertWithDeps } from "./route";
+import { unsubscribeJobAlertWithDeps } from "./logic";
 
 async function withSecret<T>(fn: () => T | Promise<T>) {
   const backup = process.env.JOB_ALERT_UNSUBSCRIBE_SECRET;

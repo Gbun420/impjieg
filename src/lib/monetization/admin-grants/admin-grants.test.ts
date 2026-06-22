@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildCommercialGrantAuditRecord } from "./audit";
-import { buildAdminCommercialGrantInsertRow, calculateGrantCreditConsumption } from "./actions";
+import { buildAdminCommercialGrantInsertRow, calculateGrantCreditConsumption } from "./grant-helpers";
 import { isEligibleAdminUser } from "./access";
 import { createAdminCommercialGrantSchema } from "./validation";
 import {

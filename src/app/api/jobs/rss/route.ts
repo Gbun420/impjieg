@@ -2,18 +2,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { SITE } from "@/lib/constants";
 import type { JobWithEmployer } from "@/lib/supabase/types";
+import { escapeXml } from "./escape";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
-
-function escapeXml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
 
 export async function GET() {
   try {

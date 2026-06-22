@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/**/*.test.ts",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "seed:demo": "tsx scripts/seed-demo.ts",
     "qa:seed-dashboard-profiles": "tsx scripts/seed-dashboard-test-profiles.ts",
     "qa:delete-dashboard-profiles": "tsx scripts/delete-dashboard-test-profiles.ts",

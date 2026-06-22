@@ -14,11 +14,27 @@ test("getSupabaseUrl prefers configured environment values", () => {
 });
 
 test("getSupabaseUrl throws when the public Supabase URL is missing", () => {
-  assert.throws(() => getSupabaseUrl(""), /NEXT_PUBLIC_SUPABASE_URL/);
+  // requireEnv only throws outside development (it returns a dev fallback
+  // otherwise), so force production to assert the missing-config behaviour.
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  try {
+    assert.throws(() => getSupabaseUrl(""), /NEXT_PUBLIC_SUPABASE_URL/);
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+  }
 });
 
 test("getSupabaseAnonKey throws when the public Supabase anon key is missing", () => {
-  assert.throws(() => getSupabaseAnonKey(""), /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  try {
+    assert.throws(() => getSupabaseAnonKey(""), /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+  }
 });
 
 test("hasSupabasePublicEnv reports whether the public Supabase config is present", () => {

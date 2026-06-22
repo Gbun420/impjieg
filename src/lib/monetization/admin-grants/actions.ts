@@ -20,6 +20,10 @@ import {
   resolveEmployerCommercialEntitlementsFromGrants,
   selectBestCommercialDiscount,
 } from "./resolver";
+import {
+  buildAdminCommercialGrantInsertRow,
+  calculateGrantCreditConsumption,
+} from "./grant-helpers";
 import type {
   AdminCommercialGrantRow,
   AdminCommercialGrantInsert,
@@ -128,45 +132,6 @@ export async function listCommercialGrantEmployers(
   return (data ?? []) as AdminCommercialGrantEmployerOption[];
 }
 
-export async function buildAdminCommercialGrantInsertRow(
-  payload: ReturnType<typeof createAdminCommercialGrantSchema.parse>,
-  grantedBy: string
-) {
-  return {
-    employer_id: payload.employerId,
-    granted_by: grantedBy,
-    grant_type: payload.grantType,
-    product_id: payload.productId ?? null,
-    entitlement_key: payload.entitlementKey ?? null,
-    plan_key: payload.planKey ?? null,
-    credits_total: payload.creditsTotal ?? null,
-    credits_used: 0,
-    discount_percent: payload.discountPercent ?? null,
-    discount_amount_cents: payload.discountAmountCents ?? null,
-    currency: payload.currency,
-    starts_at: payload.startsAt.toISOString(),
-    expires_at: payload.expiresAt?.toISOString() ?? null,
-    status: payload.status,
-    reason: payload.reason,
-    internal_notes: payload.internalNotes ?? null,
-    metadata: payload.metadata as Json,
-  };
-}
-
-export async function calculateGrantCreditConsumption(grant: AdminCommercialGrantRow) {
-  const creditsTotal = grant.credits_total ?? 0;
-  const nextCreditsUsed = grant.credits_used + 1;
-
-  if (creditsTotal <= 0 || nextCreditsUsed > creditsTotal) {
-    throw new Error("Grant credits have been exhausted");
-  }
-
-  return {
-    nextCreditsUsed,
-    nextStatus: nextCreditsUsed >= creditsTotal ? ("consumed" as const) : ("active" as const),
-  };
-}
-
 function toEmployerVisibleGrant(
   grant: AdminCommercialGrantRow
 ): EmployerVisibleCommercialGrant {
@@ -243,7 +208,7 @@ export async function createAdminCommercialGrant(
   const grantsTable = getCommercialGrantsTable(client);
 
   const { data, error } = await grantsTable
-    .insert([await buildAdminCommercialGrantInsertRow(parsed.data, user.id)])
+    .insert([buildAdminCommercialGrantInsertRow(parsed.data, user.id)])
     .select("*")
     .single();
 
@@ -525,7 +490,7 @@ export async function consumeGrantCredit(input: unknown) {
     throw new Error("Grant is no longer active");
   }
 
-  const { nextCreditsUsed, nextStatus } = await calculateGrantCreditConsumption(grant);
+  const { nextCreditsUsed, nextStatus } = calculateGrantCreditConsumption(grant);
 
   const { data, error } = await grantsTable
     .update({

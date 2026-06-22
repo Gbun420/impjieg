@@ -38,8 +38,13 @@ test("buildEmployerNotificationEmail escapes user-controlled HTML and URLs", () 
   assert.match(payload.html, /&quot; onclick=&quot;alert\(1\)@example\.com/);
   assert.match(payload.html, /Senior &lt;Frontend&gt; Engineer/);
   assert.match(payload.html, /Hello&lt;\/div&gt;/);
-  assert.doesNotMatch(payload.html, /javascript:/);
-  assert.doesNotMatch(payload.html, /onerror=/i);
+  // User text is HTML-escaped and kept as inert visible content, so dangerous
+  // substrings legitimately survive in escaped form (asserted above). The real
+  // security invariant is that no *active* vector is emitted: the cv URL (a real
+  // href) is neutralised to "#", and no live event-handler attributes exist on
+  // any actual tag.
+  assert.match(payload.html, /<a href="#"[^>]*>View CV<\/a>/);
+  assert.doesNotMatch(payload.html, /<[^>]+\son\w+=/i);
   assert.doesNotMatch(payload.html, /<script>/i);
   assert.doesNotMatch(payload.html, /<img/i);
   assert.doesNotMatch(payload.html, /href="javascript:/i);

@@ -5,11 +5,11 @@ import {
   MAX_PARSE_RESUME_BODY_BYTES,
   MAX_RESUME_TEXT_CHARS,
   parseResumeWithDeps,
-} from "./parse-resume/route";
-import { MAX_BIAS_CHECK_TEXT_CHARS, biasCheckWithDeps } from "./bias-check/route";
+} from "./parse-resume/logic";
+import { MAX_BIAS_CHECK_TEXT_CHARS, biasCheckWithDeps } from "./bias-check/logic";
 import {
   matchScoreWithDeps,
-} from "./match-score/route";
+} from "./match-score/logic";
 
 beforeEach(() => {
   resetAiRateLimitState();
