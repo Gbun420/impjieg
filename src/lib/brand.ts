@@ -11,16 +11,16 @@ export const BRAND = {
 } as const;
 
 export const BRAND_PALETTE = {
-  harborInk: "#08111F",
-  ink: "#0B1220",
-  signalBlue: "#2563EB",
-  lagoon: "#14C7B7",
-  deepLagoon: "#0F766E",
+  harborInk: "#14110D",
+  ink: "#1A1613",
+  signalBlue: "#FFC400",
+  lagoon: "#FFC400",
+  deepLagoon: "#E0A400",
   saffron: "#FFB020",
   limestone: "#F7F4EC",
   mist: "#F5F8FC",
   slate: "#64748B",
   deepSlate: "#334155",
   emerald: "#12B76A",
-  rose: "#E5484D",
+  rose: "#FFC400",
 } as const;

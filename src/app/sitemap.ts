@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SECTORS, LOCATIONS, SITE } from "@/lib/constants";
 import { isJobPubliclyLive } from "@/lib/job-visibility";
+import { getAllPosts } from "@/lib/blog/posts";
 import type { Employer } from "@/lib/supabase/types";
 
 type SitemapJobRef = {
@@ -55,6 +56,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
+  const blogPages = getAllPosts().map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
   let jobPages: MetadataRoute.Sitemap = [];
   let companyPages: MetadataRoute.Sitemap = [];
 
@@ -96,5 +104,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // If Supabase is not configured yet, return static pages only
   }
 
-  return [...staticPages, ...seoSectorPages, ...seoLocationPages, ...jobPages, ...companyPages];
+  return [...staticPages, ...seoSectorPages, ...seoLocationPages, ...blogPages, ...jobPages, ...companyPages];
 }

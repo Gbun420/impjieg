@@ -2,11 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { MapPin, Briefcase, Clock, Banknote, ArrowRight } from "lucide-react";
-import { formatSalary, daysAgo } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Briefcase } from "lucide-react";
+import JobCard from "@/components/jobs/job-card";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import { SECTORS, LOCATIONS } from "@/lib/constants";
 
@@ -92,7 +91,11 @@ export default async function SectorPage({
   const { data: jobs, error } = await query.limit(JOBS_PER_PAGE);
 
   if (error || !jobs) {
-    return <p>Error loading jobs.</p>;
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-16 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
+        We couldn&apos;t load roles right now. Please refresh in a moment.
+      </div>
+    );
   }
 
   const typedJobs = jobs as unknown as JobWithEmployer[];
@@ -123,92 +126,25 @@ export default async function SectorPage({
 
       <section aria-label="Job listings">
         {typedJobs.length === 0 ? (
-          <Card className="p-8 text-center">
-            <h2 className="text-lg font-semibold text-foreground">No jobs found</h2>
-            <p className="mt-2 text-muted-foreground">
-              No {sectorLabel.toLowerCase()} roles at the moment. Try another sector.
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">
+              <Briefcase className="h-7 w-7 text-[#141210]" aria-hidden="true" />
+            </div>
+            <h2 className="mt-4 text-lg font-bold text-foreground">No {sectorLabel.toLowerCase()} roles just yet</h2>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+              New roles are added regularly. Set a free alert for {sectorLabel.toLowerCase()} jobs, or explore other sectors below.
             </p>
-          </Card>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button asChild variant="primary" size="lg"><Link href="/alerts">Set a job alert</Link></Button>
+              <Button asChild variant="outline" size="lg"><Link href="/jobs">Browse all jobs</Link></Button>
+            </div>
+          </div>
         ) : (
-          <ul className="space-y-4">
+          <div className="space-y-3">
             {typedJobs.map((job) => (
-              <li key={job.id}>
-                <Link href={`/jobs/${job.employers?.slug}/${job.slug}`}>
-                  <Card className={`group p-5 transition-all hover:shadow-md ${
-                    job.is_featured
-                      ? "border-primary/30 bg-gradient-to-r from-primary/5 to-transparent"
-                      : "hover:border-primary/20"
-                  }`}>
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                          job.is_featured
-                            ? "bg-gradient-to-br from-primary/20 to-secondary/20"
-                            : "bg-muted/50"
-                        }`}
-                        role="img"
-                        aria-label={
-                          job.employers?.logo_url
-                            ? `${job.employers?.name} logo`
-                            : `${job.employers?.name} logo placeholder`
-                        }
-                      >
-                        {job.employers?.logo_url ? (
-                          <Image
-                            src={job.employers.logo_url}
-                            alt={`${job.employers.name} logo`}
-                            width={32}
-                            height={32}
-                            className="rounded-lg object-cover"
-                          />
-                        ) : (
-                          <span aria-hidden="true" className="text-lg font-bold text-muted-foreground">
-                            {job.employers?.name?.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="truncate font-semibold text-foreground group-hover:text-primary transition-colors">
-                            {job.title}
-                          </h3>
-                          {job.is_featured && <Badge variant="default">Featured</Badge>}
-                        </div>
-                        <p className="mt-0.5 text-sm text-muted-foreground">
-                          {job.employers?.name}
-                        </p>
-                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {job.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Briefcase className="h-3.5 w-3.5" />
-                            {job.job_type}
-                          </span>
-                          {job.remote_type && (
-                            <Badge variant="secondary" className="text-xs">{job.remote_type}</Badge>
-                          )}
-                          {job.salary_min && (
-                            <span className="flex items-center gap-1 font-medium text-primary">
-                              <Banknote className="h-3.5 w-3.5" />
-                              {formatSalary(job.salary_min)}
-                              {job.salary_max ? ` - ${formatSalary(job.salary_max)}` : "+"}
-                            </span>
-                          )}
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" />
-                            {daysAgo(job.created_at)}
-                          </span>
-                        </div>
-                      </div>
-                      <ArrowRight className="hidden h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 sm:block" />
-                    </div>
-                  </Card>
-                </Link>
-              </li>
+              <JobCard key={job.id} job={job} />
             ))}
-          </ul>
+          </div>
         )}
       </section>
 
@@ -222,7 +158,7 @@ export default async function SectorPage({
               <Link
                 key={loc}
                 href={`/jobs/sector/${sector}/location/${labelToSlug(loc)}`}
-                className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-accent hover:text-foreground"
               >
                 {loc}
               </Link>
@@ -239,7 +175,7 @@ export default async function SectorPage({
               <Link
                 key={sec}
                 href={`/jobs/sector/${labelToSlug(sec)}`}
-                className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                className="rounded-xl border border-border/50 bg-card p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-accent hover:text-foreground"
               >
                 {sec}
               </Link>
@@ -248,7 +184,7 @@ export default async function SectorPage({
         </div>
       </section>
 
-      <section className="mt-12 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-transparent p-6 sm:p-8">
+      <section className="mt-12 rounded-2xl border border-accent/30 bg-accent/[0.05] p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-foreground">
           Working in {sectorLabel} in Malta
         </h2>

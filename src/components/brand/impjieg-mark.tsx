@@ -18,16 +18,12 @@ export function ImpjiegMark({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect width="64" height="64" rx="18" fill="#08111F" />
-      <path
-        d="M18 43C24.5 35.5 31.5 32 40 28C43.2 26.5 45.8 24.5 48 21"
-        stroke="#2563EB"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <circle cx="32" cy="18" r="5.5" fill="#14C7B7" />
-      <rect x="28" y="27" width="8" height="21" rx="4" fill="#F7F4EC" />
-      <circle cx="48" cy="21" r="4" fill="#14C7B7" />
+      {/* Deep warm-black app tile */}
+      <rect width="64" height="64" rx="16" fill="#14110D" />
+      {/* The "i" stem */}
+      <rect x="27" y="29" width="10" height="20" rx="5" fill="#FFFFFF" />
+      {/* The sunny yellow dot — the brand's signature accent */}
+      <circle cx="32" cy="19" r="6" fill="#FFC400" />
     </svg>
   );
 }

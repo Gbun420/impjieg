@@ -41,13 +41,13 @@ export default function CompanyOpenRoles({
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <Link
               href="/candidate/alerts"
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#174FD1_100%)] px-4 text-sm font-medium text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#E0A400_100%)] px-4 text-sm font-medium text-primary-foreground shadow-[0_12px_28px_rgba(255,196,0,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(255,196,0,0.28)]"
             >
               Create job alert
             </Link>
             <Link
               href={display.sectorLinkHref}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface/90 px-4 text-sm font-medium text-foreground shadow-[0_8px_20px_rgba(11,18,32,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface/90 px-4 text-sm font-medium text-foreground shadow-[0_8px_20px_rgba(20,17,13,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
             >
               {display.sectorLinkLabel}
             </Link>

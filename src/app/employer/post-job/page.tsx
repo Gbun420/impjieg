@@ -154,7 +154,7 @@ export default function PostJobPage() {
       <form action={handleSubmit} className="space-y-8">
         {entitlements && (
           <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
-            <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(30,99,255,0.08),rgba(20,199,183,0.04))] px-6 py-5">
+            <div className="border-b border-border/60 bg-[linear-gradient(135deg,rgba(255,196,0,0.08),rgba(255,196,0,0.04))] px-6 py-5">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                 Hiring add-ons
               </p>
@@ -485,7 +485,7 @@ export default function PostJobPage() {
                   {entitlements && entitlements.credits.featured.remaining > 0 ? (
                     <Badge variant="success">Free with credit</Badge>
                   ) : (
-                    <span className="font-mono text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    <span className="font-mono text-lg font-bold text-foreground">
                       €{PRICING.featured.price}
                     </span>
                   )}

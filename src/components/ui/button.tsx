@@ -28,11 +28,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
 
     const baseStyles =
-      "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-xl active:scale-[0.98]";
+      "inline-flex items-center justify-center font-semibold tracking-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 rounded-full active:scale-[0.98]";
 
     const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
       primary:
-        "bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary-hover)_100%)] text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]",
+        "bg-accent text-accent-foreground shadow-[0_1px_2px_rgba(26,22,19,0.12),0_12px_24px_-8px_rgba(255,196,0,0.60)] hover:bg-[#E8A800] hover:-translate-y-0.5",
       secondary:
         "border border-secondary/25 bg-secondary/10 text-secondary hover:border-secondary/35 hover:bg-secondary/18",
       outline:

@@ -77,7 +77,7 @@ function StatCard({
 }) {
   return (
     <Card className="overflow-hidden border-border/70 bg-surface p-5 shadow-sm">
-      <div className="h-1 w-full rounded-full bg-[linear-gradient(90deg,#1E63FF_0%,#14C7B7_100%)]" />
+      <div className="h-1 w-full rounded-full bg-accent" />
       <div className="mt-4 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
@@ -177,9 +177,8 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] text-white shadow-[0_28px_80px_rgba(11,18,32,0.18)]">
+      <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-gradient-to-br from-[#272019] to-[#0C0A08] text-white shadow-[0_28px_80px_rgba(12,10,8,0.18)]">
         <div className="relative overflow-hidden px-6 py-7 sm:px-8">
-          <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.24),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.16),transparent_28%)]" />
           <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -284,7 +283,7 @@ export default async function AdminDashboardPage() {
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
-          <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(226,76,76,0.95)_0%,rgba(30,99,255,0.95)_48%,rgba(20,199,183,0.95)_100%)]" />
+          <div className="h-1 w-full bg-accent" />
           <div className="p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -329,7 +328,7 @@ export default async function AdminDashboardPage() {
         </Card>
 
         <Card className="overflow-hidden border-border/70 bg-surface p-0 shadow-sm">
-          <div className="h-1 w-full bg-[linear-gradient(90deg,rgba(20,199,183,0.95)_0%,rgba(30,99,255,0.95)_100%)]" />
+          <div className="h-1 w-full bg-accent" />
           <div className="p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -353,7 +352,7 @@ export default async function AdminDashboardPage() {
               {recentAuditLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="rounded-[1.25rem] border border-border/70 bg-muted/20 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                  className="rounded-[1.25rem] border border-border/70 bg-muted/20 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
@@ -506,7 +505,7 @@ export default async function AdminDashboardPage() {
             {recentApplications.map((application) => (
               <div
                 key={application.id}
-                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -556,7 +555,7 @@ export default async function AdminDashboardPage() {
               {recentEmployers.map((employer) => (
                 <div
                   key={employer.id}
-                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                className="rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -586,7 +585,7 @@ export default async function AdminDashboardPage() {
               {recentPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
                 >
                   <div>
                     <p className="font-medium text-foreground">{payment.listing_type}</p>
@@ -619,7 +618,7 @@ export default async function AdminDashboardPage() {
             {recentAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
               >
                 <div>
                   <p className="font-medium text-foreground">{alert.email}</p>
@@ -644,7 +643,7 @@ export default async function AdminDashboardPage() {
             {recentSubscriptions.map((subscription) => (
               <div
                 key={subscription.id}
-                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(11,18,32,0.04)]"
+                className="flex items-center justify-between rounded-2xl border border-border/70 bg-muted/15 p-4 shadow-[0_8px_24px_rgba(12,10,8,0.04)]"
               >
                 <div>
                   <p className="font-medium text-foreground">

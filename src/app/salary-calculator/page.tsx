@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Briefcase } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import SalaryCalculatorForm from "@/components/salary/salary-calculator-form";
 import SalaryResultCard from "@/components/salary/salary-result-card";
 import SalaryBreakdownCard from "@/components/salary/salary-breakdown-card";
@@ -30,27 +30,21 @@ export default function SalaryCalculatorPage() {
 
   return (
     <div data-testid="salary-calculator">
-      <section className="relative overflow-hidden bg-harbor py-10 text-foreground sm:py-16">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#272019] to-[#0C0A08] py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <Briefcase className="h-3.5 w-3.5" />
-            Salary signal
-          </div>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-[-0.055em] text-foreground sm:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
             Malta Salary Calculator
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-8 text-white/70 sm:text-lg">
             Estimate your take-home pay with clearer salary signals.
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
               <Link href="/jobs">
                 Browse jobs with salary <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
+            <Button asChild variant="outline" size="lg" className="w-full border-white/25 bg-white/10 text-white hover:bg-white/20 sm:w-auto">
               <Link href="/employer/post-job">
                 Post a role with salary visibility
               </Link>

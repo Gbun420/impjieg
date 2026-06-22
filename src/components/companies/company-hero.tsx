@@ -55,7 +55,7 @@ export default function CompanyHero({
             priority
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-[#08111F] via-[#0C2240] to-[#1A3A5C]" />
+          <div className="h-full w-full bg-gradient-to-br from-[#272019] to-[#0C0A08]" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
@@ -146,7 +146,7 @@ export default function CompanyHero({
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href={heroCtaHref}
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#174FD1_100%)] px-6 text-base font-medium text-primary-foreground shadow-[0_12px_28px_rgba(30,99,255,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(30,99,255,0.28)]"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary)_0%,#E0A400_100%)] px-6 text-base font-medium text-primary-foreground shadow-[0_12px_28px_rgba(255,196,0,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(255,196,0,0.28)]"
             >
               {heroCtaLabel}
             </Link>
@@ -155,7 +155,7 @@ export default function CompanyHero({
                 href={heroSecondaryHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-surface/90 px-6 text-base font-medium text-foreground shadow-[0_8px_20px_rgba(11,18,32,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
+                className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-surface/90 px-6 text-base font-medium text-foreground shadow-[0_8px_20px_rgba(20,17,13,0.04)] transition-all hover:border-border-hover hover:bg-muted/60"
               >
                 {heroSecondaryLabel}
               </a>

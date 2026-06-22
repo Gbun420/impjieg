@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobWithEmployer } from "@/lib/supabase/types";
 import Link from "next/link";
+import { Briefcase } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -215,7 +216,11 @@ async function JobsContent({
   ]);
 
   if (jobsError || !jobsData) {
-    return <p className="text-sm text-muted-foreground">Error loading jobs.</p>;
+    return (
+      <div className="mt-6 rounded-2xl border border-border bg-card px-6 py-12 text-center">
+        <p className="text-sm text-muted-foreground">We couldn&apos;t load roles right now. Please refresh in a moment.</p>
+      </div>
+    );
   }
 
   const typedJobs = jobsData;
@@ -225,6 +230,9 @@ async function JobsContent({
   const savedJobIds = new Set((savedJobs || []).map((row) => row.job_id));
   const totalJobs = jobsCount ?? typedJobs.length;
   const hasNextPage = from + typedJobs.length < totalJobs;
+  const hasFilters = Boolean(
+    queryText || sector || location || workTypes.length > 0 || experience.length > 0 || visa || searchParams.salaryMin || searchParams.salaryMax
+  );
 
   return (
     <>
@@ -233,11 +241,34 @@ async function JobsContent({
       </Suspense>
       <div className="mt-6">
         {typedJobs.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No jobs found matching your criteria.</p>
-            <Link href="/jobs" className="mt-3 inline-flex text-sm text-primary hover:text-primary-hover transition-colors">
-              Clear filters
-            </Link>
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">
+              <Briefcase className="h-7 w-7 text-[#141210]" aria-hidden="true" />
+            </div>
+            <h2 className="mt-4 text-lg font-bold text-foreground">
+              {hasFilters ? "No roles match your filters" : "No live roles just yet"}
+            </h2>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+              {hasFilters
+                ? "Try widening your search — clear a filter or two and check again."
+                : "New Malta roles are added regularly. Set a free alert and we'll email you the moment something fits."}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {hasFilters ? (
+                <Button asChild variant="primary" size="lg">
+                  <Link href="/jobs">Clear filters</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="primary" size="lg">
+                    <Link href="/alerts">Set a job alert</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link href="/jobs/sector/igaming">Browse iGaming roles</Link>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         ) : (
           <>
@@ -274,34 +305,15 @@ export default async function JobsPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <div className="mb-8 overflow-hidden rounded-[2rem] border border-border/70 bg-[#08111F] p-6 text-white shadow-[0_22px_70px_rgba(11,18,32,0.18)] sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#46D1BE]">
-          Malta marketplace search
+      <header className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Malta job marketplace</p>
+        <h1 className="mt-2 text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
+          Jobs in Malta
+        </h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+          Browse Malta&apos;s tech, digital, iGaming, finance and compliance roles with clear salary, work-mode and employer signals — filter by salary, location, and work mode.
         </p>
-        <div className="mt-3 grid gap-4 lg:grid-cols-[1fr_0.72fr] lg:items-end">
-          <div>
-            <h1 className="text-3xl font-bold tracking-[-0.05em] text-white sm:text-4xl">
-              Browse roles with the signals that matter.
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68 sm:text-base">
-              Filter Malta&apos;s tech, digital, and iGaming jobs by salary range, location, work mode, and hiring context.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center text-xs text-white/68">
-            {["Salary", "Work mode", "Employer"].map((item) => (
-              <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-3">
-                <p className="font-semibold text-white">{item}</p>
-                <p className="mt-1">Signals</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="mb-6">
-        <p className="text-sm text-muted-foreground">
-          Browse live Malta roles with salary, work-mode, employer, and freshness signals.
-        </p>
-      </div>
+      </header>
       <Suspense fallback={<SearchFiltersSkeleton />}>
         <JobsContent searchParams={params} />
       </Suspense>

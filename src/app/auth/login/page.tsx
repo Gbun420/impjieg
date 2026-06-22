@@ -38,20 +38,11 @@ function LoginForm() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(135deg,#0B1220_0%,#121A2B_55%,#0F172A_100%)] p-5 text-white shadow-[0_20px_60px_rgba(11,18,32,0.14)]">
+      <div className="rounded-[1.75rem] border border-border/70 bg-gradient-to-br from-[#272019] to-[#0C0A08] p-5 text-white shadow-[0_20px_60px_rgba(12,10,8,0.14)]">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
-              <Shield className="h-3.5 w-3.5" />
-              Secure sign in
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
-              {destinationLabel}
-            </span>
-          </div>
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.28em] text-white/55">
-              Workspace access
+              Workspace access · {destinationLabel}
             </p>
             <h1 className="text-3xl font-semibold text-white">
               Welcome back
@@ -62,17 +53,17 @@ function LoginForm() {
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
-              <Briefcase className="h-4 w-4 text-signal-teal" />
+              <Briefcase className="h-4 w-4 text-accent" />
               <p className="mt-3 text-sm font-medium">Employer tools</p>
               <p className="mt-1 text-xs text-white/65">Post roles, review applicants, and manage billing.</p>
             </Card>
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
-              <UserRound className="h-4 w-4 text-brand-blue" />
+              <UserRound className="h-4 w-4 text-accent" />
               <p className="mt-3 text-sm font-medium">Candidate workspace</p>
               <p className="mt-1 text-xs text-white/65">Track applications, alerts, and saved roles.</p>
             </Card>
             <Card className="border-white/10 bg-white/5 p-4 text-white shadow-none">
-              <Shield className="h-4 w-4 text-performance-amber" />
+              <Shield className="h-4 w-4 text-accent" />
               <p className="mt-3 text-sm font-medium">Admin access</p>
               <p className="mt-1 text-xs text-white/65">Use the internal admin login when you need console access.</p>
             </Card>

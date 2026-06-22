@@ -14,9 +14,8 @@ type CandidatePortalShellProps = {
 export function CandidatePortalShell({ children }: CandidatePortalShellProps) {
   return (
     <div className="space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,#08111F_0%,#0B1220_48%,#121A2B_100%)] p-0 text-white shadow-[0_28px_80px_rgba(11,18,32,0.2)]">
+      <Card className="overflow-hidden border-border/70 bg-gradient-to-br from-[#272019] to-[#0C0A08] p-0 text-white shadow-[0_28px_80px_rgba(12,10,8,0.2)]">
         <div className="relative overflow-hidden p-6 sm:p-8">
-          <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_top_right,rgba(30,99,255,0.24),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,199,183,0.16),transparent_28%)]" />
           <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-4">
               <div className="flex flex-wrap items-center gap-2">

@@ -5,6 +5,7 @@ import JobCard from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import { Reveal } from "@/components/ui/reveal";
 import { deriveEmployerComplianceSummary } from "@/lib/compliance";
 import {
   Banknote,
@@ -17,36 +18,34 @@ import {
   CheckCircle2,
   MessageSquare,
   RefreshCw,
+  Search,
+  MapPin,
 } from "lucide-react";
 import type { JobWithEmployer } from "@/lib/supabase/types";
+import { SectorCards } from "@/components/home/sector-cards";
 
 export const dynamic = "force-dynamic";
 
-const HOMEPAGE_SECTORS = [
-  "iGaming",
-  "Technology",
-  "Legal & Compliance",
-  "Finance & Banking",
-  "Marketing & Media",
-  "Retail & E-commerce",
-] as const;
-
 async function StatsSection() {
-  const supabase = await createClient();
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("status, salary_min, salary_max, expires_at")
-    .eq("status", "active")
-    .gte("expires_at", new Date().toISOString());
-
-  const salaryCoverage = deriveEmployerComplianceSummary((jobs || []) as Array<{
-    status: "active";
-    salary_min: number | null;
-    salary_max: number | null;
-  }>);
+  let activeJobs = 0;
+  try {
+    const supabase = await createClient();
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("status, salary_min, salary_max, expires_at")
+      .eq("status", "active")
+      .gte("expires_at", new Date().toISOString());
+    activeJobs = deriveEmployerComplianceSummary((jobs || []) as Array<{
+      status: "active";
+      salary_min: number | null;
+      salary_max: number | null;
+    }>).activeJobs;
+  } catch {
+    activeJobs = 0;
+  }
 
   const stats = [
-    { value: `${salaryCoverage.activeJobs} active roles`, note: "Updated daily", Icon: Building2 },
+    { value: activeJobs > 0 ? `${activeJobs} active roles` : "Live Malta roles", note: "Updated daily", Icon: Building2 },
     { value: "Salary visibility", note: "Clearer pay signals", Icon: Banknote },
     { value: "30-day freshness", note: "Expired roles drop off", Icon: Clock },
     { value: "Direct apply", note: "No middlemen", Icon: CheckCircle2 },
@@ -55,11 +54,11 @@ async function StatsSection() {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       {stats.map((s) => (
-        <div key={s.value} className="flex items-center gap-2 rounded-xl border border-border/40 bg-card/60 px-3 py-2.5 backdrop-blur sm:flex-col sm:items-start sm:gap-1 sm:px-4 sm:py-3.5">
-          <s.Icon className="h-4 w-4 shrink-0 text-primary sm:h-3.5 sm:w-3.5" />
+        <div key={s.value} className="flex items-center gap-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-2.5 backdrop-blur-sm sm:flex-col sm:items-start sm:gap-1.5 sm:px-4 sm:py-4">
+          <s.Icon className="h-4 w-4 shrink-0 text-[#141210] sm:h-3.5 sm:w-3.5" />
           <div className="min-w-0">
-            <p className="text-sm font-semibold leading-snug text-foreground sm:text-[0.8rem]">{s.value}</p>
-            <p className="text-[0.65rem] leading-tight text-muted-foreground sm:text-[0.65rem]">{s.note}</p>
+            <p className="text-sm font-semibold leading-snug text-[#141210] sm:text-[0.8rem]">{s.value}</p>
+            <p className="text-[0.65rem] leading-tight text-[#5b4f33] sm:text-[0.65rem]">{s.note}</p>
           </div>
         </div>
       ))}
@@ -68,21 +67,27 @@ async function StatsSection() {
 }
 
 async function LatestJobs() {
-  const supabase = await createClient();
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("*, employers(id, name, slug, logo_url, location)")
-    .eq("status", "active")
-    .gte("expires_at", new Date().toISOString())
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(12);
+  let jobs: JobWithEmployer[] | null = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("jobs")
+      .select("*, employers(id, name, slug, logo_url, location)")
+      .eq("status", "active")
+      .gte("expires_at", new Date().toISOString())
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(12);
+    jobs = data as unknown as JobWithEmployer[] | null;
+  } catch {
+    jobs = null;
+  }
 
   if (!jobs || jobs.length === 0) {
     return null;
   }
 
-  const typedJobs = jobs as unknown as JobWithEmployer[];
+  const typedJobs = jobs;
   const featuredJobs = typedJobs.filter((job) => job.is_featured);
   const standardJobs = typedJobs.filter((job) => !job.is_featured);
   const displayJobs = [
@@ -110,116 +115,112 @@ async function LatestJobs() {
   );
 }
 
-export default async function HomePage() {
+export default function HomePage() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden bg-harbor py-10 text-foreground sm:py-16 lg:py-20">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(30,99,255,0.24),transparent_28%),radial-gradient(circle_at_85%_12%,rgba(20,199,183,0.16),transparent_30%)]" />
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:px-8">
+      {/* Hero — vibrant sunlight yellow */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FFD93B] to-[#FFC400] py-20 sm:py-28">
+        <div aria-hidden className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-white/25 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-black/[0.06] blur-3xl" />
+        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <div className="animate-fade-in-up">
-            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Malta hiring signal
-            </div>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-[-0.055em] text-foreground sm:text-5xl lg:text-6xl">
-              Jobs with clearer signals.
+            <h1 className="mx-auto max-w-[16ch] text-5xl font-extrabold leading-[1.02] tracking-[-0.04em] text-[#141210] sm:text-6xl lg:text-7xl">
+              Find your next opportunity in Malta.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-              Impjieg helps candidates and employers move faster with salary, work-mode, employer, and freshness signals built into every role.
+            <p className="mx-auto mt-6 max-w-xl text-lg font-medium leading-8 text-[#3f3414] sm:text-xl">
+              Real salaries, clear work-mode, verified employers — Malta&apos;s tech, iGaming, finance and digital jobs, without the noise.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
-                <Link href="/jobs">
-                  <span className="flex items-center gap-2">
-                    Find roles
-                  </span>
-                </Link>
+            <form
+              action="/jobs"
+              method="GET"
+              role="search"
+              className="mx-auto mt-9 flex max-w-2xl flex-col gap-2 rounded-2xl border border-black/10 bg-white p-2 shadow-[0_22px_50px_-22px_rgba(20,18,16,0.5)] sm:flex-row sm:items-center sm:rounded-full"
+            >
+              <div className="flex flex-1 items-center gap-2.5 px-4 py-2.5">
+                <Search className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <input
+                  name="q"
+                  type="text"
+                  placeholder="Job title or keyword"
+                  aria-label="Job title or keyword"
+                  className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+              <div className="flex flex-1 items-center gap-2.5 px-4 py-2.5">
+                <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <input
+                  name="location"
+                  type="text"
+                  placeholder="Location in Malta"
+                  aria-label="Location"
+                  className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <Button
+                type="submit"
+                size="lg"
+                className="gap-2 bg-[#141210] text-white shadow-[0_10px_24px_-10px_rgba(20,18,16,0.6)] hover:bg-black sm:rounded-full"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+                Search
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
-                <Link href="/employer/post-job">
-                  <span className="flex items-center gap-2">
-                    Post a role
-                  </span>
+            </form>
+
+            <div className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-2 text-sm">
+              <span className="font-semibold text-[#3f3414]">Popular:</span>
+              {[
+                ["iGaming", "/jobs/sector/igaming"],
+                ["Technology", "/jobs/sector/technology"],
+                ["Finance", "/jobs/sector/finance-banking"],
+                ["Remote", "/jobs?workType=Remote"],
+              ].map(([label, href]) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="rounded-full border border-black/15 bg-white/60 px-3 py-1 font-semibold text-[#141210] transition-colors hover:bg-white"
+                >
+                  {label}
                 </Link>
-              </Button>
+              ))}
             </div>
 
-            <div className="mt-10">
-              <Suspense fallback={<Skeleton className="h-20 w-full max-w-md" />}>
+            <div className="mx-auto mt-12 max-w-3xl">
+              <Suspense fallback={<Skeleton className="h-16 w-full" />}>
                 <StatsSection />
               </Suspense>
             </div>
           </div>
-
-          <div className="animate-fade-in-up stagger-2">
-            <div className="rounded-[2rem] border border-border/30 bg-card/50 p-3 shadow-[0_28px_90px_rgba(11,18,32,0.15)] backdrop-blur sm:p-4">
-              <div className="rounded-[1.5rem] border border-border/30 bg-background/80 p-3 sm:p-4">
-                <div className="flex items-center justify-between border-b border-border pb-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Marketplace pulse</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">Live Malta roles</p>
-                  </div>
-                  <span className="rounded-full bg-lagoon/15 px-3 py-1 text-xs font-semibold text-lagoon">Updated</span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {[
-                    ["Product designer", "Sliema · Hybrid", "€42k–55k"],
-                    ["Compliance analyst", "St Julian's · On-site", "€36k–48k"],
-                    ["Senior React engineer", "Malta / EU · Remote", "€62k–78k"],
-                  ].map(([title, meta, salary]) => (
-                    <div key={title} className="flex items-center justify-between gap-3 rounded-2xl border border-border/30 bg-card/50 px-3 py-2.5">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-foreground">{title}</p>
-                        <p className="mt-0.5 text-sm text-muted-foreground">{meta}</p>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-primary">{salary}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 rounded-2xl border border-border/30 bg-card/50 p-3">
-                  <p className="text-sm font-semibold text-foreground">Marketplace search</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">Search live Malta roles. Results update automatically.</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    <span className="rounded-full bg-lagoon/15 px-2.5 py-0.5 text-xs font-semibold text-lagoon">Live signal</span>
-                    <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-0.5 text-xs font-semibold text-foreground">Explore</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Trusted by */}
-      <section className="border-y border-border bg-muted/30 py-6 sm:py-8">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              <span>Employer context</span>
-            </div>
-            <div className="hidden sm:block h-4 w-px bg-border" />
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-primary" />
-              <span>Salary transparency</span>
-            </div>
-            <div className="hidden sm:block h-4 w-px bg-border" />
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              <span>Fresh market signal</span>
-            </div>
+      {/* Trust strip — warm-black band, white font + yellow accents */}
+      <section className="bg-[#141210] py-7 text-white sm:py-9">
+        <Reveal className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 px-4 text-sm text-white/75 sm:flex-row sm:gap-8 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-[#FFC400]" />
+            <span>Employer context</span>
           </div>
-        </div>
+          <div className="hidden h-4 w-px bg-white/15 sm:block" />
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-[#FFC400]" />
+            <span>Salary transparency</span>
+          </div>
+          <div className="hidden h-4 w-px bg-white/15 sm:block" />
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-[#FFC400]" />
+            <span>Fresh market signal</span>
+          </div>
+        </Reveal>
       </section>
 
-      {/* Trust signals */}
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Built around clarity, speed, and trust</h2>
-            <p className="text-sm text-muted-foreground mt-1">Every role on Impjieg carries signals that help you decide faster</p>
+      {/* Built around clarity */}
+      <section className="py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Built around clarity, speed, and trust</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Every role on Impjieg carries signals that help you decide faster</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {[
@@ -231,9 +232,9 @@ export default async function HomePage() {
             ].map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.label} className="rounded-2xl border border-border bg-card p-5 text-center">
-                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                <div key={item.label} className="rounded-2xl border border-border bg-card p-5 text-center transition-transform duration-200 hover:-translate-y-1">
+                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-accent/20">
+                    <Icon className="h-5 w-5 text-[#141210]" />
                   </div>
                   <h3 className="mt-3 text-sm font-semibold text-foreground">{item.label}</h3>
                   <p className="mt-1 text-xs text-muted-foreground">{item.desc}</p>
@@ -241,155 +242,111 @@ export default async function HomePage() {
               );
             })}
           </div>
-        </div>
+        </Reveal>
       </section>
 
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="marketplace-panel rounded-[1.75rem] p-6 sm:p-8">
-              <p className="brand-eyebrow text-primary">
-                For employers
-              </p>
-              <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                Build a stronger Malta hiring pipeline without agency-level drag.
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm sm:text-base leading-7 text-muted-foreground">
-                Publish polished roles, surface salary and work-mode expectations, boost urgent vacancies, and review applicants from one clean employer workspace.
-              </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
-                  <Link href="/employer/post-job">
-                    Start Hiring
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                  <Link href="/pricing">
-                    View Pricing
-                  </Link>
-                </Button>
+      {/* For employers — warm-black band, white font + yellow accents */}
+      <section className="py-6 sm:py-10">
+        <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1f1a12] to-[#0c0a08] p-8 shadow-[0_28px_70px_-30px_rgba(12,10,8,0.6)] sm:p-12">
+            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#FFC400]">For employers</p>
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Build a stronger Malta hiring pipeline without agency-level drag.
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+                  Publish polished roles, surface salary and work-mode expectations, boost urgent vacancies, and review applicants from one clean employer workspace.
+                </p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Button asChild variant="primary" size="lg" className="w-full sm:w-auto">
+                    <Link href="/employer/post-job">Start hiring</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="w-full border-white/25 bg-white/10 text-white hover:bg-white/20 sm:w-auto">
+                    <Link href="/pricing">View pricing</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                {[
+                  { title: "Paid visibility", copy: "Give urgent roles stronger placement across the marketplace.", icon: TrendingUp },
+                  { title: "Screening support", copy: "Add candidate checks when a role needs a tighter shortlist.", icon: Shield },
+                  { title: "Hiring analytics", copy: "See what is getting views, clicks, and applications faster.", icon: Users },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                      <Icon className="h-5 w-5 text-[#FFC400]" />
+                      <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+                      <p className="mt-1.5 text-sm leading-6 text-white/65">{item.copy}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-              {[
-                {
-                  title: "Paid visibility",
-                  copy: "Give urgent roles stronger placement across the marketplace.",
-                  icon: TrendingUp,
-                },
-                {
-                  title: "Screening support",
-                  copy: "Add candidate checks when a role needs a tighter shortlist.",
-                  icon: Shield,
-                },
-                {
-                  title: "Hiring analytics",
-                  copy: "See what is getting views, clicks, and applications faster.",
-                  icon: Users,
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="marketplace-panel rounded-[1.5rem] p-5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="mt-4 text-base font-semibold text-foreground">{item.title}</h3>
-                    <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{item.copy}</p>
-                  </div>
-                );
-              })}
-            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Browse by Sector */}
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
+      <section className="py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Browse key sectors</h2>
-              <p className="text-sm text-muted-foreground mt-1">Focus on the industries that move Malta hiring forward</p>
+              <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Browse key sectors</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Focus on the industries that move Malta hiring forward</p>
             </div>
-            <Link href="/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              All sectors <ArrowRight className="inline h-3.5 w-3.5 ml-0.5" />
+            <Link href="/jobs" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              All sectors <ArrowRight className="ml-0.5 inline h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {HOMEPAGE_SECTORS.map((sector) => (
-              <Link
-                key={sector}
-                href={`/jobs?sector=${encodeURIComponent(sector)}`}
-                className="group rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card-hover hover:shadow-sm"
-              >
-                {sector}
-              </Link>
-            ))}
-          </div>
-        </div>
+          <SectorCards />
+        </Reveal>
       </section>
 
       {/* Latest Jobs */}
-      <section className="border-t border-border py-12 sm:py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <section className="border-t border-border py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LatestJobs />
           </Suspense>
-        </div>
+        </Reveal>
       </section>
 
       {/* Why Impjieg */}
-      <section className="border-t border-border bg-muted/30 py-12 sm:py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Why Impjieg</h2>
-            <p className="text-sm text-muted-foreground mt-1">Malta&apos;s hiring marketplace for salary, work-mode, and employer clarity</p>
+      <section className="border-t border-border bg-muted/40 py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Why Impjieg</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Malta&apos;s hiring marketplace for salary, work-mode, and employer clarity</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="marketplace-panel rounded-[1.35rem] p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Banknote className="h-5 w-5 text-primary" />
-              </div>
-              <h3 className="mt-3 text-base font-semibold text-foreground">
-                Salary clarity
-              </h3>
-              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Every listing shows a salary range up front, so candidates can judge fit before they apply.
-              </p>
-            </div>
-            <div className="marketplace-panel rounded-[1.35rem] p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Clock className="h-5 w-5 text-primary" />
-              </div>
-              <h3 className="mt-3 text-base font-semibold text-foreground">
-                Fresh listings
-              </h3>
-              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Jobs expire after 30 days, keeping the marketplace current and useful.
-              </p>
-            </div>
-            <div className="marketplace-panel rounded-[1.35rem] p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <h3 className="mt-3 text-base font-semibold text-foreground">
-                Direct applications
-              </h3>
-              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                Apply directly to employers. No middlemen, no hidden steps.
-              </p>
-            </div>
+            {[
+              { icon: Banknote, title: "Salary clarity", copy: "Every listing shows a salary range up front, so candidates can judge fit before they apply." },
+              { icon: Clock, title: "Fresh listings", copy: "Jobs expire after 30 days, keeping the marketplace current and useful." },
+              { icon: Users, title: "Direct applications", copy: "Apply directly to employers. No middlemen, no hidden steps." },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="rounded-[1.35rem] border border-border bg-card p-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/20">
+                    <Icon className="h-5 w-5 text-[#141210]" />
+                  </div>
+                  <h3 className="mt-3 text-base font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+                </div>
+              );
+            })}
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            <Card className="marketplace-panel p-6 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 mx-auto">
+            <Card className="p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-success/10">
                 <CheckCircle2 className="h-6 w-6 text-success" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">Verified employers</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Companies complete profile verification and post at least one live role.
                 Verified employers get a trust badge on their profile and job cards.
               </p>
@@ -397,24 +354,24 @@ export default async function HomePage() {
                 Get verified <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Card>
-            <Card className="marketplace-panel p-6 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto">
-                <RefreshCw className="h-6 w-6 text-primary" />
+            <Card className="p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
+                <RefreshCw className="h-6 w-6 text-[#141210]" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">30-day freshness</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Every job auto-expires after 30 days. Expired roles are removed from search, so you only see active opportunities.
               </p>
               <Link href="/jobs" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
                 Browse fresh roles <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Card>
-            <Card className="marketplace-panel p-6 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 mx-auto">
-                <TrendingUp className="h-6 w-6 text-warning" />
+            <Card className="p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
+                <TrendingUp className="h-6 w-6 text-[#141210]" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">Boosted placement</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Featured roles appear at the top of search and get priority in candidate alerts.
                 Add when posting or upgrade anytime from your dashboard.
               </p>
@@ -423,15 +380,15 @@ export default async function HomePage() {
               </Link>
             </Card>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-border py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Common questions</h2>
-            <p className="text-sm text-muted-foreground mt-1">Everything you need to know about Impjieg</p>
+      <section className="border-t border-border py-14 sm:py-20">
+        <Reveal className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Common questions</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Everything you need to know about Impjieg</p>
           </div>
           <dl className="space-y-4">
             {[
@@ -460,42 +417,40 @@ export default async function HomePage() {
                 a: "Impjieg focuses on tech, digital, iGaming, finance, legal, marketing, and related professional sectors in Malta. Remote and hybrid roles open to Malta-based candidates are also welcome.",
               },
             ].map((faq, idx) => (
-              <div key={idx} className="group rounded-xl border border-border/50 bg-background/50 p-5 hover:border-primary/30 transition-colors">
+              <div key={idx} className="group rounded-xl border border-border/60 bg-card p-5 transition-colors hover:border-accent">
                 <dt className="flex items-center justify-between gap-4 font-medium text-foreground">
                   {faq.q}
-                  <MessageSquare className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <MessageSquare className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-[#141210]" />
                 </dt>
-                <dd className="mt-3 text-sm text-muted-foreground leading-relaxed">{faq.a}</dd>
+                <dd className="mt-3 text-sm leading-relaxed text-muted-foreground">{faq.a}</dd>
               </div>
             ))}
           </dl>
-        </div>
+        </Reveal>
       </section>
 
-      {/* CTA - Single focused action for employers */}
-      <section className="relative overflow-hidden py-16 sm:py-20">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
-        <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            <Building2 className="h-6 w-6 text-primary" />
+      {/* CTA — vibrant yellow bookend */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FFD93B] to-[#FFC400] py-16 sm:py-20">
+        <div aria-hidden className="pointer-events-none absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-white/25 blur-3xl" />
+        <Reveal className="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#141210]">
+            <Building2 className="h-6 w-6 text-[#FFC400]" />
           </div>
-          <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-[#141210] sm:text-4xl">
             Hiring? Post roles that get seen.
           </h2>
-          <p className="mt-2 text-base text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-md text-base font-medium text-[#3f3414]">
             Reach Malta&apos;s best-fit candidates with salary clarity, stronger visibility, and a cleaner application flow.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Button asChild variant="primary" size="lg">
-              <Link href="/employer/post-job">
-                Start Hiring Free
-              </Link>
+            <Button asChild size="lg" className="bg-[#141210] text-white shadow-[0_10px_24px_-10px_rgba(20,18,16,0.6)] hover:bg-black">
+              <Link href="/employer/post-job">Start hiring free</Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
+          <p className="mt-4 text-xs font-medium text-[#3f3414]">
             First listing free · No card required · 30-day listing
           </p>
-        </div>
+        </Reveal>
       </section>
     </div>
   );

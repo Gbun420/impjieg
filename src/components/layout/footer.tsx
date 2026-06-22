@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
+import { ImpjiegLogo } from "@/components/brand";
 
 const jobSeekerLinks = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -24,27 +25,14 @@ const companyLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-[#08111F] text-white">
+    <footer className="border-t border-border bg-[#14110D] text-white">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-3" aria-label="Impjieg Homepage">
-              <img src="/logo-icon.svg" alt="" width={32} height={32} className="shrink-0" aria-hidden="true" />
-              <span className="flex flex-col leading-none">
-                <span className="font-display text-[1.05rem] font-semibold tracking-[-0.04em] text-white">
-                  {SITE.name}
-                </span>
-                <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/55">
-                  Hiring signal
-                </span>
-              </span>
-            </Link>
+            <ImpjiegLogo onDark />
             <p className="mt-3 text-sm leading-6 text-white/64">
               Malta&apos;s hiring marketplace for salary, work-mode, and employer clarity.
             </p>
-            <span className="mt-3 inline-flex rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#46D1BE]">
-              Malta hiring signal
-            </span>
           </div>
 
           <div>
@@ -106,7 +94,7 @@ export default function Footer() {
           <p>
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <p className="text-xs text-white/45">Jobs with clearer signals.</p>
+          <p className="text-xs text-white/45">Find your next opportunity.</p>
         </div>
       </div>
     </footer>
